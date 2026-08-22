@@ -1,3 +1,5 @@
+import ChatWidget from '@/components/chat-widget';
+import DarkModeToggle from '@/components/dark-mode-toggle';
 import LoadingScreen from '@/components/loading-screen';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,6 +125,15 @@ const PhoneIcon = () => (
     </svg>
 );
 
+const LinkedInIcon = () => (
+    <svg {...iconProps} width={18} height={18}>
+        <rect x="3" y="3" width="18" height="18" rx="3" />
+        <path d="M7.5 9.5v7M7.5 6.8v.01" />
+        <path d="M11.5 16.5v-4.2c0-1.3 1-2.3 2.3-2.3s2.2 1 2.2 2.3v4.2" />
+        <path d="M11.5 9.5v7" />
+    </svg>
+);
+
 /* Small award/medal icon for honors badges */
 const AwardIcon = () => (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -145,8 +156,6 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'about', label: 'About', icon: UserIcon },
     { id: 'projects', label: 'Projects', icon: GridIcon },
-    { id: 'skills', label: 'Skills', icon: CodeIcon },
-    { id: 'contact', label: 'Contact', icon: MailIcon },
 ];
 
 function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
@@ -231,6 +240,42 @@ type Project = {
 
 const PROJECTS: Project[] = [
     {
+        title: 'Nexus',
+        desc: 'A real-time messaging platform with AI-powered Smart Reply feature that suggests context-aware responses before you even start typing.',
+        tags: ['Laravel', 'Inertia.js', 'React', 'TypeScript', 'WebSockets', 'Tailwind CSS'],
+        images: ['/front4.png', '/left4.png'],
+        caseStudy: {
+            type: 'Personal Project',
+            coverImage: '/front4.png',
+            role: 'Full-Stack Developer',
+            duration: 'Ongoing',
+            team: 'Solo',
+            overview:
+                'Nexus is a full-stack messaging app built with Laravel and Inertia.js on the backend and React with TypeScript on the frontend. It supports one-on-one and group conversations, real-time delivery over WebSockets, and an AI-assisted Smart Reply feature that suggests responses based on conversation context.',
+            problem:
+                'Most chat tutorials stop at basic message sending. I wanted to build something closer to a production messaging product — with the social graph, media handling, and real-time UX polish that real apps like Messenger or WhatsApp actually need.',
+            features: [
+                'Friend requests with pending/accepted/declined states and a suggestions feed',
+                'One-on-one and group conversations with custom group names and avatars',
+                'Real-time message delivery, typing/read receipts, and online presence via broadcast channels',
+                'File, image, video, and voice-message attachments stored on S3-compatible object storage (Cloudflare R2)',
+                'Emoji reactions on messages with live-updating reaction counts',
+                'AI-generated Smart Reply suggestions based on the latest message in a thread',
+                'Fully responsive UI with dedicated mobile navigation and a dark, minimalist interface',
+            ],
+            myContributions: [
+                'Designed and built the full relational schema (users, friend requests, conversations, messages, attachments, reactions) in Laravel migrations',
+                'Implemented the friend request and conversation controllers, including group creation and per-user unread counts',
+                'Built the real-time layer using broadcast events (MessageSent, MessagesRead, ReactionUpdated, ConversationUpdated) over private and presence channels',
+                'Integrated Cloudflare R2 for avatar and attachment storage via a Laravel filesystem disk',
+                'Built the entire React/TypeScript frontend, including the message thread, reaction picker, voice recorder, and conversation info panel',
+                'Wired up the Smart Reply service to generate contextual reply suggestions from recent conversation history',
+            ],
+            outcome:
+                'A working, deployed messaging app with the core mechanics of a real chat product: friend graphs, group chats, media attachments, presence, and live updates — plus an AI layer that sets it apart from a typical CRUD chat clone.',
+        },
+    },
+    {
         title: 'Smart Pet Breed Identification System (Web & Mobile App)',
         desc: 'A deep learning system we trained ourselves to identify dog breeds from photos, giving instant breed insights. An admin portal supports continuous learning by correcting low-confidence scans, which are fed back into the dataset to retrain and improve the model.',
         tags: ['React', 'TypeScript', 'React Native (Expo)', 'Laravel', 'FastAPI', 'Python'],
@@ -239,7 +284,7 @@ const PROJECTS: Project[] = [
             type: 'Capstone Project',
             coverImage: '/coverimage.png',
             role: 'Fullstack Developer & ML Integration',
-            duration: '1 months',
+            duration: '3 weeks',
             team: 'Solo Dev',
             overview:
                 'A dog breed identification system built for both web and mobile, powered by a deep learning model we trained from scratch on a custom dataset. It classifies breeds from a single photo and returns instant insights — temperament, care needs, and common health notes.',
@@ -268,61 +313,69 @@ const PROJECTS: Project[] = [
         },
     },
     {
-        title: 'Project Two',
-        desc: 'An internal analytics dashboard pulling live data from multiple APIs into one clean, glanceable view.',
-        tags: ['TypeScript', 'REST API', 'Charts'],
-        images: ['https://picsum.photos/seed/proj2a/640/420', 'https://picsum.photos/seed/proj2b/640/420'],
+        title: 'Campus Asset Tracker',
+        desc: 'A role-based asset and maintenance management system with three dedicated portals — IT Admin, Technician, and Faculty/Staff — for tracking equipment, rooms, and repair tickets across campus.',
+        tags: ['Laravel', 'React', 'Inertia.js', 'TypeScript', 'Role-Based Access'],
+        images: ['/right2.png', '/left2.png', '/front2.png'],
         caseStudy: {
             type: 'Freelance Project',
-            coverImage: 'https://picsum.photos/seed/proj1-cover/1200/600',
+            coverImage: 'login.png',
             role: 'Fullstack Developer',
-            duration: '2 months',
+            duration: '2 weeks',
             team: 'Solo',
-            overview: 'A short overview of Project Two goes here.',
-            problem: 'A short description of the problem this project solved goes here.',
-            features: ['Feature one', 'Feature two', 'Feature three'],
-            myContributions: ['Built the frontend', 'Built the backend API'],
-            outcome: 'A short outcome/result statement goes here.',
+            overview:
+                'Campus Asset Tracker is a centralized system for managing school equipment, rooms, and maintenance requests. It replaces manual spreadsheets and paper-based ticket logs with a single platform, giving each user type — administrators, technicians, and faculty/staff — its own portal with access limited to exactly what their role needs.',
+            problem:
+                'The school had no unified way to track equipment across departments, rooms, and labs. Assets went missing or unaccounted for, maintenance requests were scattered across emails and verbal reports, and there was no visibility into who was responsible for fixing what. Faculty had no way to report issues or check status without contacting IT directly.',
+            features: [
+                'Three role-based portals: IT Admin, Technician, and Faculty/Staff, each with a tailored sidebar and permission set',
+                'Full asset lifecycle tracking — add, update, retire, and assign equipment to rooms and departments',
+                'Maintenance ticket system with status tracking, technician assignment, and comment threads',
+                'Real-time notifications for new tickets, asset updates, and status changes',
+                'Department and room/lab management for organizing assets by physical location',
+                'Reporting dashboard with asset and ticket analytics for admins',
+            ],
+            myContributions: [
+                'Designed and built the entire Laravel backend, including role-based route gates and permission logic',
+                'Built the React + Inertia.js frontend for all three portals with a shared, reusable component system',
+                'Implemented the maintenance ticket workflow, from submission to technician assignment to resolution',
+                'Set up the notification system to keep admins and faculty updated on ticket and asset changes',
+            ],
+            outcome:
+                'The system gave the school a single source of truth for equipment and maintenance, cutting down on lost assets and untracked repair requests. Faculty can now report issues directly and see progress in real time, while IT admins get full visibility and reporting across every department and room.',
         },
     },
     {
-        title: 'Project Three',
-        desc: 'A design-system-driven storefront focused on speed and accessibility across devices.',
-        tags: ['Design Systems', 'Next.js', 'Tailwind'],
-        images: [
-            'https://picsum.photos/seed/proj3a/640/420',
-            'https://picsum.photos/seed/proj3b/640/420',
-            'https://picsum.photos/seed/proj3c/640/420',
-        ],
+        title: 'Dental Appointment System',
+        desc: 'A full-stack booking platform for a dental clinic, with public appointment scheduling and role-based dashboards for staff and admins.',
+        tags: ['Laravel', 'React', 'TypeScript', 'Sanctum Auth', 'TanStack Query'],
+        images: ['left3.png', 'front3.png'],
         caseStudy: {
             type: 'Freelance Project',
-            coverImage: 'https://picsum.photos/seed/proj1-cover/1200/600',
-            role: 'Frontend Developer',
-            duration: '1.5 months',
+            coverImage: 'front3.png',
+            role: 'Fullstack Developer',
+            duration: '2 weeks',
             team: 'Solo',
-            overview: 'A short overview of Project Three goes here.',
-            problem: 'A short description of the problem this project solved goes here.',
-            features: ['Feature one', 'Feature two', 'Feature three'],
-            myContributions: ['Built the component library', 'Implemented the storefront UI'],
-            outcome: 'A short outcome/result statement goes here.',
-        },
-    },
-    {
-        title: 'Project Four',
-        desc: 'A cross-platform mobile app for field teams, with offline-first sync and a simplified UX for non-technical users.',
-        tags: ['React Native', 'Mobile', 'UX'],
-        images: ['https://picsum.photos/seed/proj4a/640/420', 'https://picsum.photos/seed/proj4b/640/420'],
-        caseStudy: {
-            type: 'Internship Project',
-            coverImage: 'https://picsum.photos/seed/proj1-cover/1200/600',
-            role: 'Mobile Developer',
-            duration: '3 months',
-            team: '4 members',
-            overview: 'A short overview of Project Four goes here.',
-            problem: 'A short description of the problem this project solved goes here.',
-            features: ['Feature one', 'Feature two', 'Feature three'],
-            myContributions: ['Built the offline sync logic', 'Designed the field-team UX'],
-            outcome: 'A short outcome/result statement goes here.',
+            overview:
+                'A booking and clinic-management system for a dental practice, letting patients book appointments online without an account while giving staff and admins a dashboard to manage dentists, services, patients, and schedules.',
+            problem:
+                'The clinic relied on phone calls and walk-ins to schedule appointments, with no central system to track dentist availability, service types, or patient history. Staff had no easy way to manage appointments or onboard new team members, and there was no self-service option for patients to book on their own.',
+            features: [
+                'Public booking flow — patients can view available slots and book appointments with no account required',
+                'Role-based access for Staff and Admin, each with permissions scoped to their responsibilities',
+                'Dentist and service management, including specialties, ratings, and experience',
+                'Patient records with staff-added notes for tracking history across visits',
+                'Google OAuth sign-in for staff and admins — no separate password to manage',
+                'Notification system to keep staff updated on new and changed appointments',
+            ],
+            myContributions: [
+                'Built the Laravel API backend, including Sanctum authentication, role-based route middleware, and request validation',
+                'Built the React frontend for both the public booking flow and the internal staff/admin dashboards',
+                'Implemented Google OAuth login alongside standard email/password authentication',
+                'Set up data fetching and caching with TanStack Query for a fast, low-friction admin experience',
+            ],
+            outcome:
+                'The clinic moved from manual, phone-based scheduling to a self-service booking system, reducing front-desk workload while giving staff a single place to manage dentists, patients, and appointments.',
         },
     },
 ];
@@ -334,48 +387,103 @@ const CheckIcon = () => (
 );
 
 function ProjectCaseStudyDialog({ project, open, onOpenChange }: { project: Project | null; open: boolean; onOpenChange: (v: boolean) => void }) {
+    // Drag-to-dismiss state for the mobile bottom-sheet behavior. These hooks must
+    // run on every render (including while `project` is null), so they're declared
+    // before the early-return below.
+    const [dragY, setDragY] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartY = useRef(0);
+
+    // While the sheet is open on mobile, hide the floating dock/chat widget so
+    // nothing overlaps the sheet — mirrors how a native bottom sheet takes over.
+    useEffect(() => {
+        document.body.classList.toggle('sheet-open', open);
+        return () => document.body.classList.remove('sheet-open');
+    }, [open]);
+
     if (!project) return null;
     const cs = project.caseStudy;
 
+    const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (window.innerWidth > 820) return; // only a bottom sheet on mobile
+        setIsDragging(true);
+        dragStartY.current = e.clientY;
+        e.currentTarget.setPointerCapture(e.pointerId);
+    };
+    const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!isDragging) return;
+        const delta = e.clientY - dragStartY.current;
+        if (delta > 0) setDragY(delta);
+    };
+    const handlePointerUp = () => {
+        if (!isDragging) return;
+        setIsDragging(false);
+        if (dragY > 110) {
+            onOpenChange(false); // dragged past the threshold — swipe to dismiss
+        }
+        setDragY(0);
+    };
+
+    // On mobile the sheet is pinned to the bottom via CSS (`.case-study-sheet`).
+    // That override clears the default Radix centering transform (see the
+    // `transform: none !important` rule below) — so this inline style only
+    // needs to handle the live drag offset; when idle we intentionally emit
+    // no inline transform so the CSS rule stays in control.
+    const dragStyle = dragY || isDragging ? { transform: `translate3d(0, ${dragY}px, 0)`, transition: 'none' } : undefined;
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[88vh] overflow-y-auto rounded-[24px] p-0 sm:max-w-[720px]">
+            <DialogContent className="case-study-sheet max-h-[88vh] overflow-y-auto rounded-[24px] p-0 sm:max-w-[720px]" style={dragStyle}>
+                {/* Drag handle — swipe down from here to close on mobile */}
+                <div
+                    className="sheet-drag-handle"
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
+                >
+                    <span className="sheet-drag-bar" aria-hidden="true" />
+                </div>
                 {/* Header image strip */}
-                <div className="relative h-[200px] w-full overflow-hidden bg-[#F3EFE9] sm:h-[240px]">
+                <div className="relative h-[200px] w-full overflow-hidden bg-[#F3EFE9] sm:h-[240px] dark:bg-neutral-800">
                     <img src={cs.coverImage} alt="" className="h-full w-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-                    <span className="absolute top-4 left-6 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold tracking-[0.1em] text-[#101010] uppercase backdrop-blur-sm">
+                    <span className="absolute top-4 left-6 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold tracking-[0.1em] text-[#101010] uppercase backdrop-blur-sm dark:bg-neutral-900/85 dark:text-neutral-100">
                         {cs.type}
                     </span>
                 </div>
 
                 <div className="px-6 py-6 sm:px-8 sm:py-8">
                     <DialogHeader className="items-start text-left">
-                        <DialogTitle className="text-[1.5rem] leading-tight font-semibold tracking-tight text-[#101010] sm:text-[1.75rem]">
+                        <DialogTitle className="text-[1.5rem] leading-tight font-semibold tracking-tight text-[#101010] sm:text-[1.75rem] dark:text-neutral-50">
                             {project.title}
                         </DialogTitle>
-                        <DialogDescription className="mt-2 text-[15px] leading-relaxed text-[#4b4b4b]">{cs.overview}</DialogDescription>
+                        <DialogDescription className="mt-2 text-[15px] leading-relaxed text-[#4b4b4b] dark:text-neutral-400">
+                            {cs.overview}
+                        </DialogDescription>
                     </DialogHeader>
 
                     {/* Meta row */}
-                    <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-[var(--hair)] bg-[#FAF9F7] p-4">
+                    <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-[var(--hair)] bg-[#FAF9F7] p-4 dark:bg-neutral-900">
                         <div>
-                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase">Role</p>
-                            <p className="mt-1 text-sm font-medium text-[#101010]">{cs.role}</p>
+                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase dark:text-neutral-400">Role</p>
+                            <p className="mt-1 text-sm font-medium text-[#101010] dark:text-neutral-100">{cs.role}</p>
                         </div>
                         <div>
-                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase">Duration</p>
-                            <p className="mt-1 text-sm font-medium text-[#101010]">{cs.duration}</p>
+                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase dark:text-neutral-400">Duration</p>
+                            <p className="mt-1 text-sm font-medium text-[#101010] dark:text-neutral-100">{cs.duration}</p>
                         </div>
                         <div>
-                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase">Team</p>
-                            <p className="mt-1 text-sm font-medium text-[#101010]">{cs.team}</p>
+                            <p className="text-[10px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase dark:text-neutral-400">Team</p>
+                            <p className="mt-1 text-sm font-medium text-[#101010] dark:text-neutral-100">{cs.team}</p>
                         </div>
                     </div>
 
                     {/* Tech stack */}
                     <div className="mt-6">
-                        <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase">Tech Stack</p>
+                        <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase dark:text-neutral-400">
+                            Tech Stack
+                        </p>
                         <div className="flex flex-wrap gap-2">
                             {project.tags.map((t) => (
                                 <span key={t} className="tag">
@@ -387,17 +495,19 @@ function ProjectCaseStudyDialog({ project, open, onOpenChange }: { project: Proj
 
                     {/* Problem */}
                     <div className="mt-6">
-                        <p className="mb-2 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase">The Problem</p>
-                        <p className="text-[14.5px] leading-relaxed text-[#4b4b4b]">{cs.problem}</p>
+                        <p className="mb-2 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase dark:text-neutral-400">The Problem</p>
+                        <p className="text-[14.5px] leading-relaxed text-[#4b4b4b] dark:text-neutral-400">{cs.problem}</p>
                     </div>
 
                     {/* Features */}
                     <div className="mt-6">
-                        <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase">Key Features</p>
+                        <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase dark:text-neutral-400">
+                            Key Features
+                        </p>
                         <ul className="flex flex-col gap-2">
                             {cs.features.map((f) => (
-                                <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-[#101010]">
-                                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#101010] text-white">
+                                <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-[#101010] dark:text-neutral-100">
+                                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#101010] text-white dark:bg-neutral-100 dark:text-neutral-900">
                                         <CheckIcon />
                                     </span>
                                     {f}
@@ -408,11 +518,13 @@ function ProjectCaseStudyDialog({ project, open, onOpenChange }: { project: Proj
 
                     {/* Contributions */}
                     <div className="mt-6">
-                        <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase">My Contributions</p>
+                        <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase dark:text-neutral-400">
+                            Responsibilities
+                        </p>
                         <ul className="flex flex-col gap-2">
                             {cs.myContributions.map((c) => (
-                                <li key={c} className="flex items-start gap-2.5 text-[14.5px] text-[#4b4b4b]">
-                                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#101010]" />
+                                <li key={c} className="flex items-start gap-2.5 text-[14.5px] text-[#4b4b4b] dark:text-neutral-400">
+                                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#101010] dark:bg-neutral-100" />
                                     {c}
                                 </li>
                             ))}
@@ -420,9 +532,9 @@ function ProjectCaseStudyDialog({ project, open, onOpenChange }: { project: Proj
                     </div>
 
                     {/* Outcome */}
-                    <div className="mt-6 rounded-2xl bg-[#101010] p-5 text-white">
-                        <p className="mb-1.5 text-[11px] font-semibold tracking-[0.16em] text-white/60 uppercase">Outcome</p>
-                        <p className="text-[14.5px] leading-relaxed text-white/90">{cs.outcome}</p>
+                    <div className="mt-6 rounded-2xl bg-[#101010] p-5 text-white dark:bg-neutral-100 dark:text-neutral-900">
+                        <p className="mb-1.5 text-[11px] font-semibold tracking-[0.16em] text-white/60 uppercase dark:text-neutral-900/60">Outcome</p>
+                        <p className="text-[14.5px] leading-relaxed text-white/90 dark:text-neutral-900/90">{cs.outcome}</p>
                     </div>
                 </div>
             </DialogContent>
@@ -443,9 +555,9 @@ const ChevronRightIcon = () => (
 
 function ProjectCard({ project, onViewCaseStudy }: { project: Project; onViewCaseStudy: () => void }) {
     return (
-        <div className="flex h-full flex-col overflow-hidden rounded-[24px] border border-[var(--hair)] bg-white">
+        <div className="flex h-full flex-col overflow-hidden rounded-[24px] border border-[var(--hair)] bg-white dark:bg-neutral-900">
             {/* Stacked screenshot mockups */}
-            <div className="relative h-[260px] w-full overflow-hidden bg-[#F3EFE9] md:h-[320px]">
+            <div className="relative h-[260px] w-full overflow-hidden bg-[#F3EFE9] md:h-[320px] dark:bg-neutral-800">
                 {project.images.map((src, i) => {
                     const offsets = [
                         { top: '4%', left: '2%', rotate: '-6deg', z: 1, w: '68%' },
@@ -546,13 +658,9 @@ function ProjectsCarousel() {
                                 {/* Edge overlay hinting more content ahead, only on neighbors */}
                                 {isNeighbor && (
                                     <div
-                                        className="pointer-events-none absolute inset-0 rounded-[24px]"
-                                        style={{
-                                            background:
-                                                offset < 0
-                                                    ? 'linear-gradient(to left, transparent 55%, rgba(255,255,255,0.85) 100%)'
-                                                    : 'linear-gradient(to right, transparent 55%, rgba(255,255,255,0.85) 100%)',
-                                        }}
+                                        className={`pointer-events-none absolute inset-0 rounded-[24px] ${
+                                            offset < 0 ? 'carousel-edge-fade-left' : 'carousel-edge-fade-right'
+                                        }`}
                                     />
                                 )}
                             </div>
@@ -566,7 +674,7 @@ function ProjectsCarousel() {
                 type="button"
                 onClick={prev}
                 aria-label="Previous project"
-                className="absolute top-1/2 left-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] md:left-6"
+                className="absolute top-1/2 left-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] md:left-6 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
             >
                 <ChevronLeftIcon />
             </button>
@@ -574,7 +682,7 @@ function ProjectsCarousel() {
                 type="button"
                 onClick={next}
                 aria-label="Next project"
-                className="absolute top-1/2 right-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] md:right-6"
+                className="absolute top-1/2 right-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] md:right-6 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
             >
                 <ChevronRightIcon />
             </button>
@@ -590,7 +698,7 @@ function ProjectsCarousel() {
                         className="h-2 rounded-full transition-all"
                         style={{
                             width: i === index ? '22px' : '8px',
-                            backgroundColor: i === index ? '#101010' : 'rgba(0,0,0,0.18)',
+                            backgroundColor: i === index ? 'var(--ink)' : 'var(--hair)',
                         }}
                     />
                 ))}
@@ -605,6 +713,24 @@ export default function Welcome() {
     const [active, setActive] = useState('home');
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
+    const [copiedLabel, setCopiedLabel] = useState<string | null>(null);
+
+    const handleContactClick = async (e: React.MouseEvent, item: { label: string; href: string; value: string }) => {
+        // Only intercept Email — let Messenger/Phone behave as normal links
+        if (item.label !== 'Email') return;
+
+        e.preventDefault();
+        const email = item.value;
+
+        try {
+            await navigator.clipboard.writeText(email);
+            setCopiedLabel(item.label);
+            setTimeout(() => setCopiedLabel(null), 2000);
+        } catch {
+            // Clipboard blocked — fall back to mailto
+            window.location.href = item.href;
+        }
+    };
     useEffect(() => {
         const spy = new IntersectionObserver(
             (entries) => {
@@ -798,21 +924,21 @@ export default function Welcome() {
     const CONTACT_POINTS = [
         {
             label: 'Email',
-            value: 'dave.clapis@gmail.com',
-            href: 'mailto:dave.clapis@gmail.com',
+            value: 'clapisdave8@gmail.com',
+            href: 'https://mail.google.com/mail/?view=cm&fs=1&to=clapisdave8@gmail.com&su=Portfolio%20Inquiry',
             icon: MailIcon,
         },
         {
             label: 'Chat on Messenger',
             value: 'm.me/dave.clapis',
-            href: 'https://m.me/dave.clapis',
+            href: 'https://web.facebook.com/dave.michael.beltran.clapis',
             icon: ChatIcon,
         },
         {
-            label: "Let's talk",
-            value: 'Schedule a quick call',
-            href: 'tel:+639000000000',
-            icon: PhoneIcon,
+            label: 'LinkedIn',
+            value: 'linkedin.com/in/dave-michael-clapis',
+            href: 'https://www.linkedin.com/in/dave-michael-clapis-932444374/',
+            icon: LinkedInIcon,
         },
     ];
 
@@ -835,19 +961,31 @@ export default function Welcome() {
                     --ink: #101010;
                     --muted: #5c5a56;
                     --hair: rgba(0,0,0,0.09);
+                    --dock-space: 6.75rem;   /* space the fixed side dock reserves on desktop */
+                    --dock-space-mobile: 5.5rem; /* space the fixed bottom dock reserves on mobile */
                 }
+                :root.dark {
+                    --bg: #0a0a0a;
+                    --ink: #f5f5f5;
+                    --muted: #a1a1a1;
+                    --hair: rgba(255,255,255,0.12);
+                }
+                *, *::before, *::after { box-sizing: border-box; }
                 .portfolio-root {
                     background: var(--bg);
                     color: var(--ink);
                     min-height: 100vh;
+                    width: 100%;
+                    overflow-x: hidden;
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+                    transition: background-color .3s ease, color .3s ease;
                 }
 
-                /* ---------- Liquid glass dock ---------- */
+                                /* ---------- Liquid glass dock ---------- */
                 .liquid-dock {
                     position: fixed;
                     z-index: 50;
-                    left: 22px;
+                    left: 1.375rem;
                     top: 50%;
                     transform: translateY(-50%);
                 }
@@ -859,75 +997,81 @@ export default function Welcome() {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    gap: 12px;
-                    width: 64px;
-                    padding: 10px 0 12px;
-                   
-                    border-radius: 22px;
-                    background: rgba(255,255,255,0.7);
-                    border: 1px solid rgba(0,0,0,0.08);
-                    backdrop-filter: blur(22px) saturate(140%);
-                    -webkit-backdrop-filter: blur(22px) saturate(140%);
-                    box-shadow: 0 18px 44px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+                    gap: 0.75rem;
+                    width: 4rem;
+                    padding: 0.625rem 0 0.75rem;
+
+                    border-radius: 1.75rem;
+                    background: rgba(255,255,255,0.28);
+                    border: 1px solid rgba(255,255,255,0.5);
+                    backdrop-filter: blur(28px) saturate(180%);
+                    -webkit-backdrop-filter: blur(28px) saturate(180%);
+                    box-shadow:
+                        0 22px 50px rgba(0,0,0,0.14),
+                        0 4px 14px rgba(0,0,0,0.07),
+                        inset 0 1px 0 rgba(255,255,255,0.8);
                     overflow: visible;
+                    transition: background-color .3s ease, border-color .3s ease;
+                }
+                @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+                    .liquid-dock-glass {
+                        background: rgba(250,250,250,0.92);
+                    }
+                    :root.dark .liquid-dock-glass {
+                        background: rgba(30,30,30,0.92);
+                    }
+                }
+                :root.dark .liquid-dock-glass {
+                    background: rgba(255,255,255,0.10);
+                    border: 1px solid rgba(255,255,255,0.18);
+                    box-shadow:
+                        0 22px 50px rgba(0,0,0,0.5),
+                        0 4px 14px rgba(0,0,0,0.3),
+                        inset 0 1px 0 rgba(255,255,255,0.22);
                 }
                 .liquid-dock-glass::before {
                     content: '';
                     position: absolute;
                     inset: 0;
-                    border-radius: 22px;
+                    border-radius: 1.75rem;
                     pointer-events: none;
                     opacity: var(--glow);
                     transition: opacity .35s ease;
-                    background: radial-gradient(90px 90px at var(--mx) var(--my), rgba(0,0,0,0.06), transparent 65%);
+                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.35), transparent 65%);
                 }
-
-                .dock-mark {
-                    width: 42px;
-                    height: 42px;
-                    border-radius: 13
-                    background: var(--ink);
-                    color: #fff;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 12px;
-                    font-weight: 700;
-                    letter-spacing: .02em;
-                    flex-shrink: 0;
+                :root.dark .liquid-dock-glass::before {
+                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.18), transparent 65%);
                 }
-
-                .dock-divider {
-                    width: 26px;
+                .liquid-dock-glass::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 10%;
+                    right: 10%;
                     height: 1px;
-                    background: var(--hair);
-                    margin: 4px 0 2px;
-                    flex-shrink: 0;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+                    pointer-events: none;
                 }
-
+                :root.dark .liquid-dock-glass::after {
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                }
                 .dock-group {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    gap: 10px;
+                    gap: 0.625rem;
                 }
-
-                /* Empty block at the base of the pill — this is what makes the
-                   capsule read as tall/deliberate rather than shrink-wrapped
-                   to the last icon. Scales with the item count above it. */
                 .dock-spacer {
-                    width: 4px;
-                    height: 154px;
+                    width: 0.25rem;
+                    height: 9.625rem;
                     border-radius: 999px;
-                    margin-top: 6px;
-                   
+                    margin-top: 0.375rem;
                     flex-shrink: 0;
                 }
-
                 .dock-item {
                     position: relative;
-                    width: 44px;
-                    height: 44px;
+                    width: 2.75rem;
+                    height: 2.75rem;
                     border-radius: 33%;
                     display: flex;
                     align-items: center;
@@ -939,22 +1083,28 @@ export default function Welcome() {
                     transition: transform .4s cubic-bezier(.34,1.56,.64,1),
                                 background-color .3s ease, color .3s ease;
                 }
+                :root.dark .dock-item { color: #a1a1a1; }
                 .dock-item:hover { color: var(--ink); background: rgba(0,0,0,0.05); }
+                :root.dark .dock-item:hover { background: rgba(255,255,255,0.08); }
                 .dock-item.active {
-                    background: var(--ink);
-                    color: #ffffff;
+                    background: rgba(16,16,16,0.85);
+                    color: #fff;
+                }
+                :root.dark .dock-item.active {
+                    background: rgba(255,255,255,0.9);
+                    color: #101010;
                 }
                 .dock-tooltip {
                     position: absolute;
-                    left: 58px;
+                    left: 3.625rem;
                     top: 50%;
                     transform: translateY(-50%) translateX(-6px);
-                    background: #ffffff;
+                    background: var(--bg);
                     color: var(--ink);
                     border: 1px solid rgba(0,0,0,0.1);
-                    padding: 6px 12px;
-                    border-radius: 8px;
-                    font-size: 12px;
+                    padding: 0.375rem 0.75rem;
+                    border-radius: 0.5rem;
+                    font-size: 0.75rem;
                     font-weight: 500;
                     letter-spacing: .01em;
                     white-space: nowrap;
@@ -963,6 +1113,10 @@ export default function Welcome() {
                     pointer-events: none;
                     transition: opacity .2s ease, transform .2s ease;
                 }
+                :root.dark .dock-tooltip {
+                    border: 1px solid rgba(255,255,255,0.12);
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+                }
                 .dock-item:hover .dock-tooltip {
                     opacity: 1;
                     transform: translateY(-50%) translateX(0);
@@ -970,33 +1124,42 @@ export default function Welcome() {
 
                 @media (max-width: 820px) {
                     .liquid-dock {
-                        left: 0; right: 0; top: auto; bottom: 18px;
+                        left: 0; right: 0; top: auto; bottom: 1.125rem;
                         transform: none;
                         display: flex;
                         justify-content: center;
-                        padding: 0 16px;
+                        padding: 0 1rem;
                     }
                     .liquid-dock-glass {
                         flex-direction: row;
                         width: auto;
-                        padding: 9px 16px;
+                        padding: 0.5625rem 1rem;
                     }
-                    .dock-divider { width: 1px; height: 22px; margin: 0 4px; }
                     .dock-group { flex-direction: row; }
                     .dock-spacer { display: none; }
                     .dock-tooltip { display: none; }
                 }
 
+                @media (max-width: 380px) {
+                    .liquid-dock { bottom: 0.875rem; padding: 0 0.75rem; }
+                    .liquid-dock-glass { padding: 0.5rem 0.75rem; gap: 0.5rem; }
+                    .dock-item { width: 2.5rem; height: 2.5rem; }
+                }
+
                 /* ---------- Layout / sections ---------- */
                 .portfolio-main {
-                    margin-left: 108px;
+                    margin-left: var(--dock-space);
+                    min-width: 0;
                 }
                 @media (max-width: 820px) {
-                    .portfolio-main { margin-left: 0; }
+                    .portfolio-main {
+                        margin-left: 0;
+                        padding-bottom: var(--dock-space-mobile);
+                    }
                 }
                 .section {
                     min-height: 100vh;
-                    padding: 7rem 8vw 5rem;
+                    padding: 7rem 6vw 5rem;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -1006,24 +1169,87 @@ export default function Welcome() {
                     transition: opacity .7s ease, transform .7s ease;
                 }
                 .section.in-view { opacity: 1; transform: translateY(0); }
+                @media (max-width: 820px) {
+                    .section { padding: 5.5rem 5.5vw 3.5rem; min-height: auto; }
+                }
+                @media (max-width: 480px) {
+                    .section { padding: 4.5rem 5vw 3rem; }
+                }
+                /* Home is the only section that should hug the very top of the
+                   viewport — the dark-mode toggle floats over its cover image
+                   as a pure overlay, so no reserved top padding is needed for it. */
+                .home-section {
+                    justify-content: flex-start;
+                    padding-top: 7rem;
+                }
+                @media (max-width: 820px) {
+                    .home-section { padding-top: 0; }
+                }
+                @media (max-width: 480px) {
+                    .home-section { padding-top: 0; }
+                }
+
+                /* ---------- Home cover — Facebook-profile style on mobile ----------
+                   Bleeds edge-to-edge (no side gutters, no rounded corners) by
+                   cancelling out the section's own horizontal padding. On tablet/
+                   desktop it stays a normal rounded, padded panel. */
+                .home-cover {
+                    width: 100%;
+                    height: 160px;
+                    overflow: hidden;
+                    background: #F3EFE9;
+                    border-radius: 28px;
+                }
+                :root.dark .home-cover { background: #262626; }
+                @media (max-width: 820px) {
+                    .home-cover {
+                        margin-left: -5.5vw;
+                        margin-right: -5.5vw;
+                        width: calc(100% + 11vw);
+                        border-radius: 0;
+                        height: 190px;
+                    }
+                }
+                @media (max-width: 480px) {
+                    .home-cover {
+                        margin-left: -5vw;
+                        margin-right: -5vw;
+                        width: calc(100% + 10vw);
+                        height: 170px;
+                    }
+                }
+                @media (min-width: 821px) and (max-width: 1023px) {
+                    .home-cover { height: 220px; }
+                }
+                @media (min-width: 1024px) {
+                    .home-cover { height: 340px; border-radius: 2rem; }
+                }
+
                 .eyebrow {
-                    font-size: 12px;
+                    font-size: 0.75rem;
                     letter-spacing: .16em;
                     text-transform: uppercase;
                     color: var(--muted);
                     margin-bottom: 1.1rem;
                 }
                 .h1 {
-                    font-size: clamp(2.4rem, 6vw, 5rem);
-                    line-height: 1.02;
+                    font-size: clamp(2.2rem, 6vw, 5rem);
+                    line-height: 1.05;
                     font-weight: 600;
                     letter-spacing: -0.02em;
                 }
                 .h2 {
-                    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+                    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
                     font-weight: 600;
                     letter-spacing: -0.01em;
-                    margin-bottom: 2.2rem;
+                    margin-bottom: 0.75rem;
+                }
+                .section-intro {
+                    color: var(--muted);
+                    font-size: clamp(0.9rem, 1.2vw, 1rem);
+                    max-width: 56ch;
+                    line-height: 1.6;
+                    margin-bottom: 1.75rem;
                 }
                 .lead {
                     color: var(--muted);
@@ -1040,7 +1266,8 @@ export default function Welcome() {
                     transition: background-color .35s ease;
                 }
                 .card:hover { background: rgba(0,0,0,0.02); }
-                .card-title { font-size: 1.15rem; font-weight: 600; margin-bottom: .6rem; }
+                :root.dark .card:hover { background: rgba(255,255,255,0.03); }
+                .card-title { font-size: 1.15rem; font-weight: 600; margin-bottom: .6rem; color: var(--ink); }
                 .card-desc { color: var(--muted); font-size: .92rem; line-height: 1.55; }
                 .tag-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.2rem; }
                 .tag {
@@ -1058,7 +1285,7 @@ export default function Welcome() {
                     padding: 1.1rem 0;
                     border-bottom: 1px solid var(--hair);
                 }
-                .skill-name { font-size: 1.05rem; font-weight: 500; }
+                .skill-name { font-size: 1.05rem; font-weight: 500; color: var(--ink); }
                 .skill-note { color: var(--muted); font-size: .85rem; }
                 .contact-link {
                     display: inline-flex;
@@ -1075,7 +1302,11 @@ export default function Welcome() {
                 .foot {
                     color: var(--muted);
                     font-size: .8rem;
-                    padding: 2rem 8vw;
+                    padding: 2rem 6vw calc(2rem + var(--dock-space-mobile));
+                    text-align: center;
+                }
+                @media (min-width: 821px) {
+                    .foot { padding: 2rem 6vw; text-align: left; }
                 }
 
                 /* Honors badges under education entries */
@@ -1087,15 +1318,202 @@ export default function Welcome() {
                     padding: 3px 9px;
                     border-radius: 999px;
                     background: rgba(16,16,16,0.06);
-                    color: #101010;
+                    color: var(--ink);
                     font-size: 13px;
                     font-weight: 600;
                     letter-spacing: .01em;
+                }
+                :root.dark .honor-badge {
+                    background: rgba(255,255,255,0.08);
+                }
+
+                /* Carousel neighbor edge fade, theme-aware */
+                .carousel-edge-fade-left {
+                    background: linear-gradient(to left, transparent 55%, var(--bg) 100%);
+                    opacity: 0.85;
+                }
+                .carousel-edge-fade-right {
+                    background: linear-gradient(to right, transparent 55%, var(--bg) 100%);
+                    opacity: 0.85;
+                }
+
+                /* ---------- Floating liquid glass dark mode toggle ---------- */
+                .glass-toggle-dock {
+                    position: fixed;
+                    top: 1.375rem;
+                    right: 1.375rem;
+                    z-index: 60;
+                }
+
+                .glass-toggle-btn {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 3.25rem;
+                    height: 3.25rem;
+                    border-radius: 1.125rem;
+
+                    /* Always a solid white pill, regardless of light/dark theme —
+                       only the icon inside swaps, the button itself never flips
+                       to black. */
+                    background: #ffffff;
+                    border: 1px solid rgba(16,16,16,0.1);
+                    box-shadow:
+                        0 18px 44px rgba(0, 0, 0, 0.16),
+                        0 2px 8px rgba(0, 0, 0, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+                    color: #101010;
+                    cursor: pointer;
+                    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, color 0.3s ease;
+                }
+
+                .glass-toggle-btn:hover {
+                    transform: scale(1.06);
+                    background: #f5f5f5;
+                }
+
+                /* Dark mode ON: still a white pill — only border/shadow tuned so it
+                   still reads clearly against a dark page background. */
+                :root.dark .glass-toggle-btn,
+                .glass-toggle-btn[data-state='on'] {
+                    background: #ffffff;
+                    border-color: rgba(16,16,16,0.1);
+                    color: #101010;
+                    box-shadow:
+                        0 18px 44px rgba(0, 0, 0, 0.4),
+                        0 2px 8px rgba(0, 0, 0, 0.25),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+                }
+                :root.dark .glass-toggle-btn:hover,
+                .glass-toggle-btn[data-state='on']:hover {
+                    background: #f5f5f5;
+                }
+
+                .glass-toggle-icon {
+                    position: absolute;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transform: scale(0.5) rotate(-90deg);
+                    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+                }
+
+                .glass-toggle-icon[data-active='true'] {
+                    opacity: 1;
+                    transform: scale(1) rotate(0deg);
+                }
+
+                @media (max-width: 820px) {
+                    .glass-toggle-dock {
+                        top: 1rem;
+                        right: 1rem;
+                    }
+                    .glass-toggle-btn {
+                        width: 2.875rem;
+                        height: 2.875rem;
+                        border-radius: 1rem;
+                    }
+                }
+
+                /* ---------- Case study dialog → mobile bottom sheet ----------
+                   On mobile this becomes a sheet pinned to the bottom edge,
+                   full-width, rounded only at the top, with a drag handle that
+                   supports swipe-down-to-dismiss (handled in JS via inline
+                   transform applied during drag).
+
+                   IMPORTANT: shadcn/Radix's default DialogContent classes include
+                   a centering transform (translate(-50%,-50%)). Overriding
+                   position/left/right/bottom here WITHOUT also clearing that
+                   transform leaves the sheet shoved up-and-left by half its own
+                   size — which is why it was invisible. Setting transform to none fixes
+                   that; the live drag offset is still applied via inline style
+                   in the component, which takes precedence over this rule while
+                   the user is actively dragging. */
+                @media (max-width: 820px) {
+                    .case-study-sheet {
+                        position: fixed !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        bottom: 0 !important;
+                        top: auto !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        margin: 0 !important;
+                        transform: none !important;
+                        border-bottom-left-radius: 0 !important;
+                        border-bottom-right-radius: 0 !important;
+                        border-top-left-radius: 1.5rem !important;
+                        border-top-right-radius: 1.5rem !important;
+                        max-height: 92vh !important;
+                        z-index: 300 !important;
+                        transition: transform 0.32s cubic-bezier(.32,.72,0,1);
+                    }
+                }
+                .sheet-drag-handle {
+                    display: none;
+                }
+                @media (max-width: 820px) {
+                    .sheet-drag-handle {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        padding: 0.625rem 0 0.25rem;
+                        touch-action: none;
+                        cursor: grab;
+                    }
+                    .sheet-drag-bar {
+                        width: 2.75rem;
+                        height: 0.3125rem;
+                        border-radius: 999px;
+                        background: rgba(0,0,0,0.18);
+                    }
+                    :root.dark .sheet-drag-bar { background: rgba(255,255,255,0.25); }
+
+                    /* While the sheet is open, nothing else should float over it. */
+                    body.sheet-open .liquid-dock,
+                    body.sheet-open .chat-widget-mobile-anchor,
+                    body.sheet-open .glass-toggle-dock {
+                        display: none;
+                    }
+                }
+
+                /* ---------- Chat widget: pinned to the true bottom edge from the
+                   start, and stacked ABOVE the dock/toggle so that whenever the
+                   widget itself renders an open panel spanning the bottom of the
+                   screen, the dock is visually covered rather than poking out
+                   underneath it. Previously this reserved space above the dock
+                   (leaving a gap the dock rendered into) and sat at a z-index
+                   only just above the dock — both of which are why the nav was
+                   visible "at the back" while the chat panel was open. Giving
+                   this wrapper a transform makes it a new containing block for
+                   any position:fixed elements ChatWidget renders internally, so
+                   they're still constrained to (and painted within) this box. ---------- */
+                .chat-widget-mobile-anchor {
+                    display: contents;
+                }
+                @media (max-width: 820px) {
+                    .chat-widget-mobile-anchor {
+                        display: block;
+                        position: fixed;
+                        inset: 0;
+                        transform: translateZ(0);
+                        pointer-events: none;
+                        z-index: 90;
+                    }
+                    .chat-widget-mobile-anchor > * {
+                        pointer-events: auto;
+                    }
                 }
             `}</style>
 
             <div className="portfolio-root">
                 <LiquidDock active={active} onSelect={scrollTo} />
+                <DarkModeToggle />
+                <div className="chat-widget-mobile-anchor">
+                    <ChatWidget />
+                </div>
 
                 <main className="portfolio-main">
                     {/* HOME */}
@@ -1104,60 +1522,73 @@ export default function Welcome() {
                         ref={(el) => {
                             sectionRefs.current.home = el;
                         }}
-                        className="section"
-                        style={{ justifyContent: 'flex-start', paddingTop: '7rem' }}
+                        className="section home-section"
                     >
                         {/* Cover + avatar wrapper — avatar is absolutely positioned INSIDE this, so it always sits on top */}
                         <div className="relative w-full">
-                            <div className="h-[220px] w-full overflow-hidden rounded-4xl bg-[#F3EFE9] md:h-[340px]">
+                            <div className="home-cover">
                                 <img src="/cover.png" alt="" className="h-full w-full object-cover" />
                             </div>
                         </div>
 
-                        <div className="z-10 flex flex-col gap-6 px-5 md:flex-row md:items-end md:gap-8">
-                            {/* Avatar carries its own negative margin — only it reaches up into the cover */}
-                            <div className="-mt-16 shrink-0 rounded-4xl bg-gradient-to-br from-[#3c3c3c] via-[#636363] to-[#c1c1c1] p-[3px] shadow-[0_10px_28px_rgba(255,45,32,0.10)] md:-mt-20">
-                                <div className="rounded-[calc(1.5rem+3px)] bg-white p-[3px]">
-                                    <div className="h-[170px] w-[170px] overflow-hidden rounded-3xl bg-[#EFEAE3] md:h-[200px] md:w-[200px]">
-                                        <img src="/profile2.png" alt="Profile photo" className="h-full w-full object-cover object-top" />
-                                    </div>
+                        {/* Avatar + name row — side by side at EVERY breakpoint, avatar overlapping
+                            the cover bottom-left, name/role/location bottom-aligned next to it.
+                            This is the Facebook-profile layout: it was previously flex-col on
+                            mobile (avatar stacked above the text), which is why it didn't match. */}
+                        <div className="z-10 flex items-end gap-3 px-3 sm:gap-5 sm:px-5 md:gap-8">
+                            {/* A clean circular avatar with a simple ring — no nested boxy frames, so it
+                                reads as a proper portrait photo rather than a squared-off card. Overlaps
+                                the cover, Facebook-profile style, at every breakpoint. */}
+                            <div className="-mt-12 shrink-0 sm:-mt-16 md:-mt-20">
+                                <div className="h-[84px] w-[84px] overflow-hidden rounded-2xl border-[3px] border-white bg-[#EFEAE3] shadow-[0_10px_26px_rgba(0,0,0,0.18)] sm:h-[150px] sm:w-[150px] sm:border-4 md:h-[200px] md:w-[200px] dark:border-neutral-900 dark:bg-neutral-800">
+                                    <img src="/profile2.png" alt="Profile photo" className="h-full w-full object-cover object-top" />
                                 </div>
                             </div>
 
-                            {/* Zero margin — this can never enter the cover. items-end syncs its bottom to the avatar's bottom */}
-                            <div className="flex flex-col gap-4 pt-3">
-                                <div className="flex flex-col gap-1">
-                                    <p className="text-sm font-medium text-[#5c5a56]">Fullstack Web Developer / App Developer</p>
-                                    <h1 className="text-[25px] leading-[1.05] font-semibold tracking-tight text-[#101010]">
-                                        Dave Michael Beltran Clapis
-                                    </h1>
-                                    <p className="flex items-center gap-1.5 text-sm font-medium text-[#5c5a56]">
-                                        <svg
-                                            width="14"
-                                            height="14"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="1.8"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                                            <circle cx="12" cy="10" r="3" />
-                                        </svg>
-                                        Albay, Philippines
-                                    </p>
-                                </div>
-
-                                <div className="flex flex-wrap gap-3">
-                                    <Button>Download résumé</Button>
-                                    <Button variant="outline">Send email</Button>
-                                </div>
+                            {/* Bottom-aligned with the avatar, exactly like the FB reference. */}
+                            <div className="mt-3 flex flex-col gap-0.5 pb-1 sm:gap-1 md:mt-0 md:pb-3">
+                                <p className="text-xs font-medium text-[#5c5a56] sm:text-sm dark:text-neutral-400">
+                                    Fullstack Web Developer / App Developer
+                                </p>
+                                <h1 className="text-[17px] leading-[1.15] font-semibold tracking-tight text-[#101010] sm:text-[25px] dark:text-neutral-50">
+                                    Dave Michael Beltran Clapis
+                                </h1>
+                                <p className="flex items-center gap-1.5 text-xs font-medium text-[#5c5a56] sm:text-sm dark:text-neutral-400">
+                                    <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                                        <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                    Albay, Philippines
+                                </p>
                             </div>
                         </div>
 
+                        {/* Buttons — their own full-width row below the avatar/name row,
+                            matching the "Add to story / Edit profile" row in the reference. */}
+                        <div className="mt-4 flex flex-wrap gap-3 px-3 sm:px-5 md:mt-6 md:px-0">
+                            <Button>Download résumé</Button>
+                            <Button variant="outline" asChild>
+                                <a
+                                    href="https://mail.google.com/mail/?view=cm&fs=1&to=clapisdave8@gmail.com&su=Portfolio%20Inquiry"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    Send email
+                                </a>
+                            </Button>
+                        </div>
+
                         {/* Bio */}
-                        <p className="mt-10 max-w-[1100px] px-2 text-[15px] leading-relaxed text-[#4b4b4b] md:mt-6 md:px-0 md:text-[16px]">
+                        <p className="mt-8 max-w-[1100px] px-2 text-[15px] leading-relaxed text-[#4b4b4b] sm:mt-10 md:mt-6 md:px-0 md:text-[16px] dark:text-neutral-400">
                             I'm a fullstack developer who loves the moment scattered ideas click into a working product. I graduated with a BS in
                             Computer Science, but most of what I know came from staying up late debugging something that "should have worked" until it
                             did. I'm comfortable across the stack clean, responsive frontends, backed by the logic, databases, and APIs that make
@@ -1176,197 +1607,200 @@ export default function Welcome() {
                     >
                         <p className="eyebrow">About</p>
                         <h2 className="h2">Stack, experience, education.</h2>
+                        <p className="section-intro">
+                            A quick look at how I work day to day: the tools I reach for, the roles I've held, where I studied, and the fastest way to
+                            reach me if you'd like to talk.
+                        </p>
 
+                        {/* Single grid: order-* controls stacking on mobile (Tech Stack → Experience →
+                            Education → Get in Touch) while lg:order-* restores the original two-column
+                            layout on desktop. This keeps one consistent DOM/grid instead of two separate
+                            columns, so ordering can differ per breakpoint without duplicating markup. */}
                         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-                            {/* ---------- Left column ---------- */}
-                            <div className="flex flex-col gap-4">
-                                {/* Tech Stack — a single card, all groups inside */}
-                                <Card className="gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none">
-                                    <CardHeader className="px-6">
-                                        <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010]">
-                                            <LayersIcon />
-                                            Tech Stack
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex flex-col gap-5 px-6">
-                                        {STACK_GROUPS.map((group) => (
-                                            <div key={group.label}>
-                                                <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase">
-                                                    {group.label}
-                                                </p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {group.tools.map(({ name, icon: Icon }) => (
-                                                        <span
-                                                            key={name}
-                                                            className="inline-flex items-center gap-1.5 rounded-full border border-[#101010] px-3 py-1 text-xs font-medium text-[#101010] transition-colors hover:bg-[#101010] hover:text-white"
-                                                        >
-                                                            <Icon />
-                                                            {name}
-                                                        </span>
-                                                    ))}
+                            {/* Tech Stack — first on both mobile and desktop */}
+                            <Card className="order-1 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-1">
+                                <CardHeader className="px-6">
+                                    <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010] dark:text-neutral-50">
+                                        <LayersIcon />
+                                        Tech Stack
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col gap-5 px-6">
+                                    {STACK_GROUPS.map((group) => (
+                                        <div key={group.label}>
+                                            <p className="mb-2.5 text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase dark:text-neutral-400">
+                                                {group.label}
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {group.tools.map(({ name, icon: Icon }) => (
+                                                    <span
+                                                        key={name}
+                                                        className="inline-flex items-center gap-1.5 rounded-full border border-[#101010] px-3 py-1 text-xs font-medium text-[#101010] transition-colors hover:bg-[#101010] hover:text-white dark:border-neutral-100 dark:text-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900"
+                                                    >
+                                                        <Icon />
+                                                        {name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+
+                            {/* Experience — second on both mobile and desktop */}
+                            <Card className="order-2 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-2">
+                                <CardHeader className="px-6">
+                                    <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010] dark:text-neutral-50">
+                                        <BriefcaseIcon />
+                                        Experience
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="px-6">
+                                    <div className="flex flex-col gap-4">
+                                        {[
+                                            {
+                                                role: 'Web Developer / Fullstack Developer',
+                                                org: 'Freelance',
+                                                period: '2025 – Present',
+                                                current: true,
+                                            },
+                                            {
+                                                role: 'Web Developer Intern',
+                                                org: 'DOST – Technology Application and Promotion Institute',
+                                                period: '2025',
+                                                current: false,
+                                            },
+                                            {
+                                                role: 'Developer / UI Designer Intern',
+                                                org: 'Ollopa Corporation',
+                                                period: '2024',
+                                                current: false,
+                                            },
+                                            {
+                                                role: 'Lead Developer',
+                                                org: 'Capstone & school software projects',
+
+                                                current: false,
+                                            },
+                                        ].map((exp) => (
+                                            <div key={exp.role} className="flex items-start gap-3">
+                                                <span
+                                                    className={
+                                                        exp.current
+                                                            ? 'mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#101010] dark:bg-neutral-100'
+                                                            : 'mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border border-[#101010] bg-white dark:border-neutral-100 dark:bg-neutral-900'
+                                                    }
+                                                />
+                                                <div className="flex flex-1 items-start justify-between gap-4 border-b border-[var(--hair)] pb-4 last:border-b-0 last:pb-0">
+                                                    <div>
+                                                        <p className="text-[15px] font-semibold text-[#101010] dark:text-neutral-100">{exp.role}</p>
+                                                        <p className="mt-0.5 text-sm text-[#5c5a56] dark:text-neutral-400">{exp.org}</p>
+                                                    </div>
+                                                    <span className="shrink-0 pt-0.5 text-sm text-[#5c5a56] dark:text-neutral-400">{exp.period}</span>
                                                 </div>
                                             </div>
                                         ))}
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </CardContent>
+                            </Card>
 
-                                {/* Get in Touch — single card, divided rows (also reused in Contact section) */}
-                                <Card className="gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none">
-                                    <CardHeader className="px-6">
-                                        <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010]">
-                                            <SendMessageIcon />
-                                            Get in Touch
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="px-6">
-                                        {/* Get in Touch */}
-                                        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                                            <div>
-                                                <p className="text-[15px] leading-relaxed text-[#4b4b4b]">
-                                                    Available for UI/UX and WordPress freelance projects, with added support in SEO, Google Search
-                                                    Console (GSC), Google My Business (GMB), and email campaigns.
-                                                </p>
-                                            </div>
-
-                                            <div>
-                                                <p className="mb-3 text-[11px] font-semibold tracking-[0.18em] text-[#5c5a56] uppercase">
-                                                    Get in touch
-                                                </p>
-                                                <div className="flex flex-col gap-3">
-                                                    {CONTACT_POINTS.map((item) => (
-                                                        <a
-                                                            key={item.label}
-                                                            href={item.href}
-                                                            target={item.href.startsWith('http') ? '_blank' : undefined}
-                                                            rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                                                            className="flex items-center gap-3 rounded-2xl border border-[var(--hair)] px-4 py-3.5 transition-colors hover:bg-[#F8F6F3]"
-                                                        >
-                                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#101010]">
-                                                                <item.icon />
-                                                            </span>
-                                                            <div>
-                                                                <p className="text-[11px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase">
-                                                                    {item.label}
-                                                                </p>
-                                                                <p className="text-[15px] font-medium text-[#101010]">{item.value}</p>
-                                                            </div>
-                                                        </a>
-                                                    ))}
+                            {/* Education — third on mobile, but bottom-right on desktop (lg:order-4) */}
+                            <Card className="order-3 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-4">
+                                <CardHeader className="px-6">
+                                    <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010] dark:text-neutral-50">
+                                        <GradCapIcon />
+                                        Education
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="px-6">
+                                    <div className="flex flex-col">
+                                        {[
+                                            {
+                                                program: 'BS Computer Science',
+                                                school: 'Bicol University',
+                                                period: '2022 – 2026',
+                                                honor: 'Cum Laude',
+                                            },
+                                            {
+                                                program: 'Senior High School',
+                                                school: 'San Lorenzo Academy',
+                                                period: '2020 – 2022',
+                                                honor: 'With Honors',
+                                            },
+                                            {
+                                                program: 'NC III — Programming',
+                                                school: 'TESDA National Certification',
+                                                period: '2024',
+                                                honor: 'TESDA Certified',
+                                            },
+                                        ].map((edu) => (
+                                            <div
+                                                key={edu.program}
+                                                className="border-b border-[var(--hair)] py-4 first:pt-0 last:border-b-0 last:pb-0"
+                                            >
+                                                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                                                    <p className="text-[15px] font-semibold text-[#101010] dark:text-neutral-100">{edu.program}</p>
+                                                    <span className="honor-badge">
+                                                        <AwardIcon />
+                                                        {edu.honor}
+                                                    </span>
                                                 </div>
+                                                <p className="mt-0.5 text-sm text-[#5c5a56] dark:text-neutral-400">{edu.school}</p>
+                                                <p className="mt-0.5 text-sm text-[#5c5a56] dark:text-neutral-400">{edu.period}</p>
                                             </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Get in Touch — last on mobile (order-4), but bottom-left on desktop (lg:order-3) */}
+                            <Card className="order-4 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-3">
+                                <CardHeader className="px-6">
+                                    <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010] dark:text-neutral-50">
+                                        <SendMessageIcon />
+                                        Get in Touch
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="px-6">
+                                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                                        <div>
+                                            <p className="text-[15px] leading-relaxed text-[#4b4b4b] dark:text-neutral-400">
+                                                Available for UI/UX and WordPress freelance projects, with added support in SEO, Google Search Console
+                                                (GSC), Google My Business (GMB), and email campaigns.
+                                            </p>
                                         </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
 
-                            {/* ---------- Right column ---------- */}
-                            <div className="flex flex-col gap-4">
-                                {/* Experience */}
-                                <Card className="gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none">
-                                    <CardHeader className="px-6">
-                                        <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010]">
-                                            <BriefcaseIcon />
-                                            Experience
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="px-6">
-                                        <div className="flex flex-col gap-4">
-                                            {[
-                                                {
-                                                    role: 'Web Developer / Fullstack Developer',
-                                                    org: 'Freelance',
-                                                    period: '2025 – Present',
-                                                    current: true,
-                                                },
-                                                {
-                                                    role: 'Web Developer Intern',
-                                                    org: 'DOST – Technology Application and Promotion Institute',
-                                                    period: '2025',
-                                                    current: false,
-                                                },
-                                                {
-                                                    role: 'Developer / UI Designer Intern',
-                                                    org: 'Ollopa Corporation',
-                                                    period: '2024',
-                                                    current: false,
-                                                },
-                                                {
-                                                    role: 'Lead Developer',
-                                                    org: 'Capstone & school software projects',
-
-                                                    current: false,
-                                                },
-                                            ].map((exp) => (
-                                                <div key={exp.role} className="flex items-start gap-3">
-                                                    <span
-                                                        className={
-                                                            exp.current
-                                                                ? 'mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#101010]'
-                                                                : 'mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border border-[#101010] bg-white'
-                                                        }
-                                                    />
-                                                    <div className="flex flex-1 items-start justify-between gap-4 border-b border-[var(--hair)] pb-4 last:border-b-0 last:pb-0">
-                                                        <div>
-                                                            <p className="text-[15px] font-semibold text-[#101010]">{exp.role}</p>
-                                                            <p className="mt-0.5 text-sm text-[#5c5a56]">{exp.org}</p>
-                                                        </div>
-                                                        <span className="shrink-0 pt-0.5 text-sm text-[#5c5a56]">{exp.period}</span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                {/* Education */}
-                                <Card className="gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none">
-                                    <CardHeader className="px-6">
-                                        <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010]">
-                                            <GradCapIcon />
-                                            Education
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="px-6">
-                                        <div className="flex flex-col">
-                                            {[
-                                                {
-                                                    program: 'BS Computer Science',
-                                                    school: 'Bicol University',
-                                                    period: '2022 – 2026',
-                                                    honor: 'Cum Laude',
-                                                },
-                                                {
-                                                    program: 'Senior High School',
-                                                    school: 'San Lorenzo Academy',
-                                                    period: '2020 – 2022',
-                                                    honor: 'With Honors',
-                                                },
-                                                {
-                                                    program: 'NC III — Programming',
-                                                    school: 'TESDA National Certification',
-                                                    period: '2024',
-                                                    honor: 'TESDA Certified',
-                                                },
-                                            ].map((edu) => (
-                                                <div
-                                                    key={edu.program}
-                                                    className="border-b border-[var(--hair)] py-4 first:pt-0 last:border-b-0 last:pb-0"
-                                                >
-                                                    <div className="flex justify-between">
-                                                        <p className="text-[15px] font-semibold text-[#101010]">{edu.program}</p>
-                                                        <span className="honor-badge">
-                                                            <AwardIcon />
-                                                            {edu.honor}
+                                        <div>
+                                            <p className="mb-3 text-[11px] font-semibold tracking-[0.18em] text-[#5c5a56] uppercase dark:text-neutral-400">
+                                                Get in touch
+                                            </p>
+                                            <div className="flex flex-col gap-3">
+                                                {CONTACT_POINTS.map((item) => (
+                                                    <a
+                                                        key={item.label}
+                                                        href={item.href}
+                                                        target={item.href.startsWith('http') ? '_blank' : undefined}
+                                                        rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
+                                                        className="flex items-center gap-3 rounded-2xl border border-[var(--hair)] px-4 py-3.5 transition-colors hover:bg-[#F8F6F3] dark:hover:bg-neutral-800"
+                                                    >
+                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#101010] dark:bg-neutral-800 dark:text-neutral-100">
+                                                            <item.icon />
                                                         </span>
-                                                    </div>
-                                                    <p className="mt-0.5 text-sm text-[#5c5a56]">{edu.school}</p>
-                                                    <p className="mt-0.5 text-sm text-[#5c5a56]">{edu.period}</p>
-                                                </div>
-                                            ))}
+                                                        <div>
+                                                            <p className="text-[11px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase dark:text-neutral-400">
+                                                                {item.label}
+                                                            </p>
+                                                            <p className="text-[15px] font-medium text-[#101010] dark:text-neutral-100">
+                                                                {item.value}
+                                                            </p>
+                                                        </div>
+                                                    </a>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </div>
                     </section>
 
@@ -1379,110 +1813,24 @@ export default function Welcome() {
                         className="section"
                         style={{ padding: '7rem 0 5rem' }}
                     >
-                        <div style={{ padding: '0 8vw' }}>
+                        <div style={{ padding: '0 6vw' }}>
                             <p className="eyebrow">Projects</p>
                             <h2 className="h2">Selected work.</h2>
+                            <p className="section-intro">
+                                A handful of recent builds, taken from first commit to something real people use — spanning messaging, machine
+                                learning, and role-based operations tools.
+                            </p>
                         </div>
                         <ProjectsCarousel />
                     </section>
 
-                    {/* SKILLS */}
-                    <section
-                        id="skills"
-                        ref={(el) => {
-                            sectionRefs.current.skills = el;
-                        }}
-                        className="section"
-                    >
-                        <p className="eyebrow">Skills</p>
-                        <h2 className="h2">Toolkit.</h2>
-                        <div style={{ maxWidth: '48ch' }}>
-                            {[
-                                ['React & TypeScript', 'Interfaces'],
-                                ['Laravel & PHP', 'Backend'],
-                                ['PostgreSQL', 'Data'],
-                                ['Design systems', 'Product'],
-                            ].map(([name, note]) => (
-                                <div className="skill-row" key={name}>
-                                    <span className="skill-name">{name}</span>
-                                    <span className="skill-note">{note}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* CONTACT */}
-                    <section
-                        id="contact"
-                        ref={(el) => {
-                            sectionRefs.current.contact = el;
-                        }}
-                        className="section"
-                        style={{ borderBottom: 'none' }}
-                    >
-                        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-16">
-                            {/* Left — headline + availability blurb */}
-                            <div>
-                                <p className="eyebrow">Contact</p>
-                                <h2 className="text-[clamp(2rem,4.2vw,2.6rem)] leading-[1.05] font-semibold tracking-tight text-[#101010]">
-                                    Let's work <span className="text-indigo-600">together.</span>
-                                </h2>
-                                <p className="lead mt-4" style={{ maxWidth: '46ch' }}>
-                                    Available for fullstack web and mobile app projects, with added support in UI/UX design, API integrations, and
-                                    cloud deployment.
-                                </p>
-                                <div className="tag-row" style={{ marginTop: '2rem' }}>
-                                    <a className="tag" href="#" style={{ fontSize: '.85rem' }}>
-                                        GitHub
-                                    </a>
-                                    <a className="tag" href="#" style={{ fontSize: '.85rem' }}>
-                                        LinkedIn
-                                    </a>
-                                    <a className="tag" href="#" style={{ fontSize: '.85rem' }}>
-                                        Twitter
-                                    </a>
-                                </div>
-                            </div>
-
-                            {/* Right — single "Get in Touch" card, matching the About section style */}
-                            <div>
-                                <p className="mb-4 text-[11px] font-semibold tracking-[0.18em] text-[#5c5a56] uppercase">Get in touch</p>
-                                <Card className="gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none">
-                                    <CardContent className="px-6">
-                                        <div className="flex flex-col">
-                                            {CONTACT_POINTS.map((item) => (
-                                                <a
-                                                    key={item.label}
-                                                    href={item.href}
-                                                    target={item.href.startsWith('http') ? '_blank' : undefined}
-                                                    rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                                                    className="group flex items-center justify-between gap-4 border-b border-[var(--hair)] py-4 first:pt-0 last:border-b-0 last:pb-0"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#101010] text-white">
-                                                            <item.icon />
-                                                        </span>
-                                                        <div>
-                                                            <p className="text-[11px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase">
-                                                                {item.label}
-                                                            </p>
-                                                            <p className="text-[15px] font-medium text-[#101010]">{item.value}</p>
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-[#5c5a56] transition-colors group-hover:text-[#101010]">
-                                                        <ArrowUpRightIcon />
-                                                    </span>
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </div>
-                    </section>
-
                     <p className="foot">© 2026 — Built with Laravel & React.</p>
                 </main>
+                {copiedLabel && (
+                    <div className="fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-full bg-[#101010] px-4 py-2 text-sm font-medium text-white shadow-lg dark:bg-neutral-100 dark:text-neutral-900">
+                        Email copied to clipboard
+                    </div>
+                )}
             </div>
         </>
     );

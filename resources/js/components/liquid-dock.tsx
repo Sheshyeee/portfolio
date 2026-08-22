@@ -63,9 +63,12 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                     onMouseLeave={handleMouseLeave}
                     style={{ ['--mx' as string]: '50%', ['--my' as string]: '0%', ['--glow' as string]: 0 }}
                     className={cn(
-                        'relative flex flex-col items-center gap-2.5 rounded-[22px] border border-black/[0.08] bg-white/75 py-2.5',
-                        'shadow-[0_18px_44px_rgba(15,17,20,0.08),0_2px_8px_rgba(15,17,20,0.04),inset_0_1px_0_rgba(255,255,255,0.9)]',
-                        'backdrop-blur-xl backdrop-saturate-150',
+                        'relative flex flex-col items-center gap-2.5 rounded-[26px] py-2.5',
+                        'border border-white/50 bg-white/[0.28]',
+                        'dark:border-white/[0.18] dark:bg-white/10',
+                        'shadow-[0_22px_50px_rgba(0,0,0,0.14),0_4px_14px_rgba(0,0,0,0.07),inset_0_1px_0_rgba(255,255,255,0.8)]',
+                        'dark:shadow-[0_22px_50px_rgba(0,0,0,0.5),0_4px_14px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.22)]',
+                        'backdrop-blur-[28px] backdrop-saturate-[1.8]',
                         'max-md:w-auto max-md:flex-row max-md:gap-1.5 max-md:px-3 max-md:py-2',
                     )}
                 >
@@ -76,6 +79,11 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                         style={{
                             background: 'radial-gradient(90px 90px at var(--mx) var(--my), rgba(52,87,213,0.07), transparent 65%)',
                         }}
+                    />
+
+                    <div
+                        aria-hidden
+                        className="pointer-events-none absolute inset-x-[10%] top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent dark:via-white/35"
                     />
 
                     <div className="flex flex-col items-center gap-2.5 max-md:flex-row max-md:gap-1.5">
@@ -97,7 +105,9 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                                             className={cn(
                                                 'relative flex size-11 items-center justify-center rounded-[14px] transition-[transform,background-color,color] duration-300',
                                                 'ease-[cubic-bezier(.34,1.56,.64,1)]',
-                                                isActive ? 'bg-[#101114] text-white' : 'text-neutral-500 hover:bg-black/[0.05] hover:text-[#101114]',
+                                                isActive
+                                                    ? 'bg-[#101114]/85 text-white shadow-[0_6px_14px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-md dark:bg-white/90 dark:text-[#101114]'
+                                                    : 'text-neutral-500 hover:bg-white/35 hover:text-[#101114] hover:backdrop-blur-sm dark:hover:bg-white/12',
                                             )}
                                         >
                                             {item.icon}
