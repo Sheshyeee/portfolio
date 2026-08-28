@@ -12,12 +12,12 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 /* ------------------------------------------------------------------ */
 
 const iconProps = {
-    width: 19,
-    height: 19,
+    width: 21,
+    height: 21,
     viewBox: '0 0 24 24',
     fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.6,
+    stroke: 'white',
+    strokeWidth: 1.8,
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
 };
@@ -156,6 +156,7 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'about', label: 'About', icon: UserIcon },
     { id: 'projects', label: 'Projects', icon: GridIcon },
+    { id: 'skills', label: 'Skills', icon: CodeIcon },
 ];
 
 function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
@@ -196,10 +197,14 @@ function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: strin
                                 onMouseEnter={() => setHovered(i)}
                                 onClick={() => onSelect(item.id)}
                                 aria-label={item.label}
+                                liquid-doc
                                 aria-current={isActive}
                             >
                                 <Icon />
                                 <span className="dock-tooltip">{item.label}</span>
+                                <span className="dock-label" aria-hidden="true">
+                                    {item.label}
+                                </span>
                             </button>
                         );
                     })}
@@ -405,7 +410,7 @@ function ProjectCaseStudyDialog({ project, open, onOpenChange }: { project: Proj
     const cs = project.caseStudy;
 
     const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-        if (window.innerWidth > 820) return; // only a bottom sheet on mobile
+        if (window.innerWidth > 1024) return; // only a bottom sheet on mobile
         setIsDragging(true);
         dragStartY.current = e.clientY;
         e.currentTarget.setPointerCapture(e.pointerId);
@@ -961,8 +966,7 @@ export default function Welcome() {
                     --ink: #101010;
                     --muted: #5c5a56;
                     --hair: rgba(0,0,0,0.09);
-                    --dock-space: 6.75rem;   /* space the fixed side dock reserves on desktop */
-                    --dock-space-mobile: 5.5rem; /* space the fixed bottom dock reserves on mobile */
+                    --dock-space-mobile: 6rem;/* space the fixed bottom dock reserves */
                 }
                 :root.dark {
                     --bg: #0a0a0a;
@@ -981,13 +985,17 @@ export default function Welcome() {
                     transition: background-color .3s ease, color .3s ease;
                 }
 
-                                /* ---------- Liquid glass dock ---------- */
+                /* ---------- Liquid glass dock — always bottom-center ---------- */
                 .liquid-dock {
                     position: fixed;
                     z-index: 50;
-                    left: 1.375rem;
-                    top: 50%;
-                    transform: translateY(-50%);
+                    left: 0;
+                    right: 0;
+                    top: auto;
+                    bottom: calc(16px + env(safe-area-inset-bottom));
+                    display: flex;
+                    justify-content: center;
+                    padding: 0 1rem;
                 }
                 .liquid-dock-glass {
                     --mx: 50%;
@@ -995,13 +1003,14 @@ export default function Welcome() {
                     --glow: 0;
                     position: relative;
                     display: flex;
-                    flex-direction: column;
+                    flex-direction: row;
                     align-items: center;
-                    gap: 0.75rem;
-                    width: 4rem;
-                    padding: 0.625rem 0 0.75rem;
+                    width: auto;
+                    max-width: calc(100vw - 2rem);
+                    padding: 0.5rem 0.625rem;
+                    gap: 0;
 
-                    border-radius: 1.75rem;
+                    border-radius: 1.875rem;
                     background: rgba(255,255,255,0.28);
                     border: 1px solid rgba(255,255,255,0.5);
                     backdrop-filter: blur(28px) saturate(180%);
@@ -1033,7 +1042,7 @@ export default function Welcome() {
                     content: '';
                     position: absolute;
                     inset: 0;
-                    border-radius: 1.75rem;
+                    border-radius: 1.875rem;
                     pointer-events: none;
                     opacity: var(--glow);
                     transition: opacity .35s ease;
@@ -1057,105 +1066,84 @@ export default function Welcome() {
                 }
                 .dock-group {
                     display: flex;
-                    flex-direction: column;
+                    flex-direction: row;
                     align-items: center;
-                    gap: 0.625rem;
-                }
-                .dock-spacer {
-                    width: 0.25rem;
-                    height: 9.625rem;
-                    border-radius: 999px;
-                    margin-top: 0.375rem;
-                    flex-shrink: 0;
+                    gap: 0.125rem;
                 }
                 .dock-item {
                     position: relative;
-                    width: 2.75rem;
-                    height: 2.75rem;
-                    border-radius: 33%;
                     display: flex;
+                    flex-direction: column;
                     align-items: center;
                     justify-content: center;
+                    gap: 0.25rem;
+                    width: auto;
+                    height: auto;
+                    min-width: 3.5rem;
+                    padding: 0.375rem 0.625rem;
+                    border-radius: 1.125rem;
                     background: transparent;
                     border: none;
+                    margin-left: 1rem;
                     color: #4b4b4b;
                     cursor: pointer;
                     transition: transform .4s cubic-bezier(.34,1.56,.64,1),
                                 background-color .3s ease, color .3s ease;
                 }
                 :root.dark .dock-item { color: #a1a1a1; }
-                .dock-item:hover { color: var(--ink); background: rgba(0,0,0,0.05); }
-                :root.dark .dock-item:hover { background: rgba(255,255,255,0.08); }
+                .dock-item:hover { background: transparent; }
+                .dock-item svg {
+                    width: 22px;
+                    height: 22px;
+                }
                 .dock-item.active {
-                    background: rgba(16,16,16,0.85);
-                    color: #fff;
+                    background: rgba(10,132,255,0.14);
+                    color: #0A84FF;
                 }
                 :root.dark .dock-item.active {
-                    background: rgba(255,255,255,0.9);
-                    color: #101010;
+                    background: rgba(10,132,255,0.22);
+                    color: #52aaff;
                 }
-                .dock-tooltip {
-                    position: absolute;
-                    left: 3.625rem;
-                    top: 50%;
-                    transform: translateY(-50%) translateX(-6px);
-                    background: var(--bg);
-                    color: var(--ink);
-                    border: 1px solid rgba(0,0,0,0.1);
-                    padding: 0.375rem 0.75rem;
-                    border-radius: 0.5rem;
-                    font-size: 0.75rem;
+                .dock-item:active {
+                    transform: scale(0.96);
+                }
+                .dock-label {
+                    display: block;
+                    font-size: 10.5px;
                     font-weight: 500;
-                    letter-spacing: .01em;
-                    white-space: nowrap;
-                    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-                    opacity: 0;
-                    pointer-events: none;
-                    transition: opacity .2s ease, transform .2s ease;
+                    line-height: 1;
+                    letter-spacing: 0.01em;
+                    color: #6b6b6b;
+                    transition: color .25s ease, font-weight .25s ease;
                 }
-                :root.dark .dock-tooltip {
-                    border: 1px solid rgba(255,255,255,0.12);
-                    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+                :root.dark .dock-label {
+                    color: #FFFFFF;
                 }
-                .dock-item:hover .dock-tooltip {
-                    opacity: 1;
-                    transform: translateY(-50%) translateX(0);
+                .dock-item.active .dock-label {
+                    color: inherit;
+                    font-weight: 600;
                 }
 
-                @media (max-width: 820px) {
-                    .liquid-dock {
-                        left: 0; right: 0; top: auto; bottom: 1.125rem;
+                @media (prefers-reduced-motion: reduce) {
+                    .dock-item {
+                        transition: none;
+                    }
+                    .dock-item:active {
                         transform: none;
-                        display: flex;
-                        justify-content: center;
-                        padding: 0 1rem;
                     }
-                    .liquid-dock-glass {
-                        flex-direction: row;
-                        width: auto;
-                        padding: 0.5625rem 1rem;
-                    }
-                    .dock-group { flex-direction: row; }
-                    .dock-spacer { display: none; }
-                    .dock-tooltip { display: none; }
                 }
 
                 @media (max-width: 380px) {
                     .liquid-dock { bottom: 0.875rem; padding: 0 0.75rem; }
-                    .liquid-dock-glass { padding: 0.5rem 0.75rem; gap: 0.5rem; }
-                    .dock-item { width: 2.5rem; height: 2.5rem; }
+                    .liquid-dock-glass { padding: 0.5rem 0.75rem; gap: 0.25rem; }
+                    .dock-item { min-width: 3rem; padding: 0.375rem 0.4rem; }
                 }
 
                 /* ---------- Layout / sections ---------- */
                 .portfolio-main {
-                    margin-left: var(--dock-space);
+                    margin-left: 0;
                     min-width: 0;
-                }
-                @media (max-width: 820px) {
-                    .portfolio-main {
-                        margin-left: 0;
-                        padding-bottom: var(--dock-space-mobile);
-                    }
+                    padding-bottom: var(--dock-space-mobile);
                 }
                 .section {
                     min-height: 100vh;
@@ -1210,6 +1198,10 @@ export default function Welcome() {
                         height: 190px;
                     }
                 }
+
+                .dock-tooltip {
+    display: none;
+}
                 @media (max-width: 480px) {
                     .home-cover {
                         margin-left: -5vw;
@@ -1304,9 +1296,6 @@ export default function Welcome() {
                     font-size: .8rem;
                     padding: 2rem 6vw calc(2rem + var(--dock-space-mobile));
                     text-align: center;
-                }
-                @media (min-width: 821px) {
-                    .foot { padding: 2rem 6vw; text-align: left; }
                 }
 
                 /* Honors badges under education entries */
@@ -1470,13 +1459,14 @@ export default function Welcome() {
                         background: rgba(0,0,0,0.18);
                     }
                     :root.dark .sheet-drag-bar { background: rgba(255,255,255,0.25); }
+                }
 
-                    /* While the sheet is open, nothing else should float over it. */
-                    body.sheet-open .liquid-dock,
-                    body.sheet-open .chat-widget-mobile-anchor,
-                    body.sheet-open .glass-toggle-dock {
-                        display: none;
-                    }
+                /* While the sheet is open, nothing else should float over it — applies
+                   at every breakpoint now since the dock/toggle are always fixed-position. */
+                body.sheet-open .liquid-dock,
+                body.sheet-open .chat-widget-mobile-anchor,
+                body.sheet-open .glass-toggle-dock {
+                    display: none;
                 }
 
                 /* ---------- Chat widget: pinned to the true bottom edge from the
@@ -1491,20 +1481,174 @@ export default function Welcome() {
                    any position:fixed elements ChatWidget renders internally, so
                    they're still constrained to (and painted within) this box. ---------- */
                 .chat-widget-mobile-anchor {
-                    display: contents;
+                    display: block;
+                    position: fixed;
+                    inset: 0;
+                    transform: translateZ(0);
+                    pointer-events: none;
+                    z-index: 90;
                 }
+                    @media (max-width: 820px) {
+    .chat-widget-mobile-anchor {
+        z-index: 90;
+        pointer-events: none;
+    }
+
+    /*
+     * Move the ChatWidget's floating button above the bottom dock.
+     * Adjust 6.8rem if you want more/less space between them.
+     */
+    .chat-widget-mobile-anchor > * {
+        bottom: calc(var(--dock-space-mobile) + 0.25rem) !important;
+    }
+}
+                .chat-widget-mobile-anchor > * {
+                    pointer-events: auto;
+                }
+
+                /* ---------- HERO — oversized sliding name behind photo ---------- */
+                .hero-section {
+                    position: relative;
+                    overflow: hidden;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .hero-marquee-wrap {
+                    position: absolute;
+                    inset: 0;
+                    display: flex;
+                    align-items: center;
+                    overflow: hidden;
+                    pointer-events: none;
+                    z-index: 1;
+                }
+                .hero-marquee-track {
+                    display: flex;
+                    width: max-content;
+                    will-change: transform;
+                    animation: hero-marquee 18s linear infinite;
+                    animation-play-state: running !important;
+                }
+                .hero-marquee-text {
+                    flex: 0 0 auto;
+                    font-size: clamp(4.5rem, 22vw, 18.5rem);
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: -0.03em;
+                    white-space: nowrap;
+                    padding-right: 5vw;
+                    color: transparent;
+                    -webkit-text-stroke: 1.5px rgba(16,16,16,0.55);
+                    opacity: 0.55;
+                }
+                :root.dark .hero-marquee-text {
+                    -webkit-text-stroke: 1.5px rgba(255,255,255,0.45);
+                    opacity: 0.6;
+                }
+
+                @keyframes hero-marquee {
+                    0%   { transform: translate3d(0, 0, 0); }
+                    100% { transform: translate3d(-50%, 0, 0); }
+                }
+
+                .hero-photo-img {
+    position: relative;
+    z-index: 2;
+width: clamp(300px, 60vw, 700px);
+max-height: min(90vh, 900px);
+    object-fit: contain;
+    object-position: bottom center;
+    display: block;
+    margin: 0 auto;
+
+    /* keep clear of the bottom-center dock + its safe-area inset on every device */
+    margin-bottom: calc(var(--dock-space-mobile) + 0.5rem);
+
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .8s cubic-bezier(.16,1,.3,1) .15s,
+                transform .8s cubic-bezier(.16,1,.3,1) .15s;
+}
+.hero-section.in-view .hero-photo-img {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 820px) {
+    .hero-photo-img {
+        width: clamp(170px, 52vw, 300px);
+        max-height: 52vh;
+        margin-bottom: calc(var(--dock-space-mobile) + 0.25rem);
+    }
+}
+
+@media (max-width: 380px) {
+    .hero-photo-img {
+        width: clamp(150px, 60vw, 260px);
+        max-height: 46vh;
+    }
+}
+                .hero-photo-wrap {
+                    position: relative;
+                    z-index: 2;
+                    display: flex;
+                    justify-content: center;
+                }
+                .hero-photo {
+                    width: clamp(210px, 32vw, 440px);
+                    aspect-ratio: 3 / 4;
+                    border-radius: 28px;
+                    overflow: hidden;
+                    background: #EFEAE3;
+                    box-shadow: 0 30px 70px rgba(0,0,0,0.28), 0 6px 18px rgba(0,0,0,0.12);
+                    opacity: 0;
+                    transform: translateY(34px);
+                    transition: opacity .8s cubic-bezier(.16,1,.3,1) .15s,
+                                transform .8s cubic-bezier(.16,1,.3,1) .15s;
+                }
+                .hero-section.in-view .hero-photo {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                .hero-photo img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: top;
+                }
+                :root.dark .hero-photo { background: #262626; }
+
+                .hero-caption {
+                    position: absolute;
+                    bottom: 2.5rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 3;
+                    text-align: center;
+                    opacity: 0;
+                    transition: opacity .8s ease .4s;
+                }
+                .hero-section.in-view .hero-caption { opacity: 1; }
+                .hero-role {
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    letter-spacing: .1em;
+                    text-transform: uppercase;
+                    color: var(--muted);
+                }
+                .hero-scroll-hint {
+                    margin-top: .4rem;
+                    font-size: .75rem;
+                    color: var(--muted);
+                    opacity: .7;
+                }
+
                 @media (max-width: 820px) {
-                    .chat-widget-mobile-anchor {
-                        display: block;
-                        position: fixed;
-                        inset: 0;
-                        transform: translateZ(0);
-                        pointer-events: none;
-                        z-index: 90;
-                    }
-                    .chat-widget-mobile-anchor > * {
-                        pointer-events: auto;
-                    }
+                    .hero-photo { width: clamp(180px, 58vw, 320px); }
+                    .hero-caption { bottom: 1.75rem; }
                 }
             `}</style>
 
@@ -1517,6 +1661,28 @@ export default function Welcome() {
 
                 <main className="portfolio-main">
                     {/* HOME */}
+                    {/* HERO — oversized sliding name behind photo */}
+                    <section
+                        id="hero"
+                        ref={(el) => {
+                            sectionRefs.current.hero = el;
+                        }}
+                        className="section hero-section"
+                    >
+                        <div className="hero-marquee-wrap" aria-hidden="true">
+                            <div className="hero-marquee-track">
+                                <span className="hero-marquee-text">DAVE MICHAEL CLAPIS</span>
+                                <span className="hero-marquee-text">DAVE MICHAEL CLAPIS</span>
+                            </div>
+                        </div>
+
+                        <img src="/dp2.png" className="hero-photo-img z-10" alt="Dave Michael Clapis" />
+
+                        <div className="hero-caption">
+                            <p className="hero-role">Fullstack Web Developer / App Developer</p>
+                            <p className="hero-scroll-hint">Scroll to explore ↓</p>
+                        </div>
+                    </section>
                     <section
                         id="home"
                         ref={(el) => {
@@ -1618,7 +1784,13 @@ export default function Welcome() {
                             columns, so ordering can differ per breakpoint without duplicating markup. */}
                         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
                             {/* Tech Stack — first on both mobile and desktop */}
-                            <Card className="order-1 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-1">
+                            <Card
+                                id="skills"
+                                ref={(el) => {
+                                    sectionRefs.current.skills = el;
+                                }}
+                                className="order-1 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-1"
+                            >
                                 <CardHeader className="px-6">
                                     <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010] dark:text-neutral-50">
                                         <LayersIcon />
@@ -1754,7 +1926,13 @@ export default function Welcome() {
                             </Card>
 
                             {/* Get in Touch — last on mobile (order-4), but bottom-left on desktop (lg:order-3) */}
-                            <Card className="order-4 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-3">
+                            <Card
+                                id="contact"
+                                ref={(el) => {
+                                    sectionRefs.current.contact = el;
+                                }}
+                                className="order-4 gap-4 rounded-[20px] border-[var(--hair)] py-6 shadow-none lg:order-3"
+                            >
                                 <CardHeader className="px-6">
                                     <CardTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101010] dark:text-neutral-50">
                                         <SendMessageIcon />
