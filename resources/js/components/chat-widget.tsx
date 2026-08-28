@@ -351,7 +351,7 @@ export default function ChatWidget() {
             `}</style>
 
             {!open && (
-                <div className="fixed right-4 bottom-4 z-[9999] flex items-center gap-2.5 sm:right-6 sm:bottom-6">
+                <div className="chat-widget-fab fixed right-4 bottom-4 z-[9999] flex items-center gap-2.5 sm:right-6 sm:bottom-6">
                     <div
                         className={`pointer-events-none flex items-center gap-2 rounded-full bg-black px-4 py-2.5 text-[13px] font-medium whitespace-nowrap text-white transition-all duration-500 ease-out sm:text-[13.5px] dark:bg-white dark:text-black ${
                             teaserVisible ? 'translate-x-0 scale-100 opacity-100' : 'translate-x-1.5 scale-95 opacity-0'

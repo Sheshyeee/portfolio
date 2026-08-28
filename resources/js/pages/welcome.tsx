@@ -1486,11 +1486,11 @@ export default function Welcome() {
                     inset: 0;
                     transform: translateZ(0);
                     pointer-events: none;
-                    z-index: 90;
+                    z-index: 999;
                 }
                     @media (max-width: 820px) {
     .chat-widget-mobile-anchor {
-        z-index: 90;
+        z-index: 999;
         pointer-events: none;
     }
 
@@ -1498,7 +1498,7 @@ export default function Welcome() {
      * Move the ChatWidget's floating button above the bottom dock.
      * Adjust 6.8rem if you want more/less space between them.
      */
-    .chat-widget-mobile-anchor > * {
+    .chat-widget-mobile-anchor > .chat-widget-fab {
         bottom: calc(var(--dock-space-mobile) + 0.25rem) !important;
     }
 }
