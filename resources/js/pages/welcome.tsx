@@ -16,7 +16,7 @@ const iconProps = {
     height: 21,
     viewBox: '0 0 24 24',
     fill: 'none',
-    stroke: 'white',
+    stroke: 'currentColor', // was 'white'
     strokeWidth: 1.8,
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
@@ -162,6 +162,30 @@ const NAV_ITEMS: NavItem[] = [
 function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
     const glassRef = useRef<HTMLDivElement | null>(null);
     const [hovered, setHovered] = useState<number | null>(null);
+    const [onDark, setOnDark] = useState(false); // NEW
+
+    // NEW — watches scroll position vs. any [data-nav-theme="dark"] section
+    useEffect(() => {
+        const zones = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-theme="dark"]'));
+        if (zones.length === 0) return;
+
+        const check = () => {
+            const dockY = window.innerHeight - 56; // approx vertical center of the floating dock
+            const isDark = zones.some((el) => {
+                const r = el.getBoundingClientRect();
+                return r.top <= dockY && r.bottom >= dockY;
+            });
+            setOnDark(isDark);
+        };
+
+        check();
+        window.addEventListener('scroll', check, { passive: true });
+        window.addEventListener('resize', check);
+        return () => {
+            window.removeEventListener('scroll', check);
+            window.removeEventListener('resize', check);
+        };
+    }, []);
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const el = glassRef.current;
@@ -284,7 +308,7 @@ const PROJECTS: Project[] = [
         title: 'Smart Pet Breed Identification System (Web & Mobile App)',
         desc: 'A deep learning system we trained ourselves to identify dog breeds from photos, giving instant breed insights. An admin portal supports continuous learning by correcting low-confidence scans, which are fed back into the dataset to retrain and improve the model.',
         tags: ['React', 'TypeScript', 'React Native (Expo)', 'Laravel', 'FastAPI', 'Python'],
-        images: ['left.png', 'r.png', 'front.png'],
+        images: ['/left.png', '/right.png', '/front.png'],
         caseStudy: {
             type: 'Capstone Project',
             coverImage: '/coverimage.png',
@@ -430,11 +454,11 @@ function ProjectCaseStudyDialog({ project, open, onOpenChange }: { project: Proj
     };
 
     // On mobile the sheet is pinned to the bottom via CSS (`.case-study-sheet`).
-    // That override clears the default Radix centering transform (see the
-    // `transform: none !important` rule below) — so this inline style only
-    // needs to handle the live drag offset; when idle we intentionally emit
-    // no inline transform so the CSS rule stays in control.
-    const dragStyle = dragY || isDragging ? { transform: `translate3d(0, ${dragY}px, 0)`, transition: 'none' } : undefined;
+    // That CSS rule sets `transform: translateY(var(--sheet-drag-y, 0)) !important`
+    // to clear Radix's centering transform AND consume the live drag offset via
+    // the --sheet-drag-y CSS variable — which this inline style sets. When idle
+    // we emit no inline style so the CSS default (translateY(0)) keeps the sheet pinned.
+    const dragStyle = dragY || isDragging ? ({ '--sheet-drag-y': `${dragY}px`, transition: 'none' } as React.CSSProperties) : undefined;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -1096,14 +1120,21 @@ export default function Welcome() {
                     width: 22px;
                     height: 22px;
                 }
-                .dock-item.active {
-                    background: rgba(10,132,255,0.14);
-                    color: #0A84FF;
-                }
-                :root.dark .dock-item.active {
-                    background: rgba(10,132,255,0.22);
-                    color: #52aaff;
-                }
+                /* line ~1099 */
+.dock-item.active {
+    background: rgba(255, 255, 255, 0.55);
+    color: #0A84FF;
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+:root.dark .dock-item.active {
+    background: rgba(255, 255, 255, 0.16);
+    color: #52aaff;
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
                 .dock-item:active {
                     transform: scale(0.96);
                 }
@@ -1138,6 +1169,21 @@ export default function Welcome() {
                     .liquid-dock-glass { padding: 0.5rem 0.75rem; gap: 0.25rem; }
                     .dock-item { min-width: 3rem; padding: 0.375rem 0.4rem; }
                 }
+
+                .nav-on-dark .liquid-dock-glass {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+.nav-on-dark .dock-item {
+    color: rgba(255, 255, 255, 0.75);
+}
+.nav-on-dark .dock-label {
+    color: rgba(255, 255, 255, 0.6);
+}
+.nav-on-dark .dock-item.active {
+    color: #66b3ff;
+    background: rgba(255, 255, 255, 0.22);
+}
 
                 /* ---------- Layout / sections ---------- */
                 .portfolio-main {
@@ -1334,50 +1380,47 @@ export default function Welcome() {
                     z-index: 60;
                 }
 
-                .glass-toggle-btn {
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 3.25rem;
-                    height: 3.25rem;
-                    border-radius: 1.125rem;
+               .glass-toggle-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 1.125rem;
 
-                    /* Always a solid white pill, regardless of light/dark theme —
-                       only the icon inside swaps, the button itself never flips
-                       to black. */
-                    background: #ffffff;
-                    border: 1px solid rgba(16,16,16,0.1);
-                    box-shadow:
-                        0 18px 44px rgba(0, 0, 0, 0.16),
-                        0 2px 8px rgba(0, 0, 0, 0.08),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-                    color: #101010;
-                    cursor: pointer;
-                    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, color 0.3s ease;
-                }
+    /* Light mode: dark pill */
+    background: #101010;
+    border: 1px solid rgba(16,16,16,0.1);
+    box-shadow:
+        0 18px 44px rgba(0, 0, 0, 0.16),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, color 0.3s ease;
+}
 
-                .glass-toggle-btn:hover {
-                    transform: scale(1.06);
-                    background: #f5f5f5;
-                }
+.glass-toggle-btn:hover {
+    transform: scale(1.06);
+    background: #1a1a1a;
+}
 
-                /* Dark mode ON: still a white pill — only border/shadow tuned so it
-                   still reads clearly against a dark page background. */
-                :root.dark .glass-toggle-btn,
-                .glass-toggle-btn[data-state='on'] {
-                    background: #ffffff;
-                    border-color: rgba(16,16,16,0.1);
-                    color: #101010;
-                    box-shadow:
-                        0 18px 44px rgba(0, 0, 0, 0.4),
-                        0 2px 8px rgba(0, 0, 0, 0.25),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-                }
-                :root.dark .glass-toggle-btn:hover,
-                .glass-toggle-btn[data-state='on']:hover {
-                    background: #f5f5f5;
-                }
+/* Dark mode: white pill */
+:root.dark .glass-toggle-btn,
+.glass-toggle-btn[data-state='on'] {
+    background: #ffffff;
+    border-color: rgba(16,16,16,0.1);
+    color: #101010;
+    box-shadow:
+        0 18px 44px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+:root.dark .glass-toggle-btn:hover,
+.glass-toggle-btn[data-state='on']:hover {
+    background: #f5f5f5;
+}
 
                 .glass-toggle-icon {
                     position: absolute;
@@ -1406,44 +1449,54 @@ export default function Welcome() {
                     }
                 }
 
-                /* ---------- Case study dialog → mobile bottom sheet ----------
-                   On mobile this becomes a sheet pinned to the bottom edge,
-                   full-width, rounded only at the top, with a drag handle that
-                   supports swipe-down-to-dismiss (handled in JS via inline
-                   transform applied during drag).
+                                /* ---------- Case study dialog → mobile bottom sheet ----------
+                   On screens <= 1024px the case study opens as a native-style
+                   bottom sheet: a ~28px top gap (safe-area aware), small side
+                   margins, rounded top corners, a flat bottom edge, and smooth
+                   internal scrolling. The drag handle stays pinned to the top of
+                   the sheet so swipe-down-to-dismiss stays usable while the
+                   content scrolls. */
 
-                   IMPORTANT: shadcn/Radix's default DialogContent classes include
-                   a centering transform (translate(-50%,-50%)). Overriding
-                   position/left/right/bottom here WITHOUT also clearing that
-                   transform leaves the sheet shoved up-and-left by half its own
-                   size — which is why it was invisible. Setting transform to none fixes
-                   that; the live drag offset is still applied via inline style
-                   in the component, which takes precedence over this rule while
-                   the user is actively dragging. */
-                @media (max-width: 820px) {
-                    .case-study-sheet {
-                        position: fixed !important;
-                        left: 0 !important;
-                        right: 0 !important;
-                        bottom: 0 !important;
-                        top: auto !important;
-                        width: 100% !important;
-                        max-width: 100% !important;
-                        margin: 0 !important;
-                        transform: none !important;
-                        border-bottom-left-radius: 0 !important;
-                        border-bottom-right-radius: 0 !important;
-                        border-top-left-radius: 1.5rem !important;
-                        border-top-right-radius: 1.5rem !important;
-                        max-height: 92vh !important;
-                        z-index: 300 !important;
-                        transition: transform 0.32s cubic-bezier(.32,.72,0,1);
+                @media (max-width: 1024px) {
+    .case-study-sheet {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: max(28px, env(safe-area-inset-top)) !important;
+        bottom: env(safe-area-inset-bottom, 0px) !important;
+        width: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        margin: 0 !important;
+        transform: translateY(var(--sheet-drag-y, 0)) !important;
+        translate: none !important;
+        scale: none !important;
+        rotate: none !important;
+        animation: none !important;
+        overscroll-contain: contain;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+        border-left: none !important;
+        border-right: none !important;
+        z-index: 300 !important;
+        transition: transform 0.32s cubic-bezier(.32,.72,0,1);
+    }
+}
+
+                    /* Keep the swipe-to-dismiss handle pinned to the top of the sheet
+                       while the case-study content scrolls beneath it. */
+                    .sheet-drag-handle {
+                        position: sticky !important;
+                        top: 0 !important;
+                        z-index: 10 !important;
                     }
                 }
                 .sheet-drag-handle {
                     display: none;
                 }
-                @media (max-width: 820px) {
+                @media (max-width: 1024px) {
                     .sheet-drag-handle {
                         display: flex;
                         justify-content: center;
@@ -1459,6 +1512,14 @@ export default function Welcome() {
                         background: rgba(0,0,0,0.18);
                     }
                     :root.dark .sheet-drag-bar { background: rgba(255,255,255,0.25); }
+                }
+
+                /* While the sheet is open on mobile, lock the page behind it so only
+                   the sheet's own content can scroll (desktop is left untouched). */
+                @media (max-width: 1024px) {
+                    body.sheet-open {
+                        overflow: hidden;
+                    }
                 }
 
                 /* While the sheet is open, nothing else should float over it — applies
@@ -1507,14 +1568,21 @@ export default function Welcome() {
                 }
 
                 /* ---------- HERO — oversized sliding name behind photo ---------- */
-                .hero-section {
-                    position: relative;
-                    overflow: hidden;
-                    padding: 0;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
+                /* line ~1511 — base rule, add min-height */
+/* line ~1511 */
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 92vh;
+    min-height: 92svh;
+}
+
+
+
 
                 .hero-marquee-wrap {
                     position: absolute;
@@ -1532,22 +1600,23 @@ export default function Welcome() {
                     animation: hero-marquee 18s linear infinite;
                     animation-play-state: running !important;
                 }
-                .hero-marquee-text {
-                    flex: 0 0 auto;
-                    font-size: clamp(4.5rem, 22vw, 18.5rem);
-                    font-weight: 800;
-                    text-transform: uppercase;
-                    letter-spacing: -0.03em;
-                    white-space: nowrap;
-                    padding-right: 5vw;
-                    color: transparent;
-                    -webkit-text-stroke: 1.5px rgba(16,16,16,0.55);
-                    opacity: 0.55;
-                }
-                :root.dark .hero-marquee-text {
-                    -webkit-text-stroke: 1.5px rgba(255,255,255,0.45);
-                    opacity: 0.6;
-                }
+               /* line ~1536 */
+.hero-marquee-text {
+    flex: 0 0 auto;
+    font-size: clamp(4.5rem, 22vw, 18.5rem);
+    font-weight: 900;                          /* was 800 */
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    padding-right: 5vw;
+    color: transparent;
+    -webkit-text-stroke: 2.5px rgba(16,16,16,0.6);  /* was 1.5px / 0.55 */
+    opacity: 0.6;
+}
+:root.dark .hero-marquee-text {
+    -webkit-text-stroke: 2.5px rgba(255,255,255,0.5);  /* was 1.5px / 0.45 */
+    opacity: 0.65;
+}
 
                 @keyframes hero-marquee {
                     0%   { transform: translate3d(0, 0, 0); }
@@ -1577,18 +1646,19 @@ max-height: min(90vh, 900px);
     transform: translateY(0);
 }
 
+/* line ~1581 */
 @media (max-width: 820px) {
     .hero-photo-img {
-        width: clamp(170px, 52vw, 300px);
-        max-height: 52vh;
+        width: clamp(220px, 78vw, 360px);   /* was clamp(170px, 52vw, 300px) */
+        max-height: 66vh;                    /* was 52vh */
         margin-bottom: calc(var(--dock-space-mobile) + 0.25rem);
     }
 }
 
 @media (max-width: 380px) {
     .hero-photo-img {
-        width: clamp(150px, 60vw, 260px);
-        max-height: 46vh;
+        width: clamp(200px, 82vw, 300px);   /* was clamp(150px, 60vw, 260px) */
+        max-height: 60vh;                    /* was 46vh */
     }
 }
                 .hero-photo-wrap {
@@ -1646,10 +1716,24 @@ max-height: min(90vh, 900px);
                     opacity: .7;
                 }
 
-                @media (max-width: 820px) {
-                    .hero-photo { width: clamp(180px, 58vw, 320px); }
-                    .hero-caption { bottom: 1.75rem; }
-                }
+                /* line ~1650 — inside the existing mobile media block, add hero-section override */
+@media (max-width: 820px) {
+    .hero-section {
+    align-items: flex-end;
+        min-height: 88vh;
+        min-height: 88svh;
+    }
+    .hero-photo { width: clamp(180px, 58vw, 320px); }
+    .hero-caption { bottom: 1.75rem; }
+
+    .hero-marquee-text {
+        font-size: clamp(5rem, 27vw, 12rem);
+        -webkit-text-stroke: 3px rgba(16,16,16,0.65);
+    }
+    :root.dark .hero-marquee-text {
+        -webkit-text-stroke: 3px rgba(255,255,255,0.55);
+    }
+}
             `}</style>
 
             <div className="portfolio-root">
@@ -1663,6 +1747,7 @@ max-height: min(90vh, 900px);
                     {/* HOME */}
                     {/* HERO — oversized sliding name behind photo */}
                     <section
+                        data-nav-theme="dark"
                         id="hero"
                         ref={(el) => {
                             sectionRefs.current.hero = el;
@@ -1684,6 +1769,7 @@ max-height: min(90vh, 900px);
                         </div>
                     </section>
                     <section
+                        data-nav-theme="dark"
                         id="home"
                         ref={(el) => {
                             sectionRefs.current.home = el;
@@ -1765,6 +1851,7 @@ max-height: min(90vh, 900px);
 
                     {/* ABOUT */}
                     <section
+                        data-nav-theme="dark"
                         id="about"
                         ref={(el) => {
                             sectionRefs.current.about = el;
@@ -1984,6 +2071,7 @@ max-height: min(90vh, 900px);
 
                     {/* PROJECTS */}
                     <section
+                        data-nav-theme="dark"
                         id="projects"
                         ref={(el) => {
                             sectionRefs.current.projects = el;
