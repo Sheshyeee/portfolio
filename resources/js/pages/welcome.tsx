@@ -155,37 +155,13 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'about', label: 'About', icon: UserIcon },
-    { id: 'projects', label: 'Projects', icon: GridIcon },
     { id: 'skills', label: 'Skills', icon: CodeIcon },
+    { id: 'projects', label: 'Projects', icon: GridIcon },
 ];
 
 function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
     const glassRef = useRef<HTMLDivElement | null>(null);
     const [hovered, setHovered] = useState<number | null>(null);
-    const [onDark, setOnDark] = useState(false); // NEW
-
-    // NEW — watches scroll position vs. any [data-nav-theme="dark"] section
-    useEffect(() => {
-        const zones = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-theme="dark"]'));
-        if (zones.length === 0) return;
-
-        const check = () => {
-            const dockY = window.innerHeight - 56; // approx vertical center of the floating dock
-            const isDark = zones.some((el) => {
-                const r = el.getBoundingClientRect();
-                return r.top <= dockY && r.bottom >= dockY;
-            });
-            setOnDark(isDark);
-        };
-
-        check();
-        window.addEventListener('scroll', check, { passive: true });
-        window.addEventListener('resize', check);
-        return () => {
-            window.removeEventListener('scroll', check);
-            window.removeEventListener('resize', check);
-        };
-    }, []);
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const el = glassRef.current;
@@ -210,18 +186,18 @@ function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: strin
                     {NAV_ITEMS.map((item, i) => {
                         const isActive = active === item.id;
                         const distance = hovered === null ? 99 : Math.abs(hovered - i);
-                        const scale = distance === 0 ? 1.14 : distance === 1 ? 1.05 : 1;
+                        const scale = distance === 0 ? 1.22 : distance === 1 ? 1.08 : 1;
+                        const lift = distance === 0 ? -8 : distance === 1 ? -3 : 0;
                         const Icon = item.icon;
                         return (
                             <button
                                 key={item.id}
                                 type="button"
                                 className={`dock-item ${isActive ? 'active' : ''}`}
-                                style={{ transform: `scale(${scale})` }}
+                                style={{ transform: `translateY(${lift}px) scale(${scale})` }}
                                 onMouseEnter={() => setHovered(i)}
                                 onClick={() => onSelect(item.id)}
                                 aria-label={item.label}
-                                liquid-doc
                                 aria-current={isActive}
                             >
                                 <Icon />
@@ -306,7 +282,7 @@ const PROJECTS: Project[] = [
     },
     {
         title: 'Smart Pet Breed Identification System (Web & Mobile App)',
-        desc: 'A deep learning system we trained ourselves to identify dog breeds from photos, giving instant breed insights. An admin portal supports continuous learning by correcting low-confidence scans, which are fed back into the dataset to retrain and improve the model.',
+        desc: 'A self-trained deep learning system that identifies dog breeds from photos and improves via an admin-driven retraining loop.',
         tags: ['React', 'TypeScript', 'React Native (Expo)', 'Laravel', 'FastAPI', 'Python'],
         images: ['/left.png', '/right.png', '/front.png'],
         caseStudy: {
@@ -644,14 +620,67 @@ function ProjectCard({ project, onViewCaseStudy }: { project: Project; onViewCas
 function ProjectsCarousel() {
     const [index, setIndex] = useState(0);
     const [openProject, setOpenProject] = useState<Project | null>(null);
+    const [isSpinning, setIsSpinning] = useState(false);
     const count = PROJECTS.length;
 
+    // Wraps the whole carousel (arrows + dots included) so IntersectionObserver
+    // can tell us when the user has actually scrolled it into view.
+    const carouselRef = useRef<HTMLDivElement>(null);
+    // Guards against re-triggering the auto-spin every time the section
+    // scrolls in/out of view — it should only ever play once.
+    const hasAutoSpun = useRef(false);
+
     const goTo = (i: number) => setIndex((i + count) % count);
-    const prev = () => goTo(index - 1);
-    const next = () => goTo(index + 1);
+    const prev = () => {
+        if (isSpinning) return;
+        goTo(index - 1);
+    };
+    const next = () => {
+        if (isSpinning) return;
+        goTo(index + 1);
+    };
+
+    // Auto-spin once, right-to-left, all the way back around to the first
+    // project, then stop and hand control back to the user.
+    useEffect(() => {
+        const el = carouselRef.current;
+        if (!el || count <= 1) return;
+
+        const SPIN_STEP_MS = 240; // speed of the auto-spin — lower = faster
+        // Kept slightly under the 320ms card transition (see className below)
+        // so each step overlaps the tail of the previous one instead of
+        // pausing between steps — that overlap is what reads as a smooth,
+        // continuous spin rather than a jerky series of stops.
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting || hasAutoSpun.current) return;
+
+                    hasAutoSpun.current = true;
+                    setIsSpinning(true);
+
+                    let ticks = 0;
+                    const spinInterval = setInterval(() => {
+                        ticks += 1;
+                        setIndex((prev) => (prev + 1) % count);
+
+                        if (ticks >= count) {
+                            clearInterval(spinInterval);
+                            setIsSpinning(false);
+                        }
+                    }, SPIN_STEP_MS);
+                });
+            },
+            { threshold: 0.4 },
+        );
+
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [count]);
 
     return (
-        <div className="relative mt-8 select-none">
+        <div ref={carouselRef} className="relative mt-8 select-none">
             <div className="relative mx-auto flex h-[560px] max-w-[1100px] items-center justify-center overflow-hidden px-[8vw] md:h-[600px] md:px-0">
                 {PROJECTS.map((project, i) => {
                     // position relative to active index: -1 = prev, 0 = active, 1 = next
@@ -662,18 +691,22 @@ function ProjectsCarousel() {
                     const isActive = offset === 0;
                     const isNeighbor = Math.abs(offset) === 1;
 
-                    if (!isActive && !isNeighbor) return null; // only render active + immediate neighbors
-
+                    // Every card stays mounted (there are only a handful of
+                    // projects) so it can slide smoothly through the visible
+                    // zone instead of popping in/out at ±1. Cards two-or-more
+                    // away are just faded to invisible and ignore clicks.
                     const translateX = offset * 92; // % — controls how much of neighbor peeks in
                     const scale = isActive ? 1 : 0.9;
-                    const opacity = isActive ? 1 : 0.55;
-                    const zIndex = isActive ? 10 : 5;
+                    const opacity = isActive ? 1 : isNeighbor ? 0.55 : 0;
+                    const zIndex = isActive ? 10 : isNeighbor ? 5 : 1;
 
                     return (
                         <div
                             key={project.title}
-                            className="absolute w-[78%] transition-all duration-500 ease-out md:w-[62%]"
-                            onClick={!isActive ? () => goTo(i) : undefined}
+                            className={`absolute w-[78%] md:w-[62%] ${
+                                isSpinning ? 'transition-all duration-[320ms] ease-linear' : 'transition-all duration-500 ease-out'
+                            }`}
+                            onClick={!isActive && isNeighbor && !isSpinning ? () => goTo(i) : undefined}
                             style={{
                                 transform: `translateX(${translateX}%) scale(${scale})`,
                                 opacity,
@@ -702,16 +735,18 @@ function ProjectsCarousel() {
             <button
                 type="button"
                 onClick={prev}
+                disabled={isSpinning}
                 aria-label="Previous project"
-                className="absolute top-1/2 left-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] md:left-6 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
+                className="absolute top-1/2 left-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] disabled:pointer-events-none disabled:opacity-40 md:left-6 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
             >
                 <ChevronLeftIcon />
             </button>
             <button
                 type="button"
                 onClick={next}
+                disabled={isSpinning}
                 aria-label="Next project"
-                className="absolute top-1/2 right-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] md:right-6 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
+                className="absolute top-1/2 right-2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--hair)] bg-white text-[#101010] shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#F3F1EE] disabled:pointer-events-none disabled:opacity-40 md:right-6 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
             >
                 <ChevronRightIcon />
             </button>
@@ -723,8 +758,9 @@ function ProjectsCarousel() {
                         key={project.title}
                         type="button"
                         aria-label={`Go to ${project.title}`}
-                        onClick={() => goTo(i)}
-                        className="h-2 rounded-full transition-all"
+                        onClick={() => !isSpinning && goTo(i)}
+                        disabled={isSpinning}
+                        className="h-2 rounded-full transition-all disabled:pointer-events-none"
                         style={{
                             width: i === index ? '22px' : '8px',
                             backgroundColor: i === index ? 'var(--ink)' : 'var(--hair)',
@@ -741,6 +777,41 @@ export default function Welcome() {
     const [loading, setLoading] = useState(true);
     const [active, setActive] = useState('home');
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+    // The DOM section ids don't map 1:1 onto the 4 nav buttons — this table
+    // is the single source of truth for which nav button should light up
+    // for each section, and (below, in NAV_TARGET) where clicking that
+    // button should scroll to:
+    //   hero   (top marquee/photo intro)         → Home
+    //   home   (avatar, name, bio — "about me")   → About
+    //   about  (tech stack / experience / edu)    → Skills
+    //   skills (Tech Stack card, nested in About) → Skills
+    //   contact(Get-in-touch card, nested there)  → Skills
+    //   projects                                  → Projects
+    const SECTION_TO_NAV: Record<string, string> = {
+        hero: 'home',
+        home: 'about',
+        about: 'skills',
+        skills: 'skills',
+        contact: 'skills',
+        projects: 'projects',
+    };
+
+    // Where each nav button should actually scroll to. "home" is handled as
+    // a special case below (always the literal top of the page).
+    const NAV_TARGET: Record<string, string> = {
+        home: 'hero',
+        about: 'home',
+        skills: 'about',
+        projects: 'projects',
+    };
+
+    // While a nav click is smooth-scrolling the page, sections it scrolls
+    // *past* (e.g. About while heading to Projects) can also briefly cross
+    // the spy's intersection band and hijack `active` mid-flight. This ref
+    // marks a short window after a manual click during which the scroll-spy
+    // defers to the click's own target instead of what's passing by.
+    const suppressSpyUntil = useRef(0);
 
     const [copiedLabel, setCopiedLabel] = useState<string | null>(null);
 
@@ -763,8 +834,9 @@ export default function Welcome() {
     useEffect(() => {
         const spy = new IntersectionObserver(
             (entries) => {
+                if (Date.now() < suppressSpyUntil.current) return; // a manual nav click is still settling
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting) setActive(entry.target.id);
+                    if (entry.isIntersecting) setActive(SECTION_TO_NAV[entry.target.id] ?? entry.target.id);
                 });
             },
             { rootMargin: '-42% 0px -50% 0px', threshold: 0 },
@@ -972,7 +1044,19 @@ export default function Welcome() {
     ];
 
     const scrollTo = (id: string) => {
-        sectionRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActive(id); // instant feedback — don't wait on the scroll-spy to catch up
+        suppressSpyUntil.current = Date.now() + 900; // clears once the smooth scroll has settled
+
+        // "Home" always means the very top of the page — window.scrollTo(0)
+        // is more reliable than scrolling to the hero ref, since it can't be
+        // thrown off by fixed/sticky offsets above it.
+        if (id === 'home') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        const targetId = NAV_TARGET[id] ?? id;
+        sectionRefs.current[targetId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     return (
@@ -1009,6 +1093,34 @@ export default function Welcome() {
                     transition: background-color .3s ease, color .3s ease;
                 }
 
+                /* ---------- Site chrome (dock + dark-mode toggle) wrapper ----------
+                   Hidden only while the intro (LoadingScreen) is up; slides and
+                   fades smoothly back into position the instant it's done.
+                   NOTE: the transform/opacity animation is applied to the direct
+                   children (the actual position:fixed elements), not to
+                   .site-chrome itself — putting a transform on a non-fixed
+                   ancestor would turn it into a new containing block and break
+                   the dock/toggle's fixed pinning to the viewport. */
+                .site-chrome > * {
+                    transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+                    transform: translateY(0);
+                }
+                .site-chrome.site-chrome-hidden {
+                    pointer-events: none;
+                }
+                .site-chrome.site-chrome-hidden > * {
+                    opacity: 0;
+                    transform: translateY(16px);
+                }
+                .chat-widget-mobile-anchor {
+                    transition: opacity .6s cubic-bezier(.16,1,.3,1) .1s, transform .6s cubic-bezier(.16,1,.3,1) .1s;
+                }
+                .chat-widget-mobile-anchor.site-chrome-hidden {
+                    opacity: 0;
+                    transform: translateY(16px);
+                    pointer-events: none;
+                }
+
                 /* ---------- Liquid glass dock — always bottom-center ---------- */
                 .liquid-dock {
                     position: fixed;
@@ -1035,32 +1147,40 @@ export default function Welcome() {
                     gap: 0;
 
                     border-radius: 1.875rem;
-                    background: rgba(255,255,255,0.28);
-                    border: 1px solid rgba(255,255,255,0.5);
-                    backdrop-filter: blur(28px) saturate(180%);
-                    -webkit-backdrop-filter: blur(28px) saturate(180%);
+                    /* Lower alpha + lighter blur than before so whatever sits behind
+                       the pill (photo, headline text, dark UI) reads faintly through
+                       it — genuine glass rather than a near-solid chip. Legibility is
+                       kept up separately via the icon/label shadow below, not by
+                       relying on the pill's own opacity. */
+                    background: rgba(255,255,255,0.14);
+                    border: 1px solid rgba(255,255,255,0.4);
+                    backdrop-filter: blur(6px) saturate(140%);
+                    -webkit-backdrop-filter: blur(6px) saturate(140%);
                     box-shadow:
                         0 22px 50px rgba(0,0,0,0.14),
                         0 4px 14px rgba(0,0,0,0.07),
-                        inset 0 1px 0 rgba(255,255,255,0.8);
+                        inset 0 1px 0 rgba(255,255,255,0.45);
                     overflow: visible;
                     transition: background-color .3s ease, border-color .3s ease;
                 }
                 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
                     .liquid-dock-glass {
-                        background: rgba(250,250,250,0.92);
+                        background: rgba(250,250,250,0.94);
                     }
                     :root.dark .liquid-dock-glass {
-                        background: rgba(30,30,30,0.92);
+                        background: rgba(24,24,24,0.94);
                     }
                 }
                 :root.dark .liquid-dock-glass {
-                    background: rgba(255,255,255,0.10);
-                    border: 1px solid rgba(255,255,255,0.18);
+                    /* Dark tint (not a low-opacity white one) so the pill reads as
+                       genuinely dark glass — it won't wash out to a light blob when
+                       it passes over light content behind it (photos, light cards). */
+                    background: rgba(22,22,24,0.16);
+                    border: 1px solid rgba(255,255,255,0.1);
                     box-shadow:
                         0 22px 50px rgba(0,0,0,0.5),
                         0 4px 14px rgba(0,0,0,0.3),
-                        inset 0 1px 0 rgba(255,255,255,0.22);
+                        inset 0 1px 0 rgba(255,255,255,0.1);
                 }
                 .liquid-dock-glass::before {
                     content: '';
@@ -1091,7 +1211,7 @@ export default function Welcome() {
                 .dock-group {
                     display: flex;
                     flex-direction: row;
-                    align-items: center;
+                    align-items: flex-end;
                     gap: 0.125rem;
                 }
                 .dock-item {
@@ -1119,6 +1239,14 @@ export default function Welcome() {
                 .dock-item svg {
                     width: 22px;
                     height: 22px;
+                    /* With the pill now noticeably more see-through, a soft drop
+                       shadow keeps the icon readable over any backdrop (dark
+                       photo, busy text, light card) without needing the glass
+                       itself to be more opaque. */
+                    filter: drop-shadow(0 1px 2px rgba(255,255,255,0.9)) drop-shadow(0 1px 4px rgba(0,0,0,0.25));
+                }
+                :root.dark .dock-item svg {
+                    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7)) drop-shadow(0 0 4px rgba(0,0,0,0.5));
                 }
                 /* line ~1099 */
 .dock-item.active {
@@ -1145,10 +1273,15 @@ export default function Welcome() {
                     line-height: 1;
                     letter-spacing: 0.01em;
                     color: #6b6b6b;
+                    /* Same reasoning as the icon shadow above — keeps the label
+                       legible against whatever is showing through the more
+                       transparent glass. */
+                    text-shadow: 0 1px 2px rgba(255,255,255,0.95), 0 0 6px rgba(255,255,255,0.7);
                     transition: color .25s ease, font-weight .25s ease;
                 }
                 :root.dark .dock-label {
                     color: #FFFFFF;
+                    text-shadow: 0 1px 2px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.6);
                 }
                 .dock-item.active .dock-label {
                     color: inherit;
@@ -1169,21 +1302,6 @@ export default function Welcome() {
                     .liquid-dock-glass { padding: 0.5rem 0.75rem; gap: 0.25rem; }
                     .dock-item { min-width: 3rem; padding: 0.375rem 0.4rem; }
                 }
-
-                .nav-on-dark .liquid-dock-glass {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.22);
-}
-.nav-on-dark .dock-item {
-    color: rgba(255, 255, 255, 0.75);
-}
-.nav-on-dark .dock-label {
-    color: rgba(255, 255, 255, 0.6);
-}
-.nav-on-dark .dock-item.active {
-    color: #66b3ff;
-    background: rgba(255, 255, 255, 0.22);
-}
 
                 /* ---------- Layout / sections ---------- */
                 .portfolio-main {
@@ -1737,9 +1855,14 @@ max-height: min(90vh, 900px);
             `}</style>
 
             <div className="portfolio-root">
-                <LiquidDock active={active} onSelect={scrollTo} />
-                <DarkModeToggle />
-                <div className="chat-widget-mobile-anchor">
+                {/* Hidden only while the intro (LoadingScreen) animation is
+                    playing — reveals with a smooth slide+fade the moment it
+                    completes, regardless of scroll position afterward. */}
+                <div className={`site-chrome ${loading ? 'site-chrome-hidden' : ''}`}>
+                    <LiquidDock active={active} onSelect={scrollTo} />
+                    <DarkModeToggle />
+                </div>
+                <div className={`chat-widget-mobile-anchor ${loading ? 'site-chrome-hidden' : ''}`}>
                     <ChatWidget />
                 </div>
 
@@ -1747,7 +1870,6 @@ max-height: min(90vh, 900px);
                     {/* HOME */}
                     {/* HERO — oversized sliding name behind photo */}
                     <section
-                        data-nav-theme="dark"
                         id="hero"
                         ref={(el) => {
                             sectionRefs.current.hero = el;
@@ -1769,13 +1891,14 @@ max-height: min(90vh, 900px);
                         </div>
                     </section>
                     <section
-                        data-nav-theme="dark"
                         id="home"
                         ref={(el) => {
                             sectionRefs.current.home = el;
                         }}
                         className="section home-section"
                     >
+                        <p className="eyebrow px-3 sm:px-5 md:px-0">About</p>
+
                         {/* Cover + avatar wrapper — avatar is absolutely positioned INSIDE this, so it always sits on top */}
                         <div className="relative w-full">
                             <div className="home-cover">
@@ -1851,14 +1974,13 @@ max-height: min(90vh, 900px);
 
                     {/* ABOUT */}
                     <section
-                        data-nav-theme="dark"
                         id="about"
                         ref={(el) => {
                             sectionRefs.current.about = el;
                         }}
                         className="section"
                     >
-                        <p className="eyebrow">About</p>
+                        <p className="eyebrow">Skills</p>
                         <h2 className="h2">Stack, experience, education.</h2>
                         <p className="section-intro">
                             A quick look at how I work day to day: the tools I reach for, the roles I've held, where I studied, and the fastest way to
@@ -2071,7 +2193,6 @@ max-height: min(90vh, 900px);
 
                     {/* PROJECTS */}
                     <section
-                        data-nav-theme="dark"
                         id="projects"
                         ref={(el) => {
                             sectionRefs.current.projects = el;
