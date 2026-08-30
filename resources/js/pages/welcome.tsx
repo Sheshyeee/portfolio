@@ -1147,15 +1147,16 @@ export default function Welcome() {
                     gap: 0;
 
                     border-radius: 1.875rem;
-                    /* Lower alpha + lighter blur than before so whatever sits behind
-                       the pill (photo, headline text, dark UI) reads faintly through
-                       it — genuine glass rather than a near-solid chip. Legibility is
-                       kept up separately via the icon/label shadow below, not by
-                       relying on the pill's own opacity. */
-                    background: rgba(255,255,255,0.14);
-                    border: 1px solid rgba(255,255,255,0.4);
-                    backdrop-filter: blur(6px) saturate(140%);
-                    -webkit-backdrop-filter: blur(6px) saturate(140%);
+                    /* Frosted rather than near-invisible: strong blur + enough
+                       opacity that a single fixed icon/label color is always
+                       legible, no matter what's behind it (photo, dark code,
+                       light dashboard). Still clearly glass/translucent —
+                       content behind is softened and tinted, just not
+                       see-through enough to threaten legibility. */
+                    background: rgba(255,255,255,0.55);
+                    border: 1px solid rgba(255,255,255,0.6);
+                    backdrop-filter: blur(20px) saturate(160%);
+                    -webkit-backdrop-filter: blur(20px) saturate(160%);
                     box-shadow:
                         0 22px 50px rgba(0,0,0,0.14),
                         0 4px 14px rgba(0,0,0,0.07),
@@ -1175,8 +1176,8 @@ export default function Welcome() {
                     /* Dark tint (not a low-opacity white one) so the pill reads as
                        genuinely dark glass — it won't wash out to a light blob when
                        it passes over light content behind it (photos, light cards). */
-                    background: rgba(22,22,24,0.16);
-                    border: 1px solid rgba(255,255,255,0.1);
+                    background: rgba(22,22,24,0.6);
+                    border: 1px solid rgba(255,255,255,0.12);
                     box-shadow:
                         0 22px 50px rgba(0,0,0,0.5),
                         0 4px 14px rgba(0,0,0,0.3),
@@ -1229,24 +1230,24 @@ export default function Welcome() {
                     background: transparent;
                     border: none;
                     margin-left: 1rem;
-                    color: #4b4b4b;
+                    color: #ffffff;
                     cursor: pointer;
                     transition: transform .4s cubic-bezier(.34,1.56,.64,1),
                                 background-color .3s ease, color .3s ease;
                 }
-                :root.dark .dock-item { color: #a1a1a1; }
                 .dock-item:hover { background: transparent; }
+                /* The glass is frosted enough now (see .liquid-dock-glass) that
+                   a single fixed color per theme is legible everywhere — no
+                   outline or blend-mode trick needed. */
+                .dock-item:not(.active) svg {
+                    color: #4b4b4b;
+                }
+                :root.dark .dock-item:not(.active) svg {
+                    color: #d4d4d4;
+                }
                 .dock-item svg {
                     width: 22px;
                     height: 22px;
-                    /* With the pill now noticeably more see-through, a soft drop
-                       shadow keeps the icon readable over any backdrop (dark
-                       photo, busy text, light card) without needing the glass
-                       itself to be more opaque. */
-                    filter: drop-shadow(0 1px 2px rgba(255,255,255,0.9)) drop-shadow(0 1px 4px rgba(0,0,0,0.25));
-                }
-                :root.dark .dock-item svg {
-                    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7)) drop-shadow(0 0 4px rgba(0,0,0,0.5));
                 }
                 /* line ~1099 */
 .dock-item.active {
@@ -1272,16 +1273,11 @@ export default function Welcome() {
                     font-weight: 500;
                     line-height: 1;
                     letter-spacing: 0.01em;
-                    color: #6b6b6b;
-                    /* Same reasoning as the icon shadow above — keeps the label
-                       legible against whatever is showing through the more
-                       transparent glass. */
-                    text-shadow: 0 1px 2px rgba(255,255,255,0.95), 0 0 6px rgba(255,255,255,0.7);
+                    color: #4b4b4b;
                     transition: color .25s ease, font-weight .25s ease;
                 }
                 :root.dark .dock-label {
-                    color: #FFFFFF;
-                    text-shadow: 0 1px 2px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.6);
+                    color: #d4d4d4;
                 }
                 .dock-item.active .dock-label {
                     color: inherit;
