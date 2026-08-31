@@ -1146,7 +1146,7 @@ export default function Welcome() {
                     padding: 0.5rem 0.625rem;
                     gap: 0;
 
-                    border-radius: 1.875rem;
+                    border-radius: 1.975rem;
                     /* Frosted rather than near-invisible: strong blur + enough
                        opacity that a single fixed icon/label color is always
                        legible, no matter what's behind it (photo, dark code,
@@ -1263,7 +1263,7 @@ export default function Welcome() {
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
+}a
                 .dock-item:active {
                     transform: scale(0.96);
                 }
