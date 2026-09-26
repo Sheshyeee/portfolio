@@ -20,9 +20,12 @@ php artisan view:cache || true
 # Ensure storage symlink exists (for public file access)
 php artisan storage:link || true
 
-# Run migrations automatically on boot (set RUN_MIGRATIONS=false to skip)
-if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
+# Run migrations automatically on boot, but only if a DB is actually configured
+# (set RUN_MIGRATIONS=false to force-skip even if DB_CONNECTION is set)
+if [ -n "$DB_CONNECTION" ] && [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
     php artisan migrate --force || true
+else
+    echo "Skipping migrations (no DB_CONNECTION set or RUN_MIGRATIONS=false)"
 fi
 
 # Fix permissions in case volumes reset ownership
