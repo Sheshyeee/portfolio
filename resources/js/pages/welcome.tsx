@@ -258,96 +258,107 @@ export default function Welcome() {
                 }
                 .chat-widget-mobile-anchor > * { pointer-events: auto; }
 
-               /* ---- Liquid dock (bottom nav) ---- */
-.liquid-dock-glass {
-    --mx: 50%; --my: 0%; --glow: 0;
-    position: relative; display: inline-flex; flex-direction: row; align-items: center;
-    width: fit-content; max-width: calc(100vw - 2rem); padding: 0.5rem 0.75rem; gap: 0.5rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    box-shadow:
-        0 20px 45px rgba(0, 0, 0, 0.16),
-        0 3px 12px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.7);
-    overflow: visible;
-    transition: background-color .3s ease, border-color .3s ease;
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .liquid-dock-glass { background: rgba(250,250,250,0.96); }
-    :root.dark .liquid-dock-glass { background: rgba(20,20,22,0.96); }
-}
-:root.dark .liquid-dock-glass {
-    background: rgba(30, 30, 32, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow:
-        0 20px 45px rgba(0, 0, 0, 0.55),
-        0 3px 12px rgba(0, 0, 0, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-.liquid-dock-glass::before {
-    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-    opacity: var(--glow); transition: opacity .35s ease;
-    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.35), transparent 65%);
-}
-:root.dark .liquid-dock-glass::before {
-    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.18), transparent 65%);
-}
-.liquid-dock-glass::after {
-    content: ''; position: absolute; top: 0; left: 12%; right: 12%; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
-    pointer-events: none;
-}
-:root.dark .liquid-dock-glass::after {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-}
-.dock-group { display: flex; flex-direction: row; align-items: center; gap: 0.15rem; }
-.dock-item {
-    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 0.2rem; min-width: 3.1rem; padding: 0.4rem 0.55rem;
-    border-radius: 1.125rem; background: transparent; border: none;
-    color: #6b6b6b; cursor: pointer;
-    transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease;
-}
-:root.dark .dock-item { color: #b0b0b0; }
-.dock-item svg { width: 21px; height: 21px; color: inherit; }
-.dock-item:hover:not(.active) svg { color: #101010; }
-:root.dark .dock-item:hover:not(.active) svg { color: #f0f0f0; }
+                /* ---- Liquid dock (bottom nav) ---- */
+                .liquid-dock {
+                    position: fixed;
+                    z-index: 50;
+                    left: 0;
+                    right: 0;
+                    top: auto;
+                    bottom: calc(16px + env(safe-area-inset-bottom));
+                    display: flex;
+                    justify-content: center;
+                    padding: 0 1rem;
+                }
+                .liquid-dock-glass {
+                    --mx: 50%; --my: 0%; --glow: 0;
+                    position: relative; display: inline-flex; flex-direction: row; align-items: center;
+                    width: fit-content; max-width: calc(100vw - 2rem); padding: 0.5rem 0.75rem; gap: 0.5rem;
+                    border-radius: 999px;
+                    background: rgba(255, 255, 255, 0.5);
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    backdrop-filter: blur(24px) saturate(180%);
+                    -webkit-backdrop-filter: blur(24px) saturate(180%);
+                    box-shadow:
+                        0 20px 45px rgba(0, 0, 0, 0.16),
+                        0 3px 12px rgba(0, 0, 0, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+                    overflow: visible;
+                    transition: background-color .3s ease, border-color .3s ease;
+                }
+                @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+                    .liquid-dock-glass { background: rgba(250,250,250,0.96); }
+                    :root.dark .liquid-dock-glass { background: rgba(20,20,22,0.96); }
+                }
+                :root.dark .liquid-dock-glass {
+                    background: rgba(30, 30, 32, 0.55);
+                    border: 1px solid rgba(255, 255, 255, 0.14);
+                    box-shadow:
+                        0 20px 45px rgba(0, 0, 0, 0.55),
+                        0 3px 12px rgba(0, 0, 0, 0.35),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                }
+                .liquid-dock-glass::before {
+                    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+                    opacity: var(--glow); transition: opacity .35s ease;
+                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.35), transparent 65%);
+                }
+                :root.dark .liquid-dock-glass::before {
+                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.18), transparent 65%);
+                }
+                .liquid-dock-glass::after {
+                    content: ''; position: absolute; top: 0; left: 12%; right: 12%; height: 1px;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+                    pointer-events: none;
+                }
+                :root.dark .liquid-dock-glass::after {
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+                }
+                .dock-group { display: flex; flex-direction: row; align-items: center; gap: 0.15rem; }
+                .dock-item {
+                    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    gap: 0.2rem; min-width: 3.1rem; padding: 0.4rem 0.55rem;
+                    border-radius: 1.125rem; background: transparent; border: none;
+                    color: #6b6b6b; cursor: pointer;
+                    transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease;
+                }
+                :root.dark .dock-item { color: #b0b0b0; }
+                .dock-item svg { width: 21px; height: 21px; color: inherit; }
+                .dock-item:hover:not(.active) svg { color: #101010; }
+                :root.dark .dock-item:hover:not(.active) svg { color: #f0f0f0; }
 
-/* Solid-ish white/dark capsule for the active tab — deliberately MORE
-   opaque than the glass behind it, so it reads as a clear highlight
-   instead of blending into the same translucent fill */
-.dock-item.active {
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1);
-}
-.dock-item.active svg,
-.dock-item.active .dock-label { color: #0A84FF; }
-:root.dark .dock-item.active {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-:root.dark .dock-item.active svg,
-:root.dark .dock-item.active .dock-label { color: #6cb3ff; }
+                /* Solid-ish white/dark capsule for the active tab — deliberately MORE
+                   opaque than the glass behind it, so it reads as a clear highlight
+                   instead of blending into the same translucent fill */
+                .dock-item.active {
+                    background: rgba(255, 255, 255, 0.9);
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1);
+                }
+                .dock-item.active svg,
+                .dock-item.active .dock-label { color: #0A84FF; }
+                :root.dark .dock-item.active {
+                    background: rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                }
+                :root.dark .dock-item.active svg,
+                :root.dark .dock-item.active .dock-label { color: #6cb3ff; }
 
-.dock-item:active { transform: scale(0.96); }
-.dock-label {
-    display: block; font-size: 10.5px; font-weight: 500; line-height: 1; letter-spacing: 0.01em;
-    color: inherit; transition: color .25s ease, font-weight .25s ease;
-}
-.dock-item.active .dock-label { font-weight: 600; }
-.dock-tooltip { display: none; }
-@media (prefers-reduced-motion: reduce) {
-    .dock-item { transition: none; }
-    .dock-item:active { transform: none; }
-}
-@media (max-width: 380px) {
-    .liquid-dock { bottom: 0.875rem; padding: 0 0.75rem; }
-    .liquid-dock-glass { padding: 0.4rem 0.6rem; gap: 0.35rem; }
-    .dock-item { min-width: 2.85rem; padding: 0.35rem 0.4rem; }
-}
+                .dock-item:active { transform: scale(0.96); }
+                .dock-label {
+                    display: block; font-size: 10.5px; font-weight: 500; line-height: 1; letter-spacing: 0.01em;
+                    color: inherit; transition: color .25s ease, font-weight .25s ease;
+                }
+                .dock-item.active .dock-label { font-weight: 600; }
+                .dock-tooltip { display: none; }
+                @media (prefers-reduced-motion: reduce) {
+                    .dock-item { transition: none; }
+                    .dock-item:active { transform: none; }
+                }
+                @media (max-width: 380px) {
+                    .liquid-dock { bottom: 0.875rem; padding: 0 0.75rem; }
+                    .liquid-dock-glass { padding: 0.4rem 0.6rem; gap: 0.35rem; }
+                    .dock-item { min-width: 2.85rem; padding: 0.35rem 0.4rem; }
+                }
 
                 /* ---- Hero section ---- */
                 .hero-section {
