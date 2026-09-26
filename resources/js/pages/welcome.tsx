@@ -242,14 +242,13 @@ export default function Welcome() {
 
                 /* ---------- Chat widget: pinned to the true bottom edge, stacked
                    above the dock/toggle so an open chat panel visually covers them. ---------- */
-                .chat-widget-mobile-anchor {
-                    display: block;
-                    position: fixed;
-                    inset: 0;
-                    transform: translateZ(0);
-                    pointer-events: none;
-                    z-index: 999;
-                }
+               .chat-widget-mobile-anchor {
+    display: block;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+}
                 @media (max-width: 820px) {
                     .chat-widget-mobile-anchor { z-index: 999; pointer-events: none; }
                     .chat-widget-mobile-anchor > .chat-widget-fab {
