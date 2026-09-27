@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 type HomeSectionProps = {
     sectionRef: (el: HTMLElement | null) => void;
@@ -20,15 +20,20 @@ const EXPERIENCE: ExperienceItem[] = [
 
 export function HomeSection({ sectionRef }: HomeSectionProps) {
     const localRef = useRef<HTMLElement | null>(null);
-    const [visible, setVisible] = useState(false);
 
-    // Own IntersectionObserver so this section's reveal replays every time
-    // it re-enters view (not just the first time, like the rest of the page).
+    // Toggles a class directly on the DOM node on every intersection change,
+    // so the reveal plays each time the section re-enters view — not just once.
+    // No React state involved, so this can't trigger a render loop.
     useEffect(() => {
         const el = localRef.current;
         if (!el) return;
 
-        const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { threshold: 0.22 });
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                el.classList.toggle('is-visible', entry.isIntersecting);
+            },
+            { threshold: 0.2 },
+        );
 
         observer.observe(el);
         return () => observer.disconnect();
@@ -40,7 +45,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
     };
 
     return (
-        <section id="home" ref={attachRefs} className={`section xp-section ${visible ? 'is-visible' : ''}`}>
+        <section id="home" ref={attachRefs} className="section xp-section">
             <style>{`
                 .xp-section {
                     position: relative;
@@ -86,7 +91,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     gap: 2.75rem;
                 }
 
-                /* ---- top-left card: experience ---- */
                 .xp-top {
                     align-self: flex-start;
                     width: min(660px, 68%);
@@ -105,7 +109,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     transition-delay: .05s;
                 }
 
-                /* ---- bottom-right card: education + certification ---- */
                 .xp-bottom {
                     align-self: flex-end;
                     width: min(560px, 58%);
@@ -241,7 +244,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
             </p>
 
             <div className="xp-wrap">
-                {/* Top-left card: Experience */}
                 <div className="xp-top">
                     <p className="xp-eyebrow">
                         <svg
@@ -278,7 +280,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     </div>
                 </div>
 
-                {/* Bottom-right card: Education + Certification, merged */}
                 <div className="xp-bottom">
                     <div className="xp-block">
                         <p className="xp-block-tag">Education</p>
