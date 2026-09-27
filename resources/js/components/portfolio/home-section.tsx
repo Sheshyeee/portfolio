@@ -52,7 +52,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     justify-content: center;
                     background: #17171a;
                     overflow: hidden;
-                    padding: 3.5rem 0 calc(3rem + var(--dock-space-mobile, 6rem));
+                    padding: 4rem 0 calc(3rem + var(--dock-space-mobile, 6rem));
                     border-bottom: 1px solid rgba(255,255,255,0.08);
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
@@ -64,9 +64,9 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     transform: translate(-50%, -50%);
                     margin: 0;
                     width: max-content;
-                    font-size: clamp(5rem, 15vw, 12rem);
+                    font-size: clamp(4.5rem, 12.5vw, 10.5rem);
                     font-weight: 900;
-                    letter-spacing: -0.03em;
+                    letter-spacing: -0.02em;
                     line-height: 1;
                     text-transform: uppercase;
                     color: transparent;
@@ -80,6 +80,10 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
                 .xp-section.is-visible .xp-watermark { opacity: 1; }
 
+                /* This flex column only decides vertical order — the cards below
+                   size themselves with vw units so they stay anchored to the true
+                   viewport edges at any width down to the phone breakpoint,
+                   instead of depending on the parent's box being a fixed size. */
                 .xp-wrap {
                     position: relative;
                     z-index: 1;
@@ -89,17 +93,21 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     gap: 2.5rem;
                 }
 
+                .xp-card {
+                    border: 1px solid rgba(255,255,255,0.10);
+                    box-shadow: 0 30px 70px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+                    padding: 2.1rem 2.4rem 2.2rem;
+                }
+
                 .xp-top {
                     align-self: flex-start;
                     margin-left: 0;
-                    width: min(920px, 66%);
+                    width: min(880px, 60vw);
                     background:
-                        radial-gradient(130% 130% at 12% -15%, rgba(255,255,255,0.06), transparent 55%),
-                        linear-gradient(160deg, #232326 0%, #1b1b1e 55%, #171719 100%);
-                    border: 1px solid rgba(255,255,255,0.09);
+                        radial-gradient(120% 140% at 8% -20%, rgba(255,255,255,0.07), transparent 55%),
+                        radial-gradient(120% 160% at 105% 120%, rgba(0,0,0,0.4), transparent 60%),
+                        linear-gradient(160deg, #232326 0%, #1b1b1e 55%, #161618 100%);
                     border-radius: 0 1.75rem 1.75rem 1.75rem;
-                    padding: 2.25rem 2.5rem 2rem;
-                    box-shadow: 0 30px 70px rgba(0,0,0,0.4);
                     opacity: 0;
                     transform: translateY(28px) scale(0.97);
                     transition: opacity .6s cubic-bezier(.19,1,.22,1), transform .6s cubic-bezier(.19,1,.22,1);
@@ -113,14 +121,12 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 .xp-bottom {
                     align-self: flex-end;
                     margin-right: 0;
-                    width: min(640px, 54%);
+                    width: min(600px, 46vw);
                     background:
-                        radial-gradient(130% 130% at 85% -15%, rgba(255,255,255,0.06), transparent 55%),
-                        linear-gradient(160deg, #232326 0%, #1b1b1e 55%, #171719 100%);
-                    border: 1px solid rgba(255,255,255,0.09);
+                        radial-gradient(120% 140% at 95% -20%, rgba(255,255,255,0.07), transparent 55%),
+                        radial-gradient(120% 160% at -5% 120%, rgba(0,0,0,0.4), transparent 60%),
+                        linear-gradient(160deg, #232326 0%, #1b1b1e 55%, #161618 100%);
                     border-radius: 1.75rem 0 1.75rem 1.75rem;
-                    padding: 2.1rem 2.25rem 2rem;
-                    box-shadow: 0 30px 70px rgba(0,0,0,0.4);
                     opacity: 0;
                     transform: translateY(28px) scale(0.97);
                     transition: opacity .6s cubic-bezier(.19,1,.22,1), transform .6s cubic-bezier(.19,1,.22,1);
@@ -134,89 +140,120 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 .xp-eyebrow {
                     display: inline-flex;
                     align-items: center;
-                    gap: 0.4rem;
+                    gap: 0.45rem;
                     font-size: 0.72rem;
-                    font-weight: 600;
-                    letter-spacing: 0.08em;
+                    font-weight: 700;
+                    letter-spacing: 0.09em;
                     text-transform: uppercase;
-                    color: rgba(255,255,255,0.42);
+                    color: rgba(255,255,255,0.45);
                     margin: 0 0 1.5rem;
                 }
 
-                .xp-current-role {
-                    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
-                    font-weight: 800;
-                    letter-spacing: -0.02em;
-                    color: #f8f8f8;
-                    margin: 0;
-                    line-height: 1.15;
-                }
-                .xp-current-meta {
-                    font-size: 0.92rem;
-                    color: rgba(255,255,255,0.48);
-                    margin: 0.55rem 0 1.6rem;
-                }
-
+                /* Every experience entry — including the current one — shares
+                   this exact styling. No entry is sized up as a headline. */
                 .xp-list {
                     margin: 0;
-                    padding: 1.4rem 0 0;
-                    border-top: 1px solid rgba(255,255,255,0.08);
+                    padding: 0;
                     display: flex;
                     flex-direction: column;
-                    gap: 1.15rem;
                 }
                 .xp-list-row {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.85rem;
+                    padding: 1.1rem 0;
+                }
+                .xp-list-row + .xp-list-row {
+                    border-top: 1px solid rgba(255,255,255,0.08);
+                }
+                .xp-dot {
+                    flex-shrink: 0;
+                    margin-top: 0.4rem;
+                    width: 7px;
+                    height: 7px;
+                    border-radius: 50%;
+                    border: 1.5px solid rgba(255,255,255,0.35);
+                    background: transparent;
+                }
+                .xp-dot.is-current {
+                    background: #f5f5f5;
+                    border-color: #f5f5f5;
+                    box-shadow: 0 0 0 3px rgba(245,245,245,0.12);
+                }
+                .xp-list-main {
+                    flex: 1;
+                    min-width: 0;
                     display: flex;
                     align-items: baseline;
                     justify-content: space-between;
                     gap: 1rem;
                 }
                 .xp-list-role {
-                    font-size: 0.92rem;
+                    font-size: 0.94rem;
                     font-weight: 700;
-                    color: #e9e9e9;
+                    letter-spacing: -0.005em;
+                    color: #eaeaea;
                     margin: 0;
                 }
                 .xp-list-place {
                     font-size: 0.8rem;
-                    color: rgba(255,255,255,0.4);
-                    margin: 0.2rem 0 0;
+                    color: rgba(255,255,255,0.42);
+                    margin: 0.22rem 0 0;
                 }
                 .xp-list-dates {
                     font-size: 0.76rem;
-                    color: rgba(255,255,255,0.35);
+                    color: rgba(255,255,255,0.38);
                     white-space: nowrap;
                     flex-shrink: 0;
                 }
 
                 .xp-block + .xp-block {
-                    margin-top: 1.5rem;
-                    padding-top: 1.5rem;
+                    margin-top: 1.6rem;
+                    padding-top: 1.6rem;
                     border-top: 1px solid rgba(255,255,255,0.08);
+                }
+                .xp-block-head {
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: space-between;
+                    gap: 1rem;
+                    margin-bottom: 1.1rem;
                 }
                 .xp-block-tag {
                     font-size: 0.72rem;
-                    font-weight: 600;
-                    letter-spacing: 0.06em;
+                    font-weight: 700;
+                    letter-spacing: 0.08em;
                     text-transform: uppercase;
-                    color: rgba(255,255,255,0.4);
-                    margin: 0 0 0.9rem;
+                    color: rgba(255,255,255,0.42);
+                    margin: 0;
+                }
+                .xp-icon-badge {
+                    flex-shrink: 0;
+                    width: 2.3rem;
+                    height: 2.3rem;
+                    border-radius: 0.8rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.09);
+                    color: rgba(255,255,255,0.6);
                 }
                 .xp-degree {
-                    font-size: 1.1rem;
+                    font-size: 1.12rem;
                     font-weight: 800;
                     letter-spacing: -0.01em;
                     color: #f8f8f8;
                     margin: 0;
                 }
                 .xp-school {
-                    font-size: 0.85rem;
+                    font-size: 0.86rem;
                     color: rgba(255,255,255,0.5);
                     margin: 0.35rem 0 0;
                 }
                 .xp-dates {
                     font-size: 0.8rem;
-                    color: rgba(255,255,255,0.35);
+                    color: rgba(255,255,255,0.36);
                     margin: 0.35rem 0 0;
                 }
                 .xp-badge {
@@ -232,23 +269,25 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     font-weight: 700;
                 }
 
-                @media (max-width: 900px) {
-                    .xp-top, .xp-bottom { width: 100%; margin: 0; border-radius: 1.5rem; }
+                /* Only true phone widths fall back to a simple stacked card —
+                   tablets and small laptops keep the edge-bleed layout. */
+                @media (max-width: 640px) {
+                    .xp-top, .xp-bottom { width: 100%; margin: 0; border-radius: 1.4rem; }
                 }
-                @media (max-width: 820px) {
-                    .xp-section { padding: 4rem 5vw calc(2.5rem + var(--dock-space-mobile, 6rem)); }
-                    .xp-top, .xp-bottom { padding: 1.6rem 1.5rem 1.5rem; border-radius: 1.4rem; }
-                    .xp-list-row { flex-direction: column; gap: 0.15rem; }
-                    .xp-wrap { gap: 1.75rem; }
+                @media (max-width: 540px) {
+                    .xp-section { padding: 3.5rem 5vw calc(2.5rem + var(--dock-space-mobile, 6rem)); }
+                    .xp-card { padding: 1.6rem 1.5rem 1.6rem; }
+                    .xp-list-main { flex-direction: column; gap: 0.15rem; }
+                    .xp-wrap { gap: 1.5rem; }
                 }
             `}</style>
 
             <p className="xp-watermark" aria-hidden="true">
-                DAVE CLAPIS
+                DAVE MICHAEL CLAPIS
             </p>
 
             <div className="xp-wrap">
-                <div className="xp-top">
+                <div className="xp-top xp-card">
                     <p className="xp-eyebrow">
                         <svg
                             width="13"
@@ -266,27 +305,42 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                         Experience
                     </p>
 
-                    <p className="xp-current-role">{EXPERIENCE[0].role}</p>
-                    <p className="xp-current-meta">
-                        {EXPERIENCE[0].place} · {EXPERIENCE[0].dates}
-                    </p>
-
                     <div className="xp-list">
-                        {EXPERIENCE.slice(1).map((item) => (
+                        {EXPERIENCE.map((item) => (
                             <div className="xp-list-row" key={item.role}>
-                                <div>
-                                    <p className="xp-list-role">{item.role}</p>
-                                    <p className="xp-list-place">{item.place}</p>
+                                <span className={`xp-dot ${item.current ? 'is-current' : ''}`} />
+                                <div className="xp-list-main">
+                                    <div>
+                                        <p className="xp-list-role">{item.role}</p>
+                                        <p className="xp-list-place">{item.place}</p>
+                                    </div>
+                                    <p className="xp-list-dates">{item.dates}</p>
                                 </div>
-                                {item.dates && <p className="xp-list-dates">{item.dates}</p>}
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="xp-bottom">
+                <div className="xp-bottom xp-card">
                     <div className="xp-block">
-                        <p className="xp-block-tag">Education</p>
+                        <div className="xp-block-head">
+                            <p className="xp-block-tag">Education</p>
+                            <span className="xp-icon-badge" aria-hidden="true">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M22 10 12 5 2 10l10 5 10-5Z" />
+                                    <path d="M6 12v5c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5v-5" />
+                                </svg>
+                            </span>
+                        </div>
                         <p className="xp-degree">BS Computer Science</p>
                         <p className="xp-school">Bicol University</p>
                         <p className="xp-dates">2022 – 2026</p>
@@ -309,7 +363,24 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     </div>
 
                     <div className="xp-block">
-                        <p className="xp-block-tag">Certification</p>
+                        <div className="xp-block-head">
+                            <p className="xp-block-tag">Certification</p>
+                            <span className="xp-icon-badge" aria-hidden="true">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="12" cy="9" r="6" />
+                                    <path d="M8.5 14.2 7 22l5-3 5 3-1.5-7.8" />
+                                </svg>
+                            </span>
+                        </div>
                         <p className="xp-degree">NC III Programming</p>
                         <p className="xp-dates">November 2024</p>
                     </div>
