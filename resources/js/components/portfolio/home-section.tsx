@@ -50,27 +50,27 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 .xp-section {
                     position: relative;
                     justify-content: center;
-                    background: #0a0a0b;
+                    background: #17171a;
                     overflow: hidden;
-                    padding: 6.5rem 6vw calc(3rem + var(--dock-space-mobile, 6rem));
+                    padding: 3.5rem 0 calc(3rem + var(--dock-space-mobile, 6rem));
                     border-bottom: 1px solid rgba(255,255,255,0.08);
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
                 .xp-watermark {
                     position: absolute;
-                    left: -1vw;
-                    top: 52%;
-                    transform: translateY(-50%);
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
                     margin: 0;
                     width: max-content;
-                    font-size: clamp(3.5rem, 11vw, 8.5rem);
+                    font-size: clamp(5rem, 15vw, 12rem);
                     font-weight: 900;
                     letter-spacing: -0.03em;
                     line-height: 1;
                     text-transform: uppercase;
                     color: transparent;
-                    -webkit-text-stroke: 1.5px rgba(255,255,255,0.12);
+                    -webkit-text-stroke: 1.5px rgba(255,255,255,0.13);
                     z-index: 0;
                     pointer-events: none;
                     user-select: none;
@@ -84,21 +84,22 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     position: relative;
                     z-index: 1;
                     width: 100%;
-                    max-width: 1080px;
-                    margin: 0 auto;
                     display: flex;
                     flex-direction: column;
-                    gap: 2.75rem;
+                    gap: 2.5rem;
                 }
 
                 .xp-top {
                     align-self: flex-start;
-                    width: min(660px, 68%);
-                    background: linear-gradient(155deg, #18181b 0%, #101012 65%, #0a0a0b 100%);
-                    border: 1px solid rgba(255,255,255,0.08);
-                    border-radius: 1.75rem;
-                    padding: 2.25rem 2.25rem 2rem;
-                    box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+                    margin-left: 0;
+                    width: min(920px, 66%);
+                    background:
+                        radial-gradient(130% 130% at 12% -15%, rgba(255,255,255,0.06), transparent 55%),
+                        linear-gradient(160deg, #232326 0%, #1b1b1e 55%, #171719 100%);
+                    border: 1px solid rgba(255,255,255,0.09);
+                    border-radius: 0 1.75rem 1.75rem 1.75rem;
+                    padding: 2.25rem 2.5rem 2rem;
+                    box-shadow: 0 30px 70px rgba(0,0,0,0.4);
                     opacity: 0;
                     transform: translateY(28px) scale(0.97);
                     transition: opacity .6s cubic-bezier(.19,1,.22,1), transform .6s cubic-bezier(.19,1,.22,1);
@@ -111,12 +112,15 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
 
                 .xp-bottom {
                     align-self: flex-end;
-                    width: min(560px, 58%);
-                    background: linear-gradient(155deg, #18181b 0%, #101012 65%, #0a0a0b 100%);
-                    border: 1px solid rgba(255,255,255,0.08);
-                    border-radius: 1.75rem;
-                    padding: 2.1rem 2.1rem 2rem;
-                    box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+                    margin-right: 0;
+                    width: min(640px, 54%);
+                    background:
+                        radial-gradient(130% 130% at 85% -15%, rgba(255,255,255,0.06), transparent 55%),
+                        linear-gradient(160deg, #232326 0%, #1b1b1e 55%, #171719 100%);
+                    border: 1px solid rgba(255,255,255,0.09);
+                    border-radius: 1.75rem 0 1.75rem 1.75rem;
+                    padding: 2.1rem 2.25rem 2rem;
+                    box-shadow: 0 30px 70px rgba(0,0,0,0.4);
                     opacity: 0;
                     transform: translateY(28px) scale(0.97);
                     transition: opacity .6s cubic-bezier(.19,1,.22,1), transform .6s cubic-bezier(.19,1,.22,1);
@@ -229,10 +233,10 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
 
                 @media (max-width: 900px) {
-                    .xp-top, .xp-bottom { width: 100%; }
+                    .xp-top, .xp-bottom { width: 100%; margin: 0; border-radius: 1.5rem; }
                 }
                 @media (max-width: 820px) {
-                    .xp-section { padding: 5.5rem 5.5vw calc(2.5rem + var(--dock-space-mobile, 6rem)); }
+                    .xp-section { padding: 4rem 5vw calc(2.5rem + var(--dock-space-mobile, 6rem)); }
                     .xp-top, .xp-bottom { padding: 1.6rem 1.5rem 1.5rem; border-radius: 1.4rem; }
                     .xp-list-row { flex-direction: column; gap: 0.15rem; }
                     .xp-wrap { gap: 1.75rem; }

@@ -402,20 +402,7 @@ export default function Welcome() {
                     :root.dark .hero-marquee-text { -webkit-text-stroke: 3px rgba(255,255,255,0.55); }
                 }
 
-                /* ---- Home section (cover + avatar) ---- */
-                .home-section { justify-content: flex-start; padding-top: 7rem; }
-                @media (max-width: 820px) { .home-section { padding-top: 0; } }
-                @media (max-width: 480px) { .home-section { padding-top: 0; } }
-                .home-cover { width: 100%; height: 160px; overflow: hidden; background: #F3EFE9; border-radius: 28px; }
-                :root.dark .home-cover { background: #262626; }
-                @media (max-width: 820px) {
-                    .home-cover { margin-left: -5.5vw; margin-right: -5.5vw; width: calc(100% + 11vw); border-radius: 0; height: 190px; }
-                }
-                @media (max-width: 480px) {
-                    .home-cover { margin-left: -5vw; margin-right: -5vw; width: calc(100% + 10vw); height: 170px; }
-                }
-                @media (min-width: 821px) and (max-width: 1023px) { .home-cover { height: 220px; } }
-                @media (min-width: 1024px) { .home-cover { height: 340px; border-radius: 2rem; } }
+               
 
                 /* ---- Skills section (honor badges) ---- */
                 .honor-badge {
