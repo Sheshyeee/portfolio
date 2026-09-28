@@ -206,6 +206,9 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     gap: clamp(1.4rem, 3vw, 2.6rem);
                     min-height: 0;
                     padding: 0 !important;              /* peeks sit flush on the section edges */
+                    border-bottom: 0 !important;        /* no line under the bottom peek */
+                    margin-top: 0 !important;
+                    border-top: 0 !important;
                     background: #141414;                /* same as the Home section */
                     color: var(--ts-ink);
                     overflow: hidden;
@@ -258,20 +261,23 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     z-index: 1;
                     flex: 0 0 auto;
                     height: var(--ts-peek-h);
+                    margin-top: -1px;                   /* covers any 1px seam from the Home section above */
                     overflow: hidden;
                 }
                 .ts-hp {
                     position: absolute;
                     left: 46%;
                     right: -1px;
+                    top: -6rem;                         /* runs past the top edge so the panel always touches it */
                     bottom: 0;
                     display: grid;
                     grid-template-columns: 39fr 61fr;
                     gap: 0.4rem;
-                    padding: 0.4rem 0 0.4rem 0.4rem;
-                    border: 1px solid var(--ts-black);
+                    padding: 0 0 0.4rem 0.4rem;
+                    border: var(--ts-bezel) solid var(--ts-black);
+                    border-top: none;
                     border-right: none;
-                    border-radius: 0 0 0 clamp(18px, 2.4vw, 32px);
+                    border-radius: 0 0 0 var(--ts-radius);
                     background: #171717;
                     box-shadow: 0 30px 70px rgba(0,0,0,0.45);
                 }
@@ -279,7 +285,6 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     position: relative;
                     min-width: 0;
                     border: 1px solid var(--ts-black);
-                    padding: 1.6rem 1.6rem 2.2rem;
                     overflow: hidden;
                 }
                 .ts-hp-edu { border-radius: 0 0.5rem 0.5rem clamp(14px, 2vw, 26px); background: #1b1b1b; }
@@ -288,32 +293,6 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     border-radius: 0.5rem 0 0 0.5rem;
                     background: radial-gradient(60% 55% at 62% 78%, rgba(255,255,255,0.09), transparent 70%), #111;
                 }
-                .ts-hp-label { margin: 0; font: 500 0.72rem 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; color: rgba(255,255,255,0.5); }
-                .ts-hp-title { margin: 1.6rem 0 0; font-size: clamp(1.4rem, 2.3vw, 2.3rem); font-weight: 500; line-height: 1.08; letter-spacing: -0.03em; color: #f6f6f6; }
-                .ts-hp-cert .ts-hp-title { max-width: 55%; }
-                .ts-hp-body { margin: 0.9rem 0 0; font-size: 0.78rem; line-height: 1.6; color: rgba(255,255,255,0.42); }
-                .ts-hp-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                    margin-top: 1.1rem;
-                    padding: 0.35rem 0.8rem;
-                    border-radius: 999px;
-                    background: rgba(255,255,255,0.08);
-                    color: #f0f0f0;
-                    font-size: 0.72rem;
-                    font-weight: 600;
-                }
-                .ts-hp-medal {
-                    position: absolute;
-                    right: 14%;
-                    bottom: 1.6rem;
-                    width: clamp(5.5rem, 9vw, 9rem);
-                    height: clamp(5.5rem, 9vw, 9rem);
-                    color: rgba(255,255,255,0.72);
-                    filter: drop-shadow(0 18px 30px rgba(0,0,0,0.6));
-                }
-                .ts-hp-medal svg { width: 100%; height: 100%; display: block; }
 
                 /* =====================================================
                    BOTTOM PEEK — top slice of the Skills section.
@@ -475,10 +454,6 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     .ts-watermark { font-size: 46vw; right: -12vw; }
 
                     .ts-hp { left: 14%; }
-                    .ts-hp-col { padding: 1.1rem 1rem 1.6rem; }
-                    .ts-hp-title { font-size: 1.15rem; margin-top: 1rem; }
-                    .ts-hp-cert .ts-hp-title { max-width: 60%; }
-                    .ts-hp-medal { width: 4.5rem; height: 4.5rem; right: 0.8rem; bottom: 1rem; }
 
                     .ts-sp { padding: 1.4rem 1.15rem 0; }
                     .ts-sp-cards { grid-template-columns: 1fr; }
@@ -547,47 +522,8 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
             {/* TOP PEEK — bottom slice of Home (Education | Certification panel), glued to the top edge */}
             <div className="ts-peek-top" aria-hidden="true">
                 <div className="ts-hp">
-                    <div className="ts-hp-col ts-hp-edu">
-                        <p className="ts-hp-label">{'{2022 – 2026}'}</p>
-                        <p className="ts-hp-title">BS Computer Science</p>
-                        <p className="ts-hp-body">Bicol University</p>
-                        <span className="ts-hp-badge">
-                            <svg
-                                width="12"
-                                height="12"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <circle cx="12" cy="8" r="6" />
-                                <path d="M9 14 7 22l5-3 5 3-2-8" />
-                            </svg>
-                            Cum Laude
-                        </span>
-                    </div>
-                    <div className="ts-hp-col ts-hp-cert">
-                        <p className="ts-hp-label">{'{November 2024}'}</p>
-                        <p className="ts-hp-title">NC III Programming</p>
-                        <p className="ts-hp-body">Certification</p>
-                        <div className="ts-hp-medal">
-                            <svg
-                                viewBox="0 0 120 120"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.6"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <circle cx="60" cy="46" r="30" />
-                                <circle cx="60" cy="46" r="21" opacity="0.55" />
-                                <circle cx="60" cy="46" r="12" opacity="0.35" />
-                                <path d="M40 72 32 112l28-15 28 15-8-40" />
-                            </svg>
-                        </div>
-                    </div>
+                    <div className="ts-hp-col ts-hp-edu"></div>
+                    <div className="ts-hp-col ts-hp-cert"></div>
                 </div>
             </div>
 

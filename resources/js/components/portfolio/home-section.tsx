@@ -53,6 +53,9 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                    ===================================================== */
                 .xp-section {
                     --xp-line: #050505;
+                    /* same bezel + radius as the frames in the Tech Stack section */
+                    --xp-bezel: clamp(7px, 0.95vw, 11px);
+                    --xp-radius: clamp(24px, 3.4vw, 42px);
                     position: relative;
                     display: block;
                     min-height: 0;
@@ -92,11 +95,11 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
                 .xp-section.is-visible .xp-watermark { opacity: 1; }
 
-                /* ---------- Shared panel look (black borders) ---------- */
+                /* ---------- Shared panel look (thick black bezel) ---------- */
                 .xp-panel {
                     position: absolute;
                     z-index: 1;
-                    border: 1px solid var(--xp-line);
+                    border: var(--xp-bezel) solid var(--xp-line);
                     background: #1a1a1a;
                 }
 
@@ -115,7 +118,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     width: 69%;
                     height: 46%;
                     border-top: none;
-                    border-radius: 0 0 calc(3.2 * var(--u)) calc(3.2 * var(--u));
+                    border-radius: 0 0 var(--xp-radius) var(--xp-radius);
                     padding: calc(3.4 * var(--u)) calc(9 * var(--u)) calc(2.4 * var(--u));
                     display: flex;
                     flex-direction: column;
@@ -175,7 +178,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     bottom: -1px;
                     border-right: none;
                     border-bottom: none;
-                    border-radius: calc(3.2 * var(--u)) 0 0 0;
+                    border-radius: var(--xp-radius) 0 0 0;
                     padding: calc(0.6 * var(--u)) 0 0 calc(0.6 * var(--u));
                     display: grid;
                     grid-template-columns: 39fr 61fr;
@@ -254,6 +257,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                    off the bottom-right, watermark peeks out between them.
                    ===================================================== */
                 @media (max-width: 860px) {
+                    .xp-section { --xp-bezel: 8px; --xp-radius: 30px; }
                     .xp-stage {
                         --u: clamp(0.36rem, 1.5vw, 0.55rem);
                         height: auto;
@@ -277,7 +281,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                         order: 1;
                         margin-right: 12vw;
                         border-left: none;
-                        border-radius: 0 1.5rem 1.5rem 0;
+                        border-radius: 0 var(--xp-radius) var(--xp-radius) 0;
                         padding: calc(4.5 * var(--u)) calc(6 * var(--u)) calc(2.4 * var(--u)) calc(8 * var(--u));
                         justify-content: flex-start;
                         gap: calc(2 * var(--u));
@@ -290,7 +294,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                         order: 3;
                         margin-left: 12vw;
                         grid-template-columns: minmax(0, 1fr);
-                        border-radius: 1.5rem 0 0 0;
+                        border-radius: var(--xp-radius) 0 0 0;
                         padding: 0.4rem 0 0 0.4rem;
                         gap: 0.4rem;
                     }
