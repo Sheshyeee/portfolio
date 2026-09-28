@@ -6,6 +6,7 @@ import { HomeSection } from '@/components/portfolio/home-section';
 import { LiquidDock } from '@/components/portfolio/liquid-dock';
 import { ProjectsSection } from '@/components/portfolio/projects-section';
 import { SkillsSection } from '@/components/portfolio/skills-section';
+import { TechStackSection } from '@/components/portfolio/tech-stack-section';
 import { Head } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -460,6 +461,7 @@ export default function Welcome() {
                 <main className="portfolio-main">
                     <HeroSection sectionRef={setSectionRef('hero')} />
                     <HomeSection sectionRef={setSectionRef('home')} />
+                    <TechStackSection sectionRef={setSectionRef('stack')} onSeeWork={() => scrollTo('projects')} />
                     <SkillsSection sectionRef={setSectionRef('about')} skillsRef={setSectionRef('skills')} contactRef={setSectionRef('contact')} />
                     <ProjectsSection sectionRef={setSectionRef('projects')} />
 
