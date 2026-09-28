@@ -44,7 +44,7 @@ const WORKS: Work[] = [
         desc: 'Membership platform with plan payments, attendance check-ins, and member stats like workout streaks.',
         type: 'Freelance Project', // TODO: confirm
         tags: ['Laravel', 'React', 'Inertia.js', 'TypeScript', 'Role-Based Access'],
-        thumbnail: '/gym.png', // TODO: point to your actual thumbnail filename
+        thumbnail: '/gymrat.png', // TODO: point to your actual thumbnail filename
         role: 'Fullstack Developer', // TODO: confirm
         duration: '2 weeks', // TODO: confirm
         team: 'Solo', // TODO: confirm
@@ -72,7 +72,7 @@ const WORKS: Work[] = [
         desc: 'Real-time messaging with AI-powered Smart Reply that suggests context-aware responses before you start typing.',
         type: 'Personal Project',
         tags: ['Laravel', 'Inertia.js', 'React', 'TypeScript', 'WebSockets', 'Tailwind CSS'],
-        thumbnail: '/front4.png',
+        thumbnail: '/nexus.png',
         role: 'Full-Stack Developer',
         duration: 'Ongoing',
         team: 'Solo',
@@ -105,7 +105,7 @@ const WORKS: Work[] = [
         desc: 'Asset and maintenance management with three role-based portals: IT Admin, Technician, and Faculty/Staff.',
         type: 'Freelance Project',
         tags: ['Laravel', 'React', 'Inertia.js', 'TypeScript', 'Role-Based Access'],
-        thumbnail: '/login.png',
+        thumbnail: '/campusassets.png',
         role: 'Fullstack Developer',
         duration: '2 weeks',
         team: 'Solo',
@@ -135,7 +135,7 @@ const WORKS: Work[] = [
         desc: 'Booking platform for a dental clinic, with public scheduling and role-based dashboards for staff and admins.',
         type: 'Freelance Project',
         tags: ['Laravel', 'React', 'TypeScript', 'Sanctum Auth', 'TanStack Query'],
-        thumbnail: '/front3.png',
+        thumbnail: '/brightsmiles.png',
         role: 'Fullstack Developer',
         duration: '2 weeks',
         team: 'Solo',
@@ -165,7 +165,7 @@ const WORKS: Work[] = [
         desc: 'Self-trained deep learning system that identifies dog breeds from photos and improves through an admin-driven retraining loop.',
         type: 'Capstone Project',
         tags: ['React', 'TypeScript', 'React Native (Expo)', 'Laravel', 'FastAPI', 'Python'],
-        thumbnail: '/coverimage.png',
+        thumbnail: '/doglens.png',
         role: 'Fullstack Developer & ML Integration',
         duration: '3 weeks',
         team: 'Solo Dev',
