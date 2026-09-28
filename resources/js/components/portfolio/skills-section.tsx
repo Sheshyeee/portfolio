@@ -503,7 +503,7 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
                 </div>
             </div>
 
-            <div className="relative z-0 mx-auto max-w-[1100px] px-4 pt-14 pb-24 sm:px-6 sm:pt-16 md:px-8 lg:pt-20">
+            <div className="relative z-0 mx-auto max-w-[1100px] px-4 pt-39 pb-24 sm:px-6 sm:pt-28 md:px-8 lg:pt-50">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {WORKS.map((work, i) => (
                         <WorkCard key={work.title} work={work} centerLast={lastIsAlone && i === WORKS.length - 1} onOpen={() => setOpenWork(work)} />
