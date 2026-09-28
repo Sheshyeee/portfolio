@@ -5,17 +5,15 @@ type HomeSectionProps = {
 };
 
 type ExperienceItem = {
+    company: string;
     role: string;
-    place: string;
     dates: string;
-    current?: boolean;
 };
 
 const EXPERIENCE: ExperienceItem[] = [
-    { role: 'Web Developer / Fullstack Developer', place: 'Freelance', dates: '2025 — Present', current: true },
-    { role: 'Web Developer Intern', place: 'DOST – Technology Application and Promotion Institute', dates: '2025' },
-    { role: 'Developer / UI Designer Intern', place: 'Ollopa Corporation', dates: '2024' },
-    { role: 'Lead Developer', place: 'Capstone & school software projects', dates: '' },
+    { company: 'DOST – Technology Application and Promotion Institute', role: 'Web Developer Intern', dates: '2025' },
+    { company: 'Ollopa Corporation', role: 'Developer / UI Designer Intern', dates: '2024' },
+    { company: 'Capstone & school software projects', role: 'Lead Developer', dates: '' },
 ];
 
 export function HomeSection({ sectionRef }: HomeSectionProps) {
@@ -47,24 +45,26 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
         <section id="home" ref={attachRefs} className="section xp-section">
             <style>{`
                 /* =====================================================
-                   Layout is a single "stage" whose panels are placed with
-                   percentages, and all type/spacing is sized in --u
-                   (1cqmin), so the composition is the same picture at any
-                   large screen size — it only scales.
+                   One "stage". Panels are placed with percentages and
+                   every size is a multiple of --u, which follows BOTH the
+                   stage width and height. So on any large screen the
+                   panels stay glued to the edges AND the type grows with
+                   them. Under 860px it switches to a stacked staircase.
                    ===================================================== */
                 .xp-section {
+                    --xp-line: #050505;
                     position: relative;
                     display: block;
                     min-height: 0;
                     padding: 0 !important;
-                    background: #131313;
+                    background: #141414;
                     overflow: hidden;
                     border-bottom: 1px solid rgba(255,255,255,0.06);
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
                 .xp-stage {
-                    --u: 1cqmin;
+                    --u: max(6px, min(0.6cqw, 1.15cqh));
                     position: relative;
                     width: 100%;
                     height: 100vh;
@@ -72,18 +72,18 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     container-type: size;
                 }
 
-                /* ---------- Ghost watermark: starts at the left edge, cropped by the right edge ---------- */
+                /* ---------- Ghost watermark ---------- */
                 .xp-watermark {
                     position: absolute;
                     left: 0;
                     top: 36%;
                     margin: 0;
-                    font-size: 12.5cqw;
+                    font-size: min(12.5cqw, 27cqh);
                     font-weight: 600;
                     letter-spacing: -0.03em;
                     line-height: 1;
                     white-space: nowrap;
-                    color: rgba(255,255,255,0.045);
+                    color: rgba(255,255,255,0.05);
                     pointer-events: none;
                     user-select: none;
                     z-index: 0;
@@ -92,18 +92,18 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
                 .xp-section.is-visible .xp-watermark { opacity: 1; }
 
-                /* ---------- Shared panel look ---------- */
+                /* ---------- Shared panel look (black borders) ---------- */
                 .xp-panel {
                     position: absolute;
                     z-index: 1;
-                    border: 1px solid rgba(255,255,255,0.10);
-                    background: #161616;
+                    border: 1px solid var(--xp-line);
+                    background: #1a1a1a;
                 }
 
                 .xp-label {
                     margin: 0;
                     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-                    font-size: calc(1.45 * var(--u));
+                    font-size: max(11px, calc(1.5 * var(--u)));
                     color: rgba(255,255,255,0.5);
                     letter-spacing: 0.02em;
                 }
@@ -116,14 +116,14 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     height: 46%;
                     border-top: none;
                     border-radius: 0 0 calc(3.2 * var(--u)) calc(3.2 * var(--u));
-                    padding: calc(4.2 * var(--u)) calc(5 * var(--u)) calc(3 * var(--u));
+                    padding: calc(3.4 * var(--u)) calc(5 * var(--u)) calc(2.4 * var(--u));
                     display: flex;
                     flex-direction: column;
-                    justify-content: flex-end;
+                    justify-content: space-between;
                     background:
-                        radial-gradient(70% 80% at 28% 0%, rgba(255,255,255,0.065), transparent 65%),
-                        radial-gradient(60% 70% at 95% 100%, rgba(0,0,0,0.35), transparent 70%),
-                        #171717;
+                        radial-gradient(70% 80% at 28% 0%, rgba(255,255,255,0.06), transparent 65%),
+                        radial-gradient(60% 70% at 95% 100%, rgba(0,0,0,0.3), transparent 70%),
+                        #1a1a1a;
                     box-shadow: 0 30px 70px rgba(0,0,0,0.45);
                     opacity: 0;
                     transform: translateY(-3%);
@@ -131,58 +131,39 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
                 .xp-section.is-visible .xp-top { opacity: 1; transform: translateY(0); }
 
-                .xp-top-head { margin-bottom: auto; }
-
                 .xp-list { margin: 0; padding: 0; display: flex; flex-direction: column; }
                 .xp-row {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: calc(1.6 * var(--u));
-                    padding: calc(1.35 * var(--u)) 0;
-                }
-                .xp-row + .xp-row { border-top: 1px solid rgba(255,255,255,0.08); }
-                .xp-dot {
-                    flex-shrink: 0;
-                    margin-top: calc(0.85 * var(--u));
-                    width: calc(0.9 * var(--u));
-                    height: calc(0.9 * var(--u));
-                    min-width: 6px;
-                    min-height: 6px;
-                    border-radius: 50%;
-                    border: 1.5px solid rgba(255,255,255,0.35);
-                }
-                .xp-dot.is-current {
-                    background: #f5f5f5;
-                    border-color: #f5f5f5;
-                    box-shadow: 0 0 0 3px rgba(245,245,245,0.12);
-                }
-                .xp-row-main {
-                    flex: 1;
-                    min-width: 0;
-                    display: flex;
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) auto;
+                    column-gap: calc(2 * var(--u));
                     align-items: baseline;
-                    justify-content: space-between;
-                    gap: calc(2 * var(--u));
+                    padding: calc(1.2 * var(--u)) 0;
+                }
+                .xp-row + .xp-row { border-top: 1px solid var(--xp-line); }
+                .xp-company {
+                    grid-column: 1;
+                    grid-row: 1;
+                    margin: 0;
+                    font-size: calc(3.3 * var(--u));
+                    font-weight: 600;
+                    line-height: 1.1;
+                    letter-spacing: -0.025em;
+                    color: #f6f6f6;
                 }
                 .xp-role {
-                    margin: 0;
-                    font-size: calc(2.5 * var(--u));
-                    font-weight: 600;
-                    line-height: 1.15;
-                    letter-spacing: -0.02em;
-                    color: #f4f4f4;
-                }
-                .xp-place {
-                    margin: calc(0.5 * var(--u)) 0 0;
-                    font-size: calc(1.5 * var(--u));
+                    grid-column: 1;
+                    grid-row: 2;
+                    margin: calc(0.6 * var(--u)) 0 0;
+                    font-size: max(11.5px, calc(1.7 * var(--u)));
                     line-height: 1.4;
-                    color: rgba(255,255,255,0.42);
+                    color: rgba(255,255,255,0.45);
                 }
                 .xp-dates {
+                    grid-column: 2;
+                    grid-row: 1;
                     margin: 0;
-                    flex-shrink: 0;
                     white-space: nowrap;
-                    font-size: calc(1.4 * var(--u));
+                    font-size: max(11px, calc(1.5 * var(--u)));
                     color: rgba(255,255,255,0.38);
                 }
 
@@ -199,7 +180,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     display: grid;
                     grid-template-columns: 39fr 61fr;
                     gap: calc(0.6 * var(--u));
-                    background: #141414;
+                    background: #171717;
                     box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
                     opacity: 0;
                     transform: translate(3%, 3%);
@@ -210,37 +191,37 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 .xp-col {
                     position: relative;
                     min-width: 0;
-                    border: 1px solid rgba(255,255,255,0.09);
+                    border: 1px solid var(--xp-line);
                     border-bottom: none;
                     padding: calc(2.6 * var(--u)) calc(2.6 * var(--u)) calc(7 * var(--u));
                     overflow: hidden;
                 }
                 .xp-col-edu {
                     border-radius: calc(2.6 * var(--u)) calc(0.8 * var(--u)) 0 0;
-                    background: #191919;
+                    background: #1b1b1b;
                 }
                 .xp-col-cert {
                     border-right: none;
                     border-radius: calc(0.8 * var(--u)) 0 0 0;
                     background:
                         radial-gradient(60% 55% at 62% 78%, rgba(255,255,255,0.09), transparent 70%),
-                        #101010;
+                        #111;
                 }
 
                 .xp-title {
-                    margin: calc(4.2 * var(--u)) 0 0;
+                    margin: calc(3.6 * var(--u)) 0 0;
                     font-size: calc(3.6 * var(--u));
                     font-weight: 500;
                     line-height: 1.08;
                     letter-spacing: -0.03em;
                     color: #f6f6f6;
                 }
-                .xp-col-cert .xp-title { max-width: 60%; }
+                .xp-col-cert .xp-title { max-width: 55%; }
                 .xp-body {
                     margin: calc(1.6 * var(--u)) 0 0;
-                    font-size: calc(1.5 * var(--u));
+                    font-size: max(12px, calc(1.5 * var(--u)));
                     line-height: 1.6;
-                    color: rgba(255,255,255,0.4);
+                    color: rgba(255,255,255,0.42);
                 }
                 .xp-badge {
                     display: inline-flex;
@@ -251,51 +232,87 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     border-radius: 999px;
                     background: rgba(255,255,255,0.08);
                     color: #f0f0f0;
-                    font-size: calc(1.4 * var(--u));
+                    font-size: max(11.5px, calc(1.4 * var(--u)));
                     font-weight: 600;
                 }
 
                 /* Medal art in the "media" column (plays the role of the can in the reference) */
                 .xp-medal {
                     position: absolute;
-                    right: 16%;
-                    bottom: calc(7 * var(--u));
-                    width: calc(20 * var(--u));
-                    height: calc(20 * var(--u));
+                    right: 14%;
+                    bottom: calc(5 * var(--u));
+                    width: calc(18 * var(--u));
+                    height: calc(18 * var(--u));
                     color: rgba(255,255,255,0.72);
                     filter: drop-shadow(0 18px 30px rgba(0,0,0,0.6));
                 }
                 .xp-medal svg { width: 100%; height: 100%; display: block; }
 
-                /* ---------- Phones only: stack the panels ---------- */
-                @media (max-width: 640px) {
+                /* =====================================================
+                   Phones + small tablets: stacked staircase.
+                   Top panel hangs off the top-left, bottom panel bleeds
+                   off the bottom-right, watermark peeks out between them.
+                   ===================================================== */
+                @media (max-width: 860px) {
                     .xp-stage {
-                        --u: 0.5rem;
+                        --u: clamp(0.36rem, 1.5vw, 0.55rem);
                         height: auto;
                         container-type: normal;
-                        padding: 0 0 calc(var(--dock-space-mobile, 6rem) + 1rem);
+                        display: flex;
+                        flex-direction: column;
                     }
-                    .xp-watermark { display: none; }
                     .xp-panel { position: relative; left: auto; right: auto; top: auto; bottom: auto; width: auto; height: auto; }
+
+                    .xp-watermark {
+                        position: relative;
+                        order: 2;
+                        left: auto;
+                        top: auto;
+                        width: 100%;
+                        margin: -0.26em 0 -0.26em 3vw;
+                        font-size: 19vw;
+                    }
+
                     .xp-top {
-                        margin: 0 5vw 1.25rem;
-                        border-top: 1px solid rgba(255,255,255,0.10);
-                        border-radius: 0 0 1.4rem 1.4rem;
+                        order: 1;
+                        margin-right: 12vw;
+                        border-left: none;
+                        border-radius: 0 1.5rem 1.5rem 0;
+                        padding: calc(4.5 * var(--u)) calc(3.6 * var(--u)) calc(2.4 * var(--u)) calc(3.6 * var(--u));
                         justify-content: flex-start;
-                        padding-top: 2.5rem;
+                        gap: calc(2 * var(--u));
                     }
-                    .xp-top-head { margin-bottom: 1rem; }
-                    .xp-row-main { flex-direction: column; gap: 0.2rem; }
+                    .xp-row { padding: calc(2.2 * var(--u)) 0; }
+                    .xp-company { font-size: clamp(1.1rem, 4.6vw, 1.6rem); }
+                    .xp-dates { grid-row: 2; grid-column: 2; }
+
                     .xp-bottom {
-                        margin-left: 5vw;
-                        grid-template-columns: 1fr;
-                        border-bottom: none;
-                        padding-right: 0;
+                        order: 3;
+                        margin-left: 12vw;
+                        grid-template-columns: minmax(0, 1fr);
+                        border-radius: 1.5rem 0 0 0;
+                        padding: 0.4rem 0 0 0.4rem;
+                        gap: 0.4rem;
                     }
-                    .xp-col { padding-bottom: 2.5rem; }
-                    .xp-col-cert { min-height: 16rem; }
-                    .xp-col-cert .xp-title { max-width: 100%; }
-                    .xp-medal { right: 8%; bottom: 1.25rem; width: 8rem; height: 8rem; }
+                    .xp-col { padding: calc(3.4 * var(--u)); }
+                    .xp-col-edu {
+                        border-right: none;
+                        border-bottom: 1px solid var(--xp-line);
+                        border-radius: 1.2rem 0 0 0;
+                    }
+                    .xp-col-cert {
+                        border-radius: 0.5rem 0 0 0;
+                        padding-bottom: calc(var(--dock-space-mobile, 6rem) + 1.5rem);
+                    }
+                    .xp-title { margin-top: calc(3 * var(--u)); font-size: clamp(1.7rem, 7.4vw, 2.6rem); }
+                    .xp-col-cert .xp-title { max-width: 58%; }
+                    .xp-medal {
+                        right: 1.25rem;
+                        top: 1.5rem;
+                        bottom: auto;
+                        width: clamp(5.5rem, 26vw, 9rem);
+                        height: clamp(5.5rem, 26vw, 9rem);
+                    }
                 }
 
                 @media (prefers-reduced-motion: reduce) {
@@ -310,21 +327,14 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
 
                 {/* TOP PANEL — Experience */}
                 <div className="xp-panel xp-top">
-                    <div className="xp-top-head">
-                        <p className="xp-label">{'{Experience}'}</p>
-                    </div>
+                    <p className="xp-label">{'{Experience}'}</p>
 
                     <div className="xp-list">
                         {EXPERIENCE.map((item) => (
-                            <div className="xp-row" key={item.role}>
-                                <span className={`xp-dot ${item.current ? 'is-current' : ''}`} />
-                                <div className="xp-row-main">
-                                    <div>
-                                        <p className="xp-role">{item.role}</p>
-                                        <p className="xp-place">{item.place}</p>
-                                    </div>
-                                    {item.dates && <p className="xp-dates">{item.dates}</p>}
-                                </div>
+                            <div className="xp-row" key={item.company}>
+                                <p className="xp-company">{item.company}</p>
+                                <p className="xp-role">{item.role}</p>
+                                {item.dates && <p className="xp-dates">{item.dates}</p>}
                             </div>
                         ))}
                     </div>
