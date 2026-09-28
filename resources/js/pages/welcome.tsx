@@ -27,6 +27,7 @@ import { useEffect, useRef, useState } from 'react';
 const SECTION_TO_NAV: Record<string, string> = {
     hero: 'home',
     home: 'about',
+    stack: 'stack',
     about: 'skills',
     skills: 'skills',
     contact: 'skills',
@@ -38,6 +39,7 @@ const SECTION_TO_NAV: Record<string, string> = {
 const NAV_TARGET: Record<string, string> = {
     home: 'hero',
     about: 'home',
+    stack: 'stack',
     skills: 'about',
     projects: 'projects',
 };

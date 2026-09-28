@@ -57,9 +57,17 @@ type NavItem = {
     icon: () => ReactElement;
 };
 
+const LayersIcon = () => (
+    <svg {...iconProps}>
+        <path d="M12 3 21 8l-9 5-9-5 9-5Z" />
+        <path d="m3 12 9 5 9-5M3 16l9 5 9-5" />
+    </svg>
+);
+
 export const NAV_ITEMS: NavItem[] = [
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'about', label: 'About', icon: UserIcon },
+    { id: 'stack', label: 'Stack', icon: LayersIcon },
     { id: 'skills', label: 'Skills', icon: CodeIcon },
     { id: 'projects', label: 'Projects', icon: GridIcon },
 ];

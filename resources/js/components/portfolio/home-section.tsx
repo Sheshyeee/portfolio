@@ -75,7 +75,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 /* ---------- Ghost watermark ---------- */
                 .xp-watermark {
                     position: absolute;
-                    left: 0;
+                    left: -4cqw;
                     top: 36%;
                     margin: 0;
                     font-size: min(12.5cqw, 27cqh);
@@ -116,7 +116,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     height: 46%;
                     border-top: none;
                     border-radius: 0 0 calc(3.2 * var(--u)) calc(3.2 * var(--u));
-                    padding: calc(3.4 * var(--u)) calc(5 * var(--u)) calc(2.4 * var(--u));
+                    padding: calc(3.4 * var(--u)) calc(9 * var(--u)) calc(2.4 * var(--u));
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
@@ -269,7 +269,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                         left: auto;
                         top: auto;
                         width: 100%;
-                        margin: -0.26em 0 -0.26em 3vw;
+                        margin: -0.26em 0 -0.26em -6vw;
                         font-size: 19vw;
                     }
 
@@ -278,7 +278,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                         margin-right: 12vw;
                         border-left: none;
                         border-radius: 0 1.5rem 1.5rem 0;
-                        padding: calc(4.5 * var(--u)) calc(3.6 * var(--u)) calc(2.4 * var(--u)) calc(3.6 * var(--u));
+                        padding: calc(4.5 * var(--u)) calc(6 * var(--u)) calc(2.4 * var(--u)) calc(8 * var(--u));
                         justify-content: flex-start;
                         gap: calc(2 * var(--u));
                     }
