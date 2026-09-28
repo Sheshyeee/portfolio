@@ -429,18 +429,19 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
 
             const h = holder.offsetHeight;
             const rect = section.getBoundingClientRect();
+            const inset = window.innerWidth >= 640 ? '32px' : '16px'; // matches left-4/right-4 → sm:left-8/right-8
 
             if (rect.top <= 0 && rect.bottom > 0) {
                 header.style.position = 'fixed';
-                header.style.left = '0px';
-                header.style.right = '0px';
-                header.style.height = `${h}px`; // ← pin it to the holder's height
+                header.style.left = inset;
+                header.style.right = inset;
+                header.style.height = `${h}px`;
                 header.style.top = `${Math.min(0, rect.bottom - h)}px`;
             } else {
                 header.style.position = 'absolute';
                 header.style.left = '';
                 header.style.right = '';
-                header.style.height = ''; // ← let h-full take over again
+                header.style.height = '';
                 header.style.top = '0px';
             }
         };
@@ -470,7 +471,10 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
         >
             {/* Placeholder that keeps the header's space in the layout */}
             <div ref={holderRef} className={`relative w-full ${HEADER_H}`}>
-                <div ref={headerRef} className="absolute top-0 right-0 left-0 z-30 h-full bg-[var(--bg)] text-[#101010] dark:text-neutral-50">
+                <div
+                    ref={headerRef}
+                    className="absolute top-0 right-4 left-4 z-30 h-full bg-[var(--bg)] text-[#101010] sm:right-8 sm:left-8 dark:text-neutral-50"
+                >
                     <div className="relative flex h-full items-center justify-center overflow-hidden px-4">
                         <span
                             aria-hidden="true"
