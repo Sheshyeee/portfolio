@@ -474,8 +474,7 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
                 innerRef.current = el;
                 sectionRef(el);
             }}
-            className={`relative scroll-mt-[${HEADER_H_PX.base + SCROLL_BUFFER_PX}px] sm:scroll-mt-[${HEADER_H_PX.sm + SCROLL_BUFFER_PX}px] lg:scroll-mt-[${HEADER_H_PX.lg + SCROLL_BUFFER_PX}px]`}
-            style={{ scrollMarginTop: HEADER_H_PX.base + SCROLL_BUFFER_PX }}
+            className="relative scroll-mt-[108px] sm:scroll-mt-[136px] lg:scroll-mt-[152px]"
         >
             {/* Placeholder that keeps the header's space in the layout */}
             <div ref={holderRef} className={`relative w-full ${HEADER_H}`}>
