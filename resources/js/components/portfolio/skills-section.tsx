@@ -400,6 +400,10 @@ const HEADER_H = 'h-[76px] sm:h-[104px] lg:h-[120px]';
 // scroll-margin-top classes below so nav-click landing always clears the
 // pinned header instead of tucking the first card row underneath it.
 const HEADER_H_PX = { base: 76, sm: 104, lg: 120 };
+// Extra breathing room added on top of the header height for scroll-margin,
+// so a fast fling/overscroll still stops with clear air above the first
+// row of cards instead of landing them flush against the header edge.
+const SCROLL_BUFFER_PX = 32;
 
 export function SkillsSection({ sectionRef }: SkillsSectionProps) {
     const [openWork, setOpenWork] = useState<Work | null>(null);
@@ -470,8 +474,8 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
                 innerRef.current = el;
                 sectionRef(el);
             }}
-            className={`relative scroll-mt-[${HEADER_H_PX.base}px] sm:scroll-mt-[${HEADER_H_PX.sm}px] lg:scroll-mt-[${HEADER_H_PX.lg}px]`}
-            style={{ scrollMarginTop: HEADER_H_PX.base }}
+            className={`relative scroll-mt-[${HEADER_H_PX.base + SCROLL_BUFFER_PX}px] sm:scroll-mt-[${HEADER_H_PX.sm + SCROLL_BUFFER_PX}px] lg:scroll-mt-[${HEADER_H_PX.lg + SCROLL_BUFFER_PX}px]`}
+            style={{ scrollMarginTop: HEADER_H_PX.base + SCROLL_BUFFER_PX }}
         >
             {/* Placeholder that keeps the header's space in the layout */}
             <div ref={holderRef} className={`relative w-full ${HEADER_H}`}>
@@ -500,7 +504,7 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
                 </div>
             </div>
 
-            <div className="relative z-0 mx-auto max-w-[1100px] px-4 pt-8 pb-24 sm:px-6 sm:pt-10 md:px-8">
+            <div className="relative z-0 mx-auto max-w-[1100px] px-4 pt-14 pb-24 sm:px-6 sm:pt-16 md:px-8 lg:pt-20">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {WORKS.map((work, i) => (
                         <WorkCard key={work.title} work={work} centerLast={lastIsAlone && i === WORKS.length - 1} onOpen={() => setOpenWork(work)} />
