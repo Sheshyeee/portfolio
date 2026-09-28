@@ -24,7 +24,7 @@ const CheckIcon = () => (
 type Work = {
     title: string;
     desc: string;
-    type: string; // badge on the thumbnail + case study cover
+    type: string; // kept in data, no longer rendered as a badge
     tags: string[];
     thumbnail: string; // path inside /public (also used as the case study cover)
     role: string;
@@ -135,7 +135,7 @@ const WORKS: Work[] = [
         desc: 'Booking platform for a dental clinic, with public scheduling and role-based dashboards for staff and admins.',
         type: 'Freelance Project',
         tags: ['Laravel', 'React', 'TypeScript', 'Sanctum Auth', 'TanStack Query'],
-        thumbnail: '/brightsmiles.png',
+        thumbnail: '/brightsmile.png',
         role: 'Fullstack Developer',
         duration: '2 weeks',
         team: 'Solo',
@@ -228,9 +228,6 @@ function WorkCard({ work, centerLast, onOpen }: { work: Work; centerLast: boolea
                     loading="lazy"
                     className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                 />
-                <span className="absolute top-3 left-3 rounded-full bg-white px-3 py-1 text-[10px] font-semibold tracking-wide text-[#101010] uppercase shadow-sm sm:text-[11px] dark:bg-neutral-900 dark:text-neutral-100">
-                    {work.type}
-                </span>
                 <span className="absolute top-1/2 left-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 scale-90 items-center justify-center rounded-full bg-white text-[#101010] opacity-0 shadow-md transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100">
                     <ArrowUpRightIcon />
                 </span>
@@ -307,9 +304,6 @@ function CaseStudyDialog({ work, open, onOpenChange }: { work: Work | null; open
                 <div className="relative h-[200px] w-full overflow-hidden bg-[#F3EFE9] sm:h-[240px] dark:bg-neutral-800">
                     <img src={work.thumbnail} alt="" className="h-full w-full object-cover object-top" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-                    <span className="absolute top-4 left-6 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold tracking-[0.1em] text-[#101010] uppercase backdrop-blur-sm dark:bg-neutral-900/85 dark:text-neutral-100">
-                        {work.type}
-                    </span>
                 </div>
 
                 <div className="px-6 py-6 sm:px-8 sm:py-8">
@@ -399,8 +393,13 @@ type SkillsSectionProps = {
     contactRef?: (el: HTMLElement | null) => void; // unused
 };
 
-// Header height. The holder reserves this space in the flow while the header itself is pinned.
-const HEADER_H = 'h-[112px] sm:h-[148px] lg:h-[168px]';
+// Header height — kept smaller than before. The holder reserves this exact
+// space in the flow while the header itself is pinned (position: fixed).
+const HEADER_H = 'h-[76px] sm:h-[104px] lg:h-[120px]';
+// Same values as plain numbers, used by the scroll listener and by the
+// scroll-margin-top classes below so nav-click landing always clears the
+// pinned header instead of tucking the first card row underneath it.
+const HEADER_H_PX = { base: 76, sm: 104, lg: 120 };
 
 export function SkillsSection({ sectionRef }: SkillsSectionProps) {
     const [openWork, setOpenWork] = useState<Work | null>(null);
@@ -429,7 +428,8 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
 
             const h = holder.offsetHeight;
             const rect = section.getBoundingClientRect();
-            const inset = window.innerWidth >= 640 ? '32px' : '16px'; // matches left-4/right-4 → sm:left-8/right-8
+            const w = window.innerWidth;
+            const inset = w >= 1024 ? '40px' : w >= 640 ? '32px' : '16px';
 
             if (rect.top <= 0 && rect.bottom > 0) {
                 header.style.position = 'fixed';
@@ -461,33 +461,37 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
 
     return (
         // id="about" is kept from the old skills section so existing nav links still land here.
+        // scroll-mt-* matches the pinned header height so scrollIntoView({block:'start'}) always
+        // stops with the header flush at the top and the first card row fully visible below it —
+        // instead of landing a few pixels off and making the top row feel like it flashes by.
         <section
             id="about"
             ref={(el) => {
                 innerRef.current = el;
                 sectionRef(el);
             }}
-            className="relative"
+            className={`relative scroll-mt-[${HEADER_H_PX.base}px] sm:scroll-mt-[${HEADER_H_PX.sm}px] lg:scroll-mt-[${HEADER_H_PX.lg}px]`}
+            style={{ scrollMarginTop: HEADER_H_PX.base }}
         >
             {/* Placeholder that keeps the header's space in the layout */}
             <div ref={holderRef} className={`relative w-full ${HEADER_H}`}>
                 <div
                     ref={headerRef}
-                    className="absolute top-0 right-4 left-4 z-30 h-full bg-[var(--bg)] text-[#101010] sm:right-8 sm:left-8 dark:text-neutral-50"
+                    className="absolute top-0 right-4 left-4 z-30 h-full bg-[var(--bg)] text-[#101010] sm:right-8 sm:left-8 lg:right-10 lg:left-10 dark:text-neutral-50"
                 >
                     <div className="relative flex h-full items-center justify-center overflow-hidden px-4">
                         <span
                             aria-hidden="true"
                             className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center leading-none font-semibold tracking-tight whitespace-nowrap select-none"
                             style={{
-                                fontSize: 'clamp(2.75rem, 14vw, 9.5rem)',
+                                fontSize: 'clamp(2.25rem, 11vw, 7.5rem)',
                                 // 6% of the current text color, so it adapts to light and dark mode
                                 color: 'color-mix(in srgb, currentColor 6%, transparent)',
                             }}
                         >
                             PORTFOLIO
                         </span>
-                        <h2 className="relative text-[clamp(1.35rem,4.5vw,2.6rem)] leading-none font-semibold tracking-tight uppercase">
+                        <h2 className="relative text-[clamp(1.15rem,3.6vw,2.1rem)] leading-none font-semibold tracking-tight uppercase">
                             Selected Work
                         </h2>
                     </div>
@@ -496,7 +500,7 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
                 </div>
             </div>
 
-            <div className="relative z-0 mx-auto max-w-[1100px] px-4 pt-6 pb-24 sm:px-6 md:px-8">
+            <div className="relative z-0 mx-auto max-w-[1100px] px-4 pt-8 pb-24 sm:px-6 sm:pt-10 md:px-8">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {WORKS.map((work, i) => (
                         <WorkCard key={work.title} work={work} centerLast={lastIsAlone && i === WORKS.length - 1} onOpen={() => setOpenWork(work)} />
