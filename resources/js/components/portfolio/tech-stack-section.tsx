@@ -523,7 +523,6 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
             <div className="ts-peek-top" aria-hidden="true">
                 <div className="ts-hp">
                     <div className="ts-hp-col ts-hp-edu"></div>
-                    <div className="ts-hp-col ts-hp-cert"></div>
                 </div>
             </div>
 
