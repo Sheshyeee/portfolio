@@ -432,9 +432,15 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
 
             if (rect.top <= 0 && rect.bottom > 0) {
                 header.style.position = 'fixed';
+                header.style.left = '0px';
+                header.style.right = '0px';
+                header.style.height = `${h}px`; // ← pin it to the holder's height
                 header.style.top = `${Math.min(0, rect.bottom - h)}px`;
             } else {
                 header.style.position = 'absolute';
+                header.style.left = '';
+                header.style.right = '';
+                header.style.height = ''; // ← let h-full take over again
                 header.style.top = '0px';
             }
         };
