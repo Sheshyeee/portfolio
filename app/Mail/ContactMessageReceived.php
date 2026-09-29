@@ -19,9 +19,8 @@ class ContactMessageReceived extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            // Hitting "Reply" in your inbox answers the visitor directly.
             replyTo: [new Address($this->contact->email, $this->contact->name)],
-            subject: "New portfolio message from {$this->contact->name}",
+            subject: "Message from {$this->contact->name} via " . config('app.name'),
         );
     }
 
