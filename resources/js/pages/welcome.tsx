@@ -154,7 +154,9 @@ export default function Welcome() {
                 }
                 .chat-widget-mobile-anchor.site-chrome-hidden { opacity: 0; transform: translateY(16px); pointer-events: none; }
 
-                .portfolio-main { margin-left: 0; min-width: 0; padding-bottom: var(--dock-space-mobile); }
+                /* No bottom padding here: the contact section (last section)
+                   already reserves its own space for the dock. */
+                .portfolio-main { margin-left: 0; min-width: 0; padding-bottom: 0; }
                 .section {
                     min-height: 100vh;
                     padding: 7rem 6vw 5rem;
@@ -192,13 +194,6 @@ export default function Welcome() {
                     border: 1px solid var(--hair);
                     border-radius: 999px;
                     padding: .3rem .7rem;
-                }
-
-                .foot {
-                    color: var(--muted);
-                    font-size: .8rem;
-                    padding: 2rem 6vw calc(2rem + var(--dock-space-mobile));
-                    text-align: center;
                 }
 
                 /* ---------- Floating liquid glass dark mode toggle ---------- */
@@ -245,13 +240,13 @@ export default function Welcome() {
 
                 /* ---------- Chat widget: pinned to the true bottom edge, stacked
                    above the dock/toggle so an open chat panel visually covers them. ---------- */
-               .chat-widget-mobile-anchor {
-    display: block;
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 999;
-}
+                .chat-widget-mobile-anchor {
+                    display: block;
+                    position: fixed;
+                    inset: 0;
+                    pointer-events: none;
+                    z-index: 999;
+                }
                 @media (max-width: 820px) {
                     .chat-widget-mobile-anchor { z-index: 999; pointer-events: none; }
                     .chat-widget-mobile-anchor > .chat-widget-fab {
@@ -405,8 +400,6 @@ export default function Welcome() {
                     :root.dark .hero-marquee-text { -webkit-text-stroke: 3px rgba(255,255,255,0.55); }
                 }
 
-               
-
                 /* ---- Skills section (honor badges) ---- */
                 .honor-badge {
                     display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 3px 9px;
@@ -463,9 +456,7 @@ export default function Welcome() {
                     <HomeSection sectionRef={setSectionRef('home')} />
                     <TechStackSection sectionRef={setSectionRef('stack')} onSeeWork={() => scrollTo('projects')} />
                     <SkillsSection sectionRef={setSectionRef('about')} skillsRef={setSectionRef('skills')} contactRef={setSectionRef('contact')} />
-                   <ContactSection sectionRef={setSectionRef('contact-us')} />
-
-                    <p className="foot">© 2026 — Built with Laravel &amp; React.</p>
+                    <ContactSection sectionRef={setSectionRef('contact-us')} />
                 </main>
             </div>
         </>
