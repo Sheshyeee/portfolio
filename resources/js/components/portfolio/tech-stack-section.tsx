@@ -667,8 +667,8 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
 
             {/* BOTTOM PEEK — top slice of the Projects section (screenshot), glued to the bottom edge */}
             <div className="ts-peek-bottom" aria-hidden="true">
-                <img className="ts-sp-shot ts-sp-shot-light" src="/images/projects-peek.png" alt="" loading="lazy" draggable={false} />
-                <img className="ts-sp-shot ts-sp-shot-dark" src="/images/projects-peek-dark.png" alt="" loading="lazy" draggable={false} />
+                <img className="ts-sp-shot ts-sp-shot-light" src="/projects-peek.png" alt="" loading="lazy" draggable={false} />
+                <img className="ts-sp-shot ts-sp-shot-dark" src="/projects-peek-dark.png" alt="" loading="lazy" draggable={false} />
             </div>
         </section>
     );
