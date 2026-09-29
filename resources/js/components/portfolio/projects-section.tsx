@@ -16,6 +16,27 @@ const SOCIALS = [
     { label: 'LinkedIn', href: 'https://linkedin.com/in/yourname', icon: 'linkedin' },
 ] as const;
 
+/**
+ * Alignment — works like the align buttons in Word.
+ * Set each row to 'left', 'center' or 'right'.
+ * Every row spans the full width of the content, so this is
+ * "hard left" / "middle" / "hard right" from start to end.
+ */
+type Align = 'left' | 'center' | 'right';
+
+const ALIGN: Record<'meta' | 'title' | 'copy' | 'cta' | 'email' | 'socials' | 'footer', Align> = {
+    meta: 'center', // location + local time
+    title: 'center', // "Let's connect."
+    copy: 'center', // paragraph
+    cta: 'center', // "Contact me" button
+    email: 'center', // email label + address
+    socials: 'center', // Find me online + pills
+    footer: 'center', // © line
+};
+
+/** Mobile bottom-sheet breakpoint (px). At or below this the dialog becomes a sheet. */
+const SHEET_MAX = 640;
+
 /* ------------------------------------------------------------------ */
 /*  Icons                                                               */
 /* ------------------------------------------------------------------ */
@@ -53,7 +74,7 @@ const ICONS: Record<string, React.ReactNode> = {
     ),
 };
 
-const CheckCircle = () => (
+const CheckIcon = () => (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 6 9 17l-5-5" />
     </svg>
@@ -80,6 +101,8 @@ function useLocalTime() {
 /*  Contact dialog (desktop modal / mobile draggable bottom sheet)      */
 /* ------------------------------------------------------------------ */
 
+const MESSAGE_MAX = 2000;
+
 function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -93,7 +116,7 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
         website: '', // honeypot: real users never fill this in
     });
 
-    // Hides the dock/chat/toggle and locks body scroll on mobile while the sheet is open.
+    // Hides the dock/chat/toggle and locks body scroll while the dialog is open.
     useEffect(() => {
         document.body.classList.toggle('sheet-open', open);
         return () => document.body.classList.remove('sheet-open');
@@ -121,8 +144,10 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
         });
     };
 
+    const isSheet = () => window.innerWidth <= SHEET_MAX;
+
     const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-        if (window.innerWidth > 1024) return;
+        if (!isSheet()) return;
         setIsDragging(true);
         dragStartY.current = e.clientY;
         e.currentTarget.setPointerCapture(e.pointerId);
@@ -130,13 +155,14 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
         if (!isDragging) return;
         const delta = e.clientY - dragStartY.current;
-        if (delta > 0) setDragY(delta);
+        setDragY(delta > 0 ? delta : 0);
     };
     const handlePointerUp = () => {
         if (!isDragging) return;
         setIsDragging(false);
-        if (dragY > 110) handleOpenChange(false);
+        const shouldClose = dragY > 110;
         setDragY(0);
+        if (shouldClose) handleOpenChange(false);
     };
 
     const dragStyle = dragY || isDragging ? ({ '--sheet-drag-y': `${dragY}px`, transition: 'none' } as React.CSSProperties) : undefined;
@@ -144,21 +170,25 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent
-                className="case-study-sheet contact-dialog max-h-[90vh] overflow-y-auto rounded-[24px] p-0 sm:max-w-[520px]"
+                className="contact-dialog"
                 style={dragStyle}
+                onOpenAutoFocus={(e) => {
+                    // On phones, don't pop the keyboard the moment the sheet opens.
+                    if (isSheet()) e.preventDefault();
+                }}
             >
                 <div
-                    className="sheet-drag-handle"
+                    className="contact-handle"
                     onPointerDown={handlePointerDown}
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}
                     onPointerCancel={handlePointerUp}
                 >
-                    <span className="sheet-drag-bar" aria-hidden="true" />
+                    <span className="contact-handle-bar" aria-hidden="true" />
                 </div>
 
                 <div className="contact-dialog-body">
-                    <DialogHeader className="items-start text-left">
+                    <DialogHeader className="contact-header">
                         <DialogTitle className="contact-dialog-title">{sent ? 'Message sent' : 'Send a message'}</DialogTitle>
                         <DialogDescription className="contact-dialog-desc">
                             {sent ? "Thanks for reaching out. I'll reply to your email soon." : "Tell me about your project and I'll reply by email."}
@@ -168,9 +198,9 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
                     {sent ? (
                         <div className="contact-success">
                             <span className="contact-success-icon">
-                                <CheckCircle />
+                                <CheckIcon />
                             </span>
-                            <button type="button" className="contact-cta" onClick={() => handleOpenChange(false)}>
+                            <button type="button" className="contact-cta contact-submit" onClick={() => handleOpenChange(false)}>
                                 Close
                             </button>
                         </div>
@@ -198,6 +228,7 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
                                     className="contact-input"
                                     type="email"
                                     autoComplete="email"
+                                    inputMode="email"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     aria-invalid={!!errors.email}
@@ -207,12 +238,17 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
                             </div>
 
                             <div className="contact-field">
-                                <label htmlFor="cf-message">Message</label>
+                                <div className="contact-field-head">
+                                    <label htmlFor="cf-message">Message</label>
+                                    <span className="contact-count">
+                                        {data.message.length}/{MESSAGE_MAX}
+                                    </span>
+                                </div>
                                 <textarea
                                     id="cf-message"
                                     className="contact-input"
                                     rows={5}
-                                    maxLength={2000}
+                                    maxLength={MESSAGE_MAX}
                                     value={data.message}
                                     onChange={(e) => setData('message', e.target.value)}
                                     aria-invalid={!!errors.message}
@@ -259,16 +295,16 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                 /* Follows the site theme via --bg / --ink / --muted / --hair from welcome.tsx */
                 .contact-section,
                 .contact-dialog {
-                    --c-fill: rgba(0,0,0,0.035);
-                    --c-line: rgba(0,0,0,0.22);
+                    --c-fill: rgba(0,0,0,0.03);
+                    --c-line: rgba(0,0,0,0.14);
                     --c-accent: #0A84FF;
                     --c-error: #dc2626;
                     --c-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
                 }
                 :root.dark .contact-section,
                 :root.dark .contact-dialog {
-                    --c-fill: rgba(255,255,255,0.06);
-                    --c-line: rgba(255,255,255,0.28);
+                    --c-fill: rgba(255,255,255,0.05);
+                    --c-line: rgba(255,255,255,0.18);
                     --c-accent: #6cb3ff;
                     --c-error: #ff8f8f;
                 }
@@ -278,35 +314,39 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                 .section.contact-section {
                     justify-content: flex-start;
                     min-height: auto;
-                    padding: 6rem 6vw calc(var(--dock-space-mobile) + 0.75rem);
+                    padding: 6rem 6vw calc(var(--dock-space-mobile) + 0.5rem);
                     border-bottom: none;
                 }
 
                 .contact-wrap {
                     display: flex;
                     flex-direction: column;
-                    gap: 3.5rem;
+                    gap: 2.25rem;
                     width: 100%;
                     max-width: 1180px;
                     margin: 0 auto;
                 }
 
-                .contact-top {
+                /* ---- Word-style alignment rows ---- */
+                .contact-row {
                     display: flex;
-                    justify-content: flex-end;
+                    flex-direction: column;
+                    align-items: var(--a);
+                    text-align: var(--t);
+                }
+                .contact-row[data-align='left']   { --a: flex-start; --t: left; }
+                .contact-row[data-align='center'] { --a: center;     --t: center; }
+                .contact-row[data-align='right']  { --a: flex-end;   --t: right; }
+
+                .contact-meta {
+                    flex-direction: row;
                     align-items: baseline;
+                    justify-content: var(--a);
                     gap: 0.75rem;
                     font-size: 0.85rem;
                     color: var(--muted);
                 }
-                .contact-top strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-
-                .contact-grid {
-                    display: grid;
-                    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-                    gap: 4rem 5rem;
-                    align-items: end;
-                }
+                .contact-meta strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 
                 .contact-title {
                     margin: 0;
@@ -318,8 +358,8 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     color: var(--ink);
                 }
                 .contact-copy {
-                    max-width: 40ch;
-                    margin: 1.75rem 0 2rem;
+                    max-width: 44ch;
+                    margin: 0;
                     font-size: 1.05rem;
                     line-height: 1.65;
                     color: var(--muted);
@@ -345,9 +385,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                 .contact-pill:focus-visible,
                 .contact-email:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 
-                .contact-side { display: flex; flex-direction: column; gap: 2rem; padding-bottom: 0.4rem; }
-                .contact-block { padding-top: 1.1rem; border-top: 1px solid var(--hair); }
-                .contact-label { margin: 0 0 0.8rem; font-size: 0.85rem; color: var(--muted); }
+                .contact-label { margin: 0 0 0.7rem; font-size: 0.85rem; color: var(--muted); }
 
                 .contact-email {
                     font-family: var(--c-serif);
@@ -361,7 +399,15 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                 }
                 .contact-email:hover { border-color: var(--ink); }
 
-                .contact-links { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+                .contact-links {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: var(--a);
+                    gap: 0.6rem;
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                }
                 .contact-pill {
                     display: inline-flex;
                     align-items: center;
@@ -378,109 +424,218 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                 }
                 .contact-pill:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); transform: translateY(-2px); }
 
-                .contact-foot { margin: 0; padding-top: 1.5rem; border-top: 1px solid var(--hair); font-size: 0.8rem; color: var(--muted); }
+                /* The grey line: sits right under the content with a small gap */
+                .contact-foot {
+                    margin: 0.25rem 0 0;
+                    padding-top: 1rem;
+                    border-top: 1px solid var(--hair);
+                    font-size: 0.8rem;
+                    color: var(--muted);
+                }
 
                 @media (max-width: 900px) {
-                    .section.contact-section { padding: 5rem 6vw calc(var(--dock-space-mobile) + 0.75rem); }
-                    .contact-wrap { gap: 2.5rem; }
-                    .contact-top { justify-content: flex-start; }
-                    .contact-grid { grid-template-columns: 1fr; gap: 2.75rem; }
+                    .section.contact-section { padding: 5rem 6vw calc(var(--dock-space-mobile) + 0.5rem); }
+                    .contact-wrap { gap: 1.9rem; }
                 }
 
-                /* ---------- contact dialog / bottom sheet (portal, so not scoped to the section) ---------- */
+                /* =====================================================
+                   Contact dialog — centered modal on desktop,
+                   bottom sheet on phones. (Portaled, so not scoped
+                   to the section.)
+                   ===================================================== */
                 .contact-dialog {
+                    padding: 0 !important;
+                    gap: 0 !important;
+                    width: calc(100% - 2rem);
+                    max-width: 460px !important;
+                    max-height: 90vh;
+                    max-height: 90dvh;
+                    overflow-y: auto;
+                    border-radius: 22px !important;
                     background: var(--bg) !important;
                     color: var(--ink) !important;
-                    border-color: var(--hair) !important;
+                    border: 1px solid var(--hair) !important;
+                    box-shadow: 0 30px 80px rgba(0,0,0,0.28), 0 4px 16px rgba(0,0,0,0.08) !important;
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
-                .contact-dialog > button.absolute { color: var(--ink); }
-                .contact-dialog .sheet-drag-bar { background: var(--c-line); }
-                .contact-dialog-body { padding: 1.5rem 1.5rem 2rem; }
-                @media (min-width: 640px) { .contact-dialog-body { padding: 2.25rem 2.25rem 2.5rem; } }
 
-                .contact-dialog-title { font-family: var(--c-serif); font-weight: 400; font-size: 2.5rem; line-height: 1; letter-spacing: -0.02em; color: var(--ink); }
-                .contact-dialog-desc { margin-top: 0.6rem; font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+                /* Desktop close button (the shadcn X). Hidden on phones below. */
+                .contact-dialog > button {
+                    top: 1rem !important;
+                    right: 1rem !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 2rem;
+                    height: 2rem;
+                    border-radius: 999px;
+                    color: var(--muted);
+                    opacity: 1 !important;
+                    transition: background-color .2s ease, color .2s ease;
+                }
+                .contact-dialog > button:hover { background: var(--c-fill); color: var(--ink); }
+
+                .contact-handle { display: none; }
+                .contact-handle-bar { width: 2.5rem; height: 0.3rem; border-radius: 999px; background: var(--c-line); }
+
+                .contact-dialog-body { padding: 2rem 2rem 2rem; }
+
+                .contact-header { text-align: left; gap: 0.5rem; padding-right: 2rem; }
+                .contact-dialog-title {
+                    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    line-height: 1.2;
+                    letter-spacing: -0.02em;
+                    color: var(--ink);
+                }
+                .contact-dialog-desc { font-size: 0.925rem; line-height: 1.55; color: var(--muted); }
 
                 .contact-form { display: grid; gap: 1.1rem; margin-top: 1.75rem; }
-                .contact-field label { display: block; margin-bottom: 0.45rem; font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+                .contact-field label { display: block; margin-bottom: 0.4rem; font-size: 0.825rem; font-weight: 500; color: var(--ink); }
+                .contact-field-head { display: flex; align-items: baseline; justify-content: space-between; }
+                .contact-count { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
                 .contact-input {
                     width: 100%;
-                    padding: 0.8rem 1rem;
-                    border-radius: 14px;
+                    padding: 0.8rem 0.95rem;
+                    border-radius: 12px;
                     border: 1px solid var(--c-line);
                     background: var(--c-fill);
                     color: var(--ink);
                     font: inherit;
                     font-size: 16px; /* 16px stops iOS from zooming on focus */
+                    line-height: 1.4;
                     outline: none;
-                    transition: border-color .2s ease, box-shadow .2s ease;
+                    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
                 }
-                .contact-input::placeholder { color: var(--muted); opacity: 0.6; }
-                .contact-input:focus { border-color: var(--c-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 22%, transparent); }
+                .contact-input::placeholder { color: var(--muted); opacity: 0.65; }
+                .contact-input:hover { border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
+                .contact-input:focus {
+                    border-color: var(--c-accent);
+                    background: var(--bg);
+                    box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 20%, transparent);
+                }
                 .contact-input[aria-invalid='true'] { border-color: var(--c-error); }
-                textarea.contact-input { min-height: 8rem; resize: vertical; }
+                textarea.contact-input { min-height: 8rem; resize: none; }
                 .contact-error { margin-top: 0.4rem; font-size: 0.8rem; color: var(--c-error); }
                 .contact-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-                .contact-submit { width: 100%; margin-top: 0.4rem; }
+
+                .contact-submit { width: 100%; margin-top: 0.35rem; padding: 0.95rem 1.5rem; border-radius: 14px; }
 
                 .contact-success { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-top: 1.75rem; }
+                .contact-success .contact-submit { margin-top: 0; }
                 .contact-success-icon {
                     display: inline-flex; align-items: center; justify-content: center;
-                    width: 3.5rem; height: 3.5rem; border-radius: 999px;
-                    background: var(--ink); color: var(--bg);
+                    width: 3.25rem; height: 3.25rem; border-radius: 999px;
+                    background: color-mix(in srgb, var(--c-accent) 14%, transparent);
+                    color: var(--c-accent);
+                }
+
+                /* ---------- Phone: bottom sheet ---------- */
+                @keyframes contact-sheet-in  { from { bottom: -100dvh; } to { bottom: 0; } }
+                @keyframes contact-sheet-out { from { bottom: 0; } to { bottom: -100dvh; } }
+
+                @media (max-width: ${SHEET_MAX}px) {
+                    /* doubled class = wins over the shadcn positioning utilities */
+                    .contact-dialog.contact-dialog {
+                        position: fixed;
+                        top: auto;
+                        left: 0;
+                        right: 0;
+                        bottom: calc(var(--sheet-drag-y, 0px) * -1);
+                        width: 100%;
+                        max-width: none !important;
+                        max-height: 92vh;
+                        max-height: 92dvh;
+                        margin: 0;
+                        translate: none;
+                        transform: none;
+                        border-radius: 24px 24px 0 0 !important;
+                        border-width: 1px 0 0 0 !important;
+                        overscroll-behavior: contain;
+                        animation: contact-sheet-in .38s cubic-bezier(.32,.72,0,1) backwards !important;
+                    }
+                    .contact-dialog.contact-dialog[data-state='closed'] {
+                        animation: contact-sheet-out .26s ease-in forwards !important;
+                    }
+
+                    /* no X on phones — swipe down or tap outside */
+                    .contact-dialog > button { display: none !important; }
+
+                    .contact-handle {
+                        position: sticky;
+                        top: 0;
+                        z-index: 2;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        padding: 0.75rem 0 0.5rem;
+                        background: var(--bg);
+                        touch-action: none;
+                        cursor: grab;
+                    }
+
+                    .contact-dialog-body { padding: 0.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); }
+                    .contact-header { padding-right: 0; }
+                    .contact-dialog-title { font-size: 1.4rem; }
                 }
 
                 @media (prefers-reduced-motion: reduce) {
                     .contact-cta, .contact-pill { transition: none; }
                     button.contact-cta:hover, .contact-pill:hover { transform: none; }
+                    .contact-dialog.contact-dialog { animation-duration: .01s !important; }
                 }
             `}</style>
 
             <div className="contact-wrap">
-                <div className="contact-top">
+                <div className="contact-row contact-meta" data-align={ALIGN.meta}>
                     <span>{LOCATION}</span>
                     <strong>{time}</strong>
                 </div>
 
-                <div className="contact-grid">
-                    <div>
-                        <h2 className="contact-title">
-                            Let&apos;s
-                            <br />
-                            connect.
-                        </h2>
-                        <p className="contact-copy">Have a project in mind? Send me a message and we can talk through the details.</p>
-                        <button type="button" className="contact-cta" onClick={() => setDialogOpen(true)}>
-                            Contact me
-                        </button>
-                    </div>
-
-                    <div className="contact-side">
-                        <div className="contact-block">
-                            <p className="contact-label">Email</p>
-                            <a className="contact-email" href={`mailto:${EMAIL}`}>
-                                {EMAIL}
-                            </a>
-                        </div>
-
-                        <div className="contact-block">
-                            <p className="contact-label">Find me online</p>
-                            <ul className="contact-links">
-                                {SOCIALS.map((s) => (
-                                    <li key={s.label}>
-                                        <a className="contact-pill" href={s.href} target="_blank" rel="noreferrer noopener">
-                                            {ICONS[s.icon]}
-                                            {s.label}
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
+                <div className="contact-row" data-align={ALIGN.title}>
+                    <h2 className="contact-title">
+                        Let&apos;s
+                        <br />
+                        connect.
+                    </h2>
                 </div>
 
-                <p className="contact-foot">© 2026 — Built with Laravel &amp; React.</p>
+                <div className="contact-row" data-align={ALIGN.copy}>
+                    <p className="contact-copy">Have a project in mind? Send me a message and we can talk through the details.</p>
+                </div>
+
+                <div className="contact-row" data-align={ALIGN.cta}>
+                    <button type="button" className="contact-cta" onClick={() => setDialogOpen(true)}>
+                        Contact me
+                    </button>
+                </div>
+
+                <div className="contact-row" data-align={ALIGN.email}>
+                    <p className="contact-label">Email</p>
+                    <a className="contact-email" href={`mailto:${EMAIL}`}>
+                        {EMAIL}
+                    </a>
+                </div>
+
+                <div className="contact-row" data-align={ALIGN.socials}>
+                    <p className="contact-label">Find me online</p>
+                    <ul className="contact-links">
+                        {SOCIALS.map((s) => (
+                            <li key={s.label}>
+                                <a className="contact-pill" href={s.href} target="_blank" rel="noreferrer noopener">
+                                    {ICONS[s.icon]}
+                                    {s.label}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                <p className="contact-row contact-foot" data-align={ALIGN.footer}>
+                    © 2026 — Built with Laravel &amp; React.
+                </p>
             </div>
 
             <ContactDialog open={dialogOpen} onOpenChange={setDialogOpen} />
