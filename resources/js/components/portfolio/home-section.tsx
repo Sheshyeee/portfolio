@@ -62,7 +62,10 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     padding: 0 !important;
                     background: #141414;
                     overflow: hidden;
-                    border-bottom: 1px solid rgba(255,255,255,0.06);
+                    border-bottom: 0 !important;      /* no seam line under Home */
+                    opacity: 1 !important;            /* don't fade/slide the section itself, only its panels animate */
+                    transform: none !important;
+                    transition: none !important;
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
@@ -306,7 +309,8 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     }
                     .xp-col-cert {
                         border-radius: 0.5rem 0 0 0;
-                        padding-bottom: calc(var(--dock-space-mobile, 6rem) + 1.5rem);
+                        padding-bottom: 2rem;
+                        min-height: 11rem;
                     }
                     .xp-title { margin-top: calc(3 * var(--u)); font-size: clamp(1.7rem, 7.4vw, 2.6rem); }
                     .xp-col-cert .xp-title { max-width: 58%; }

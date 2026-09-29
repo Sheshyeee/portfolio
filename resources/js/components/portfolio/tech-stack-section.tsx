@@ -199,7 +199,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     --ts-mute: rgba(255,255,255,0.5);
                     --ts-bezel: clamp(7px, 0.95vw, 11px);
                     --ts-radius: clamp(24px, 3.4vw, 42px);
-                    --ts-peek-h: clamp(12rem, 20vw, 18rem);
+                    --ts-peek-h: clamp(8rem, 13vw, 12rem);
                     position: relative;
                     display: flex;
                     flex-direction: column;
@@ -207,8 +207,10 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     min-height: 0;
                     padding: 0 !important;              /* peeks sit flush on the section edges */
                     border-bottom: 0 !important;        /* no line under the bottom peek */
-                    margin-top: 0 !important;
+                    margin-top: -1px !important;        /* overlaps Home by 1px so no seam can open */
                     border-top: 0 !important;
+                    opacity: 1 !important;              /* no whole-section fade/slide, only inner chips animate */
+                    transform: none !important;
                     background: #141414;                /* same as the Home section */
                     color: var(--ts-ink);
                     overflow: hidden;
@@ -254,26 +256,29 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                    TOP PEEK — bottom slice of the Home section.
                    Glued to the top edge of this section. Mirrors Home's
                    bottom panel: starts at 46%, bleeds off the right edge,
-                   Education | Certification columns.
+                   Education | Certification columns. Uses the same --u
+                   formula as Home so gaps/radii line up at any size.
                    ===================================================== */
                 .ts-peek-top {
                     position: relative;
                     z-index: 1;
                     flex: 0 0 auto;
                     height: var(--ts-peek-h);
-                    margin-top: -1px;                   /* covers any 1px seam from the Home section above */
+                    margin-top: -1px;
                     overflow: hidden;
+                    container-type: inline-size;        /* lets --u use the same cqw maths as Home */
                 }
                 .ts-hp {
+                    --u: max(6px, min(0.6cqw, calc(1.15 * max(1svh, 0.52rem))));
                     position: absolute;
                     left: 46%;
                     right: -1px;
-                    top: -6rem;                         /* runs past the top edge so the panel always touches it */
+                    top: -6rem;                         /* runs past the top so the panel always touches it */
                     bottom: 0;
                     display: grid;
                     grid-template-columns: 39fr 61fr;
-                    gap: 0.4rem;
-                    padding: 0 0 0.4rem 0.4rem;
+                    gap: calc(0.6 * var(--u));
+                    padding: 0 0 calc(0.6 * var(--u)) calc(0.6 * var(--u));
                     border: var(--ts-bezel) solid var(--ts-black);
                     border-top: none;
                     border-right: none;
@@ -285,13 +290,20 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     position: relative;
                     min-width: 0;
                     border: 1px solid var(--ts-black);
+                    border-top: none;                   /* continues Home's columns, no new top edge */
                     overflow: hidden;
                 }
-                .ts-hp-edu { border-radius: 0 0.5rem 0.5rem clamp(14px, 2vw, 26px); background: #1b1b1b; }
+                .ts-hp-edu {
+                    border-radius: 0 calc(0.8 * var(--u)) calc(0.8 * var(--u)) calc(2.6 * var(--u));
+                    background: #1b1b1b;
+                }
                 .ts-hp-cert {
                     border-right: none;
-                    border-radius: 0.5rem 0 0 0.5rem;
-                    background: radial-gradient(60% 55% at 62% 78%, rgba(255,255,255,0.09), transparent 70%), #111;
+                    border-radius: 0 0 0 calc(0.8 * var(--u));
+                    /* tail end of Home's glow so the gradient flows across the seam */
+                    background:
+                        radial-gradient(60% 13rem at 62% -5rem, rgba(255,255,255,0.09), transparent 70%),
+                        #111;
                 }
 
                 /* =====================================================
@@ -304,23 +316,25 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     z-index: 1;
                     flex: 0 0 auto;
                     width: min(1120px, calc(100% - 2.5rem));
-                    height: var(--ts-peek-h);
+                    height: clamp(13rem, 22vw, 20rem);
                     margin: 0 auto;
                     overflow: hidden;
-                }
-                .ts-sp {
                     background: #ffffff;
                     border: var(--ts-bezel) solid var(--ts-black);
                     border-bottom: none;
                     border-radius: var(--ts-radius) var(--ts-radius) 0 0;
-                    padding: clamp(1.4rem, 2.6vw, 2.4rem) clamp(1.4rem, 4vw, 3.4rem) 0;
-                    min-height: 100%;
                 }
-                .ts-sp-eyebrow { margin: 0; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: #5c5a56; }
-                .ts-sp-heading { margin: 0.5rem 0 0; font-size: clamp(1.4rem, 3vw, 2.4rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; color: #101010; }
-                .ts-sp-intro { margin: 0.7rem 0 0; max-width: 52ch; font-size: 0.85rem; line-height: 1.55; color: #5c5a56; }
-                .ts-sp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.4rem; }
-                .ts-sp-card { height: 5rem; border: 1px solid #e3e0da; border-bottom: none; border-radius: 20px 20px 0 0; }
+                /* The screenshot is 1915px wide with the dark-mode button + scrollbar on the
+                   right, so it is scaled up ~15.7% and shifted to crop 130px off each side. */
+                .ts-sp-shot {
+                    display: block;
+                    width: 115.7%;
+                    max-width: none;
+                    margin-left: -7.85%;
+                    height: auto;
+                    user-select: none;
+                    pointer-events: none;
+                }
 
                 /* ---------- Main frame ---------- */
                 .ts-main {
@@ -449,16 +463,24 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                    Mobile
                    ===================================================== */
                 @media (max-width: 760px) {
-                    .ts-section { --ts-bezel: 8px; --ts-radius: 30px; --ts-peek-h: 11rem; gap: 1rem; }
-                    .ts-wrap, .ts-peek-bottom { width: calc(100% - 1.5rem); }
-                    .ts-watermark { font-size: 46vw; right: -12vw; }
+                    .ts-section { --ts-bezel: 8px; --ts-radius: 30px; --ts-peek-h: 6rem; gap: 0.9rem; }
+                    .ts-wrap, .ts-peek-bottom { width: calc(100% - 1.25rem); }
+                    .ts-peek-bottom { height: 9.5rem; }
+                    .ts-sp-shot { width: 220%; margin-left: -60%; }
+                    .ts-watermark { font-size: 34vw; right: -9vw; color: rgba(255,255,255,0.035); }
 
-                    .ts-hp { left: 14%; }
+                    /* Top peek = bottom of Home's stacked Certification column */
+                    .ts-hp {
+                        --u: clamp(0.36rem, 1.5vw, 0.55rem);
+                        left: 12%;
+                        grid-template-columns: minmax(0, 1fr);
+                        gap: 0.4rem;
+                        padding: 0 0 0.4rem 0.4rem;
+                    }
+                    .ts-hp-edu { display: none; }
+                    .ts-hp-cert { border-radius: 0 0 0 0.5rem; }
 
-                    .ts-sp { padding: 1.4rem 1.15rem 0; }
-                    .ts-sp-cards { grid-template-columns: 1fr; }
-
-                    .ts-main { padding: 1.9rem 1.15rem 1.4rem; }
+                    .ts-main { padding: 1.9rem 1.1rem 1.3rem; }
                     .ts-notch {
                         display: block;
                         position: absolute;
@@ -470,16 +492,17 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                         border-radius: 999px;
                         background: var(--ts-black);
                     }
-                    .ts-topbar { margin-top: 0.4rem; }
-                    .ts-heading { text-indent: 2.2rem; font-size: clamp(1.7rem, 8vw, 2.2rem); margin-top: 1.4rem; }
-                    .ts-side { width: 88%; margin-top: 1.2rem; }
+                    .ts-topbar { margin-top: 0.5rem; }
+                    .ts-heading { text-indent: 0; font-size: clamp(1.55rem, 7.2vw, 2rem); line-height: 1.12; margin-top: 1.2rem; }
+                    .ts-side { width: 100%; margin-top: 1rem; }
+                    .ts-btn { width: 100%; padding: 0.85rem 1.2rem; }
 
                     .ts-marquee {
                         position: relative;
                         display: flex;
                         flex-direction: column;
                         gap: 0.5rem;
-                        margin: 1.5rem -1.15rem 0;
+                        margin: 1.4rem -1.1rem 0;
                         overflow: hidden;
                         -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
                         mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
@@ -498,7 +521,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     .ts-marquee-track.rev .ts-marquee-item { color: var(--ts-accent); border-color: rgba(236,91,63,0.35); }
                     @keyframes ts-scroll { to { transform: translateX(calc(-50% - 0.25rem)); } }
 
-                    .ts-groups { grid-template-columns: 1fr; gap: 0.7rem; margin-top: 1.5rem; }
+                    .ts-groups { grid-template-columns: 1fr; gap: 0.7rem; margin-top: 1.4rem; }
                     .ts-group {
                         border: 1px solid rgba(255,255,255,0.08);
                         border-radius: 20px;
@@ -522,7 +545,8 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
             {/* TOP PEEK — bottom slice of Home (Education | Certification panel), glued to the top edge */}
             <div className="ts-peek-top" aria-hidden="true">
                 <div className="ts-hp">
-                    <div className="ts-hp-col ts-hp-edu"></div>
+                    <div className="ts-hp-col ts-hp-edu" />
+                    <div className="ts-hp-col ts-hp-cert" />
                 </div>
             </div>
 
@@ -592,20 +616,9 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                 </div>
             </div>
 
-            {/* BOTTOM PEEK — top slice of Skills (white, black border), glued to the bottom edge */}
+            {/* BOTTOM PEEK — top slice of the Projects section (screenshot), glued to the bottom edge */}
             <div className="ts-peek-bottom" aria-hidden="true">
-                <div className="ts-sp">
-                    <p className="ts-sp-eyebrow">Skills</p>
-                    <p className="ts-sp-heading">Stack, experience, education.</p>
-                    <p className="ts-sp-intro">
-                        A quick look at how I work day to day: the tools I reach for, the roles I’ve held, where I studied, and the fastest way to
-                        reach me if you’d like to talk.
-                    </p>
-                    <div className="ts-sp-cards">
-                        <div className="ts-sp-card" />
-                        <div className="ts-sp-card" />
-                    </div>
-                </div>
+                <img className="ts-sp-shot" src="/projects-peek.png" alt="" loading="lazy" draggable={false} />
             </div>
         </section>
     );
