@@ -81,7 +81,7 @@
                                             border="0">
                                             <tr>
                                                 <td class="msg"
-                                                    style="background-color:#f3f6fc;border-left:4px solid #3a5bd9;border-radius:4px 12px 12px 4px;padding:22px 24px;font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.65;color:#22304f;">
+                                                    style="background-color:#f3f6fc;border-radius:12px;padding:22px 24px;font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.65;color:#22304f;">
                                                     {!! nl2br(e($contact->message)) !!}
                                                 </td>
                                             </tr>
