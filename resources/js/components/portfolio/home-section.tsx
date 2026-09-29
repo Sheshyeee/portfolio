@@ -52,10 +52,11 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                    them. Under 860px it switches to a stacked staircase.
                    ===================================================== */
                 .xp-section {
-                    /* ---- palette (light mode = dark sections; see :root.dark below) ---- */
+                    /* ---- palette (light mode = dark sections; dark mode = graphite, see :root.dark below) ---- */
                     --xp-bg: #141414;
                     --xp-line: #050505;          /* bezel */
                     --xp-rule: #050505;          /* row dividers */
+                    --xp-ring: transparent;      /* hairline outside the bezel (dark mode only) */
                     --xp-panel: #1a1a1a;
                     --xp-panel-2: #171717;
                     --xp-edu: #1b1b1b;
@@ -91,30 +92,32 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
-                /* Dark mode: the section flips to a light "device" look */
+                /* Dark mode: graphite panels on near-black, with a warm accent glow.
+                   The bezel becomes a lifted graphite so the frames still read as devices. */
                 :root.dark .xp-section {
-                    --xp-bg: #ecebe8;
-                    --xp-line: #fdfdfc;
-                    --xp-rule: rgba(0,0,0,0.08);
-                    --xp-panel: #f6f6f4;
-                    --xp-panel-2: #f1f1ef;
-                    --xp-edu: #f8f8f6;
-                    --xp-cert: #e6e5e2;
-                    --xp-ink: #101010;
-                    --xp-label-ink: rgba(0,0,0,0.5);
-                    --xp-role-ink: rgba(0,0,0,0.55);
-                    --xp-dates-ink: rgba(0,0,0,0.42);
-                    --xp-body-ink: rgba(0,0,0,0.5);
-                    --xp-water: rgba(0,0,0,0.05);
-                    --xp-hi: rgba(255,255,255,0.8);
-                    --xp-shade: rgba(0,0,0,0.04);
-                    --xp-glow: rgba(255,255,255,0.6);
-                    --xp-shadow: rgba(0,0,0,0.12);
-                    --xp-shadow-up: rgba(0,0,0,0.1);
-                    --xp-badge-bg: rgba(0,0,0,0.07);
-                    --xp-badge-ink: #101010;
-                    --xp-medal: rgba(0,0,0,0.6);
-                    --xp-medal-drop: drop-shadow(0 18px 30px rgba(0,0,0,0.15));
+                    --xp-bg: #0e0e0f;
+                    --xp-line: #28282c;
+                    --xp-rule: rgba(255,255,255,0.08);
+                    --xp-ring: rgba(255,255,255,0.07);
+                    --xp-panel: #151517;
+                    --xp-panel-2: #131315;
+                    --xp-edu: #18181b;
+                    --xp-cert: #101012;
+                    --xp-ink: #f4f4f5;
+                    --xp-label-ink: rgba(255,255,255,0.5);
+                    --xp-role-ink: rgba(255,255,255,0.5);
+                    --xp-dates-ink: rgba(255,255,255,0.4);
+                    --xp-body-ink: rgba(255,255,255,0.48);
+                    --xp-water: rgba(255,255,255,0.04);
+                    --xp-hi: rgba(255,255,255,0.07);
+                    --xp-shade: rgba(0,0,0,0.35);
+                    --xp-glow: rgba(236,91,63,0.14);
+                    --xp-shadow: rgba(0,0,0,0.6);
+                    --xp-shadow-up: rgba(0,0,0,0.55);
+                    --xp-badge-bg: rgba(255,255,255,0.08);
+                    --xp-badge-ink: #f0f0f0;
+                    --xp-medal: rgba(236,91,63,0.9);
+                    --xp-medal-drop: drop-shadow(0 18px 30px rgba(236,91,63,0.22));
                 }
 
                 .xp-stage {
@@ -178,7 +181,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                         radial-gradient(70% 80% at 28% 0%, var(--xp-hi), transparent 65%),
                         radial-gradient(60% 70% at 95% 100%, var(--xp-shade), transparent 70%),
                         var(--xp-panel);
-                    box-shadow: 0 30px 70px var(--xp-shadow);
+                    box-shadow: 0 0 0 1px var(--xp-ring), 0 30px 70px var(--xp-shadow);
                     opacity: 0;
                     transform: translateY(-3%);
                     transition: opacity .8s cubic-bezier(.19,1,.22,1), transform .8s cubic-bezier(.19,1,.22,1);
@@ -235,7 +238,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     grid-template-columns: 39fr 61fr;
                     gap: calc(0.6 * var(--u));
                     background: var(--xp-panel-2);
-                    box-shadow: 0 -20px 60px var(--xp-shadow-up);
+                    box-shadow: 0 0 0 1px var(--xp-ring), 0 -20px 60px var(--xp-shadow-up);
                     opacity: 0;
                     transform: translate(3%, 3%);
                     transition: opacity .8s cubic-bezier(.19,1,.22,1) .15s, transform .8s cubic-bezier(.19,1,.22,1) .15s;

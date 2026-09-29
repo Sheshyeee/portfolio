@@ -193,8 +193,9 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
             <style>{`
                 .ts-section {
                     --ts-accent: #ec5b3f;
-                    /* ---- palette (light mode = dark section; see :root.dark below) ---- */
+                    /* ---- palette (light mode = dark section; dark mode = graphite, see :root.dark below) ---- */
                     --ts-bg: #141414;
+                    --ts-ring: transparent;      /* hairline outside the bezel (dark mode only) */
                     --ts-black: #050505;         /* bezel */
                     --ts-frame: #1a1a1a;
                     --ts-ink: #f4f4f4;
@@ -242,33 +243,23 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
-                /* Dark mode: the section flips to a light "device" look (matches Home) */
+                /* Dark mode: graphite frames on near-black (matches Home). Hairlines keep
+                   their white-based light-mode values, so only surfaces change here. */
                 :root.dark .ts-section {
-                    --ts-bg: #ecebe8;
-                    --ts-black: #fdfdfc;
-                    --ts-frame: #f7f7f5;
-                    --ts-ink: #101010;
-                    --ts-inv: #f4f4f4;
-                    --ts-mute: rgba(0,0,0,0.55);
-                    --ts-soft: rgba(0,0,0,0.65);
-                    --ts-dim: rgba(0,0,0,0.4);
-                    --ts-hair-1: rgba(0,0,0,0.14);
-                    --ts-hair-2: rgba(0,0,0,0.1);
-                    --ts-hair-3: rgba(0,0,0,0.16);
-                    --ts-hair-4: rgba(0,0,0,0.08);
-                    --ts-hair-5: rgba(0,0,0,0.12);
-                    --ts-fill: rgba(0,0,0,0.02);
-                    --ts-fill-2: rgba(0,0,0,0.04);
-                    --ts-fill-3: rgba(0,0,0,0.015);
-                    --ts-water: rgba(0,0,0,0.05);
-                    --ts-water-m: rgba(0,0,0,0.04);
-                    --ts-hi: rgba(255,255,255,0.8);
-                    --ts-shadow: rgba(0,0,0,0.12);
-                    --ts-shadow-lg: rgba(0,0,0,0.16);
-                    --ts-hp-bg: #f1f1ef;
-                    --ts-hp-edu: #f8f8f6;
-                    --ts-hp-cert: #e6e5e2;
-                    --ts-hp-glow: rgba(255,255,255,0.6);
+                    --ts-bg: #0e0e0f;
+                    --ts-black: #28282c;
+                    --ts-ring: rgba(255,255,255,0.07);
+                    --ts-frame: #151517;
+                    --ts-ink: #f4f4f5;
+                    --ts-water: rgba(255,255,255,0.04);
+                    --ts-water-m: rgba(255,255,255,0.03);
+                    --ts-hi: rgba(255,255,255,0.06);
+                    --ts-shadow: rgba(0,0,0,0.6);
+                    --ts-shadow-lg: rgba(0,0,0,0.7);
+                    --ts-hp-bg: #131315;
+                    --ts-hp-edu: #18181b;
+                    --ts-hp-cert: #101012;
+                    --ts-hp-glow: rgba(236,91,63,0.14);
                     --ts-peek-bg: #0a0a0a;
                 }
 
@@ -339,7 +330,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     border-right: none;
                     border-radius: 0 0 0 var(--ts-radius);
                     background: var(--ts-hp-bg);
-                    box-shadow: 0 30px 70px var(--ts-shadow);
+                    box-shadow: 0 0 0 1px var(--ts-ring), 0 30px 70px var(--ts-shadow);
                 }
                 .ts-hp-col {
                     position: relative;
