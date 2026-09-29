@@ -372,9 +372,10 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                 }
                 /* The screenshot is 1915px wide with the dark-mode button + scrollbar on the
                    right, so it is scaled up ~15.7% and shifted to crop 130px off each side. */
-                .ts-sp-shot.ts-sp-shot-dark { display: none; }
-                :root.dark .ts-sp-shot.ts-sp-shot-dark { display: block; }
-                :root.dark .ts-sp-shot.ts-sp-shot-light { display: none; }
+                .ts-sp-pic { display: block; }
+                .ts-sp-pic.ts-sp-pic-dark { display: none; }
+                :root.dark .ts-sp-pic.ts-sp-pic-dark { display: block; }
+                :root.dark .ts-sp-pic.ts-sp-pic-light { display: none; }
                 .ts-sp-shot {
                     display: block;
                     width: 115.7%;
@@ -514,8 +515,10 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                 @media (max-width: 760px) {
                     .ts-section { --ts-bezel: 8px; --ts-radius: 30px; --ts-peek-h: 6rem; gap: 0.9rem; }
                     .ts-wrap, .ts-peek-bottom { width: calc(100% - 1.25rem); }
-                    .ts-peek-bottom { height: 9.5rem; }
-                    .ts-sp-shot { width: 220%; margin-left: -60%; }
+                    .ts-peek-bottom { height: 11.5rem; }
+                    /* Mobile screenshots are ~358px wide with the theme button top-right,
+                       so crop 55px off each side (keeps the heading, drops the button). */
+                    .ts-sp-shot { width: 144.4%; margin-left: -22.2%; }
                     .ts-watermark { font-size: 34vw; right: -9vw; color: var(--ts-water-m); }
 
                     /* Top peek = bottom of Home's stacked Certification column */
@@ -667,8 +670,14 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
 
             {/* BOTTOM PEEK — top slice of the Projects section (screenshot), glued to the bottom edge */}
             <div className="ts-peek-bottom" aria-hidden="true">
-                <img className="ts-sp-shot ts-sp-shot-light" src="/projects-peek.png" alt="" loading="lazy" draggable={false} />
-                <img className="ts-sp-shot ts-sp-shot-dark" src="/projects-peek-dark.png" alt="" loading="lazy" draggable={false} />
+                <picture className="ts-sp-pic ts-sp-pic-light">
+                    <source media="(max-width: 760px)" srcSet="/projects-peek-mobile.png" />
+                    <img className="ts-sp-shot" src="/projects-peek.png" alt="" loading="lazy" draggable={false} />
+                </picture>
+                <picture className="ts-sp-pic ts-sp-pic-dark">
+                    <source media="(max-width: 760px)" srcSet="/projects-peek-mobile-dark.png" />
+                    <img className="ts-sp-shot" src="/projects-peek-dark.png" alt="" loading="lazy" draggable={false} />
+                </picture>
             </div>
         </section>
     );
