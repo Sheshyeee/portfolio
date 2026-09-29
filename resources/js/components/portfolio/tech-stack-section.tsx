@@ -193,10 +193,35 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
             <style>{`
                 .ts-section {
                     --ts-accent: #ec5b3f;
-                    --ts-black: #050505;
+                    /* ---- palette (light mode = dark section; see :root.dark below) ---- */
+                    --ts-bg: #141414;
+                    --ts-black: #050505;         /* bezel */
                     --ts-frame: #1a1a1a;
                     --ts-ink: #f4f4f4;
+                    --ts-inv: #0a0a0a;           /* text on an ink-coloured button */
                     --ts-mute: rgba(255,255,255,0.5);
+                    --ts-soft: rgba(255,255,255,0.7);
+                    --ts-dim: rgba(255,255,255,0.35);
+                    --ts-hair-1: rgba(255,255,255,0.14);
+                    --ts-hair-2: rgba(255,255,255,0.1);
+                    --ts-hair-3: rgba(255,255,255,0.16);
+                    --ts-hair-4: rgba(255,255,255,0.08);
+                    --ts-hair-5: rgba(255,255,255,0.12);
+                    --ts-fill: rgba(255,255,255,0.02);
+                    --ts-fill-2: rgba(255,255,255,0.05);
+                    --ts-fill-3: rgba(255,255,255,0.015);
+                    --ts-water: rgba(255,255,255,0.05);
+                    --ts-water-m: rgba(255,255,255,0.035);
+                    --ts-hi: rgba(255,255,255,0.05);
+                    --ts-shadow: rgba(0,0,0,0.45);
+                    --ts-shadow-lg: rgba(0,0,0,0.55);
+                    /* top peek: must match Home's bottom panel */
+                    --ts-hp-bg: #171717;
+                    --ts-hp-edu: #1b1b1b;
+                    --ts-hp-cert: #111111;
+                    --ts-hp-glow: rgba(255,255,255,0.09);
+                    /* bottom peek: matches the Projects section behind it */
+                    --ts-peek-bg: #ffffff;
                     --ts-bezel: clamp(7px, 0.95vw, 11px);
                     --ts-radius: clamp(24px, 3.4vw, 42px);
                     --ts-peek-h: clamp(8rem, 13vw, 12rem);
@@ -211,10 +236,40 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     border-top: 0 !important;
                     opacity: 1 !important;              /* no whole-section fade/slide, only inner chips animate */
                     transform: none !important;
-                    background: #141414;                /* same as the Home section */
+                    background: var(--ts-bg);
                     color: var(--ts-ink);
                     overflow: hidden;
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+                }
+
+                /* Dark mode: the section flips to a light "device" look (matches Home) */
+                :root.dark .ts-section {
+                    --ts-bg: #ecebe8;
+                    --ts-black: #fdfdfc;
+                    --ts-frame: #f7f7f5;
+                    --ts-ink: #101010;
+                    --ts-inv: #f4f4f4;
+                    --ts-mute: rgba(0,0,0,0.55);
+                    --ts-soft: rgba(0,0,0,0.65);
+                    --ts-dim: rgba(0,0,0,0.4);
+                    --ts-hair-1: rgba(0,0,0,0.14);
+                    --ts-hair-2: rgba(0,0,0,0.1);
+                    --ts-hair-3: rgba(0,0,0,0.16);
+                    --ts-hair-4: rgba(0,0,0,0.08);
+                    --ts-hair-5: rgba(0,0,0,0.12);
+                    --ts-fill: rgba(0,0,0,0.02);
+                    --ts-fill-2: rgba(0,0,0,0.04);
+                    --ts-fill-3: rgba(0,0,0,0.015);
+                    --ts-water: rgba(0,0,0,0.05);
+                    --ts-water-m: rgba(0,0,0,0.04);
+                    --ts-hi: rgba(255,255,255,0.8);
+                    --ts-shadow: rgba(0,0,0,0.12);
+                    --ts-shadow-lg: rgba(0,0,0,0.16);
+                    --ts-hp-bg: #f1f1ef;
+                    --ts-hp-edu: #f8f8f6;
+                    --ts-hp-cert: #e6e5e2;
+                    --ts-hp-glow: rgba(255,255,255,0.6);
+                    --ts-peek-bg: #0a0a0a;
                 }
 
                 /* ---------- Vertical watermark: far right, cut off top + bottom ---------- */
@@ -230,7 +285,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     letter-spacing: -0.05em;
                     line-height: 1;
                     white-space: nowrap;
-                    color: rgba(255,255,255,0.05);
+                    color: var(--ts-water);
                     pointer-events: none;
                     user-select: none;
                     z-index: 0;
@@ -249,7 +304,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     background: var(--ts-frame);
                     border: var(--ts-bezel) solid var(--ts-black);
                     border-radius: var(--ts-radius);
-                    box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 40px 90px rgba(0,0,0,0.55);
+                    box-shadow: 0 0 0 1px var(--ts-fill-2), 0 40px 90px var(--ts-shadow-lg);
                 }
 
                 /* =====================================================
@@ -283,8 +338,8 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     border-top: none;
                     border-right: none;
                     border-radius: 0 0 0 var(--ts-radius);
-                    background: #171717;
-                    box-shadow: 0 30px 70px rgba(0,0,0,0.45);
+                    background: var(--ts-hp-bg);
+                    box-shadow: 0 30px 70px var(--ts-shadow);
                 }
                 .ts-hp-col {
                     position: relative;
@@ -295,15 +350,15 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                 }
                 .ts-hp-edu {
                     border-radius: 0 calc(0.8 * var(--u)) calc(0.8 * var(--u)) calc(2.6 * var(--u));
-                    background: #1b1b1b;
+                    background: var(--ts-hp-edu);
                 }
                 .ts-hp-cert {
                     border-right: none;
                     border-radius: 0 0 0 calc(0.8 * var(--u));
                     /* tail end of Home's glow so the gradient flows across the seam */
                     background:
-                        radial-gradient(60% 13rem at 62% -5rem, rgba(255,255,255,0.09), transparent 70%),
-                        #111;
+                        radial-gradient(60% 13rem at 62% -5rem, var(--ts-hp-glow), transparent 70%),
+                        var(--ts-hp-cert);
                 }
 
                 /* =====================================================
@@ -319,13 +374,16 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     height: clamp(13rem, 22vw, 20rem);
                     margin: 0 auto;
                     overflow: hidden;
-                    background: #ffffff;
+                    background: var(--ts-peek-bg);
                     border: var(--ts-bezel) solid var(--ts-black);
                     border-bottom: none;
                     border-radius: var(--ts-radius) var(--ts-radius) 0 0;
                 }
                 /* The screenshot is 1915px wide with the dark-mode button + scrollbar on the
                    right, so it is scaled up ~15.7% and shifted to crop 130px off each side. */
+                .ts-sp-shot.ts-sp-shot-dark { display: none; }
+                :root.dark .ts-sp-shot.ts-sp-shot-dark { display: block; }
+                :root.dark .ts-sp-shot.ts-sp-shot-light { display: none; }
                 .ts-sp-shot {
                     display: block;
                     width: 115.7%;
@@ -341,7 +399,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     overflow: hidden;
                     padding: clamp(1.25rem, 2.6vw, 2.4rem) clamp(1.25rem, 3.4vw, 3.2rem) clamp(1.5rem, 3vw, 2.8rem);
                     background:
-                        radial-gradient(70% 60% at 18% 0%, rgba(255,255,255,0.05), transparent 65%),
+                        radial-gradient(70% 60% at 18% 0%, var(--ts-hi), transparent 65%),
                         var(--ts-frame);
                 }
                 .ts-notch { display: none; }
@@ -363,12 +421,12 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     display: flex;
                     justify-content: space-between;
                     align-items: baseline;
-                    border-top: 1px solid rgba(255,255,255,0.14);
+                    border-top: 1px solid var(--ts-hair-1);
                     padding-top: 0.7rem;
                     font: 500 clamp(0.72rem, 1vw, 0.82rem) 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
                 }
                 .ts-tag { color: var(--ts-accent); }
-                .ts-total { color: rgba(255,255,255,0.35); }
+                .ts-total { color: var(--ts-dim); }
 
                 .ts-heading {
                     position: relative;
@@ -393,14 +451,14 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     margin-top: clamp(1rem, 2vw, 1.6rem);
                     padding: 0.7rem 1.6rem;
                     border-radius: 999px;
-                    border: 1px solid rgba(255,255,255,0.16);
-                    background: rgba(255,255,255,0.02);
+                    border: 1px solid var(--ts-hair-3);
+                    background: var(--ts-fill);
                     color: var(--ts-ink);
                     font: 500 0.78rem 'Inter', ui-sans-serif, system-ui, sans-serif;
                     cursor: pointer;
                     transition: background-color .25s ease, border-color .25s ease, color .25s ease;
                 }
-                .ts-btn:hover { background: var(--ts-ink); border-color: var(--ts-ink); color: #0a0a0a; }
+                .ts-btn:hover { background: var(--ts-ink); border-color: var(--ts-ink); color: var(--ts-inv); }
                 .ts-btn:focus-visible, .ts-chip:focus-visible { outline: 2px solid var(--ts-accent); outline-offset: 3px; }
 
                 /* ---------- Stack groups ---------- */
@@ -411,7 +469,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     gap: clamp(1rem, 2vw, 1.75rem);
                     margin-top: clamp(1.8rem, 4vw, 3.4rem);
                 }
-                .ts-group { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.85rem; min-width: 0; }
+                .ts-group { border-top: 1px solid var(--ts-hair-2); padding-top: 0.85rem; min-width: 0; }
                 .ts-group-label {
                     display: flex;
                     justify-content: space-between;
@@ -430,11 +488,11 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     gap: 0.4rem;
                     padding: 0.36rem 0.75rem;
                     border-radius: 999px;
-                    border: 1px solid rgba(255,255,255,0.16);
+                    border: 1px solid var(--ts-hair-3);
                     font-size: 0.74rem;
                     font-weight: 500;
                     color: var(--ts-ink);
-                    background: rgba(255,255,255,0.02);
+                    background: var(--ts-fill);
                     opacity: 0;
                     transform: translateY(10px) scale(0.96);
                     transition:
@@ -467,7 +525,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     .ts-wrap, .ts-peek-bottom { width: calc(100% - 1.25rem); }
                     .ts-peek-bottom { height: 9.5rem; }
                     .ts-sp-shot { width: 220%; margin-left: -60%; }
-                    .ts-watermark { font-size: 34vw; right: -9vw; color: rgba(255,255,255,0.035); }
+                    .ts-watermark { font-size: 34vw; right: -9vw; color: var(--ts-water-m); }
 
                     /* Top peek = bottom of Home's stacked Certification column */
                     .ts-hp {
@@ -513,20 +571,20 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                         flex: 0 0 auto;
                         padding: 0.4rem 0.95rem;
                         border-radius: 999px;
-                        border: 1px solid rgba(255,255,255,0.12);
+                        border: 1px solid var(--ts-hair-5);
                         font-size: 0.74rem;
                         font-weight: 500;
-                        color: rgba(255,255,255,0.7);
+                        color: var(--ts-soft);
                     }
                     .ts-marquee-track.rev .ts-marquee-item { color: var(--ts-accent); border-color: rgba(236,91,63,0.35); }
                     @keyframes ts-scroll { to { transform: translateX(calc(-50% - 0.25rem)); } }
 
                     .ts-groups { grid-template-columns: 1fr; gap: 0.7rem; margin-top: 1.4rem; }
                     .ts-group {
-                        border: 1px solid rgba(255,255,255,0.08);
+                        border: 1px solid var(--ts-hair-4);
                         border-radius: 20px;
                         padding: 0.95rem 0.95rem 1.05rem;
-                        background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+                        background: linear-gradient(160deg, var(--ts-fill-2), var(--ts-fill-3));
                     }
                     .ts-group-label { font-size: 0.85rem; }
                 }
@@ -618,7 +676,8 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
 
             {/* BOTTOM PEEK — top slice of the Projects section (screenshot), glued to the bottom edge */}
             <div className="ts-peek-bottom" aria-hidden="true">
-                <img className="ts-sp-shot" src="/projects-peek.png" alt="" loading="lazy" draggable={false} />
+                <img className="ts-sp-shot ts-sp-shot-light" src="/images/projects-peek.png" alt="" loading="lazy" draggable={false} />
+                <img className="ts-sp-shot ts-sp-shot-dark" src="/images/projects-peek-dark.png" alt="" loading="lazy" draggable={false} />
             </div>
         </section>
     );
