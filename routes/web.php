@@ -1,12 +1,17 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ContactMessageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
+
+Route::post('/contact', [ContactMessageController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 Route::post('/api/chat', [ChatController::class, 'send'])
     ->name('chat.send');
