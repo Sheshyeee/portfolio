@@ -6,16 +6,14 @@ import { useEffect, useRef, useState } from 'react';
 /*  Edit these                                                          */
 /* ------------------------------------------------------------------ */
 
-const EMAIL = 'hello@yourdomain.com';
-const CONTACT_IMAGE = '/contact.png'; // put your image in /public
-const LOCATION = 'Naga City, PH';
+const EMAIL = 'clapisdave8@gmail.com';
+const LOCATION = 'Philippines';
 const TIME_ZONE = 'Asia/Manila';
 
 const SOCIALS = [
     { label: 'Dribbble', href: 'https://dribbble.com/yourname', icon: 'dribbble' },
     { label: 'Instagram', href: 'https://instagram.com/yourname', icon: 'instagram' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/yourname', icon: 'linkedin' },
-    { label: 'Behance', href: 'https://behance.net/yourname', icon: 'behance' },
 ] as const;
 
 /* ------------------------------------------------------------------ */
@@ -53,17 +51,11 @@ const ICONS: Record<string, React.ReactNode> = {
             <path d="M8 10.5V16M8 7.8v.1M11.5 16v-5.5M11.5 13c0-1.5 1-2.5 2.3-2.5S16 11.4 16 13v3" />
         </svg>
     ),
-    behance: (
-        <svg {...svgProps}>
-            <path d="M3 6.5h5a2.3 2.3 0 0 1 0 4.5H3zM3 11h5.5a2.5 2.5 0 0 1 0 5H3zM3 6.5V16M14.5 7.5h5M20.5 13.5h-6.2a2.9 2.9 0 0 0 5.2 1.4" />
-            <path d="M14.4 13.5a3 3 0 0 1 6.1 0" />
-        </svg>
-    ),
 };
 
-const ArrowUpRight = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 17 17 7M8 7h9v9" />
+const CheckCircle = () => (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 6 9 17l-5-5" />
     </svg>
 );
 
@@ -88,12 +80,6 @@ function useLocalTime() {
 /*  Contact dialog (desktop modal / mobile draggable bottom sheet)      */
 /* ------------------------------------------------------------------ */
 
-const CheckCircle = () => (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 6 9 17l-5-5" />
-    </svg>
-);
-
 function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -107,7 +93,7 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
         website: '', // honeypot: real users never fill this in
     });
 
-    // Same behaviour as the old case-study sheet: hides the dock/chat/toggle and locks body scroll on mobile.
+    // Hides the dock/chat/toggle and locks body scroll on mobile while the sheet is open.
     useEffect(() => {
         document.body.classList.toggle('sheet-open', open);
         return () => document.body.classList.remove('sheet-open');
@@ -158,7 +144,7 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent
-                className="case-study-sheet contact-dialog max-h-[90vh] overflow-y-auto rounded-[24px] border-white/10 bg-black p-0 text-white sm:max-w-[520px]"
+                className="case-study-sheet contact-dialog max-h-[90vh] overflow-y-auto rounded-[24px] p-0 sm:max-w-[520px]"
                 style={dragStyle}
             >
                 <div
@@ -248,7 +234,6 @@ function ContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v
 
                             <button type="submit" className="contact-cta contact-submit" disabled={processing}>
                                 {processing ? 'Sending…' : 'Send message'}
-                                {!processing && <ArrowUpRight />}
                             </button>
                         </form>
                     )}
@@ -269,306 +254,233 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
     return (
         <section id="contact-us" ref={sectionRef} className="section contact-section">
             <style>{`
-                @import url('https://fonts.bunny.net/css?family=anton:400|space-mono:400,700');
+                @import url('https://fonts.bunny.net/css?family=instrument-serif:400');
 
-                /* .section.contact-section beats the generic .section rule in welcome.tsx */
+                /* Follows the site theme via --bg / --ink / --muted / --hair from welcome.tsx */
+                .contact-section,
+                .contact-dialog {
+                    --c-fill: rgba(0,0,0,0.035);
+                    --c-line: rgba(0,0,0,0.22);
+                    --c-accent: #0A84FF;
+                    --c-error: #dc2626;
+                    --c-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+                }
+                :root.dark .contact-section,
+                :root.dark .contact-dialog {
+                    --c-fill: rgba(255,255,255,0.06);
+                    --c-line: rgba(255,255,255,0.28);
+                    --c-accent: #6cb3ff;
+                    --c-error: #ff8f8f;
+                }
+
+                /* .section.contact-section beats the generic .section rules in welcome.tsx.
+                   The bottom padding is the only dock clearance on the page. */
                 .section.contact-section {
-                    position: relative;
-                    isolation: isolate;
-                    overflow: hidden;
                     justify-content: flex-start;
-                    min-height: 100vh;
-                    padding: 0;
-                    background: #000;
-                    color: #fff;
+                    min-height: auto;
+                    padding: 6rem 6vw calc(var(--dock-space-mobile) + 0.75rem);
                     border-bottom: none;
                 }
 
-                /* soft grey glow behind the headline */
-                .contact-section::before {
-                    content: '';
-                    position: absolute;
-                    z-index: -1;
-                    top: -20%;
-                    left: -10%;
-                    width: 70vw;
-                    height: 70vw;
-                    max-width: 900px;
-                    max-height: 900px;
-                    background: radial-gradient(circle at 40% 40%, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 45%, transparent 70%);
-                    filter: blur(40px);
-                    pointer-events: none;
-                }
-
-                .contact-inner {
-                    position: relative;
-                    z-index: 2;
+                .contact-wrap {
                     display: flex;
                     flex-direction: column;
-                    gap: 2.5rem;
+                    gap: 3.5rem;
                     width: 100%;
-                    max-width: 62%;
-                    padding: 7rem 0 7rem 6vw;
+                    max-width: 1180px;
+                    margin: 0 auto;
+                }
+
+                .contact-top {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: baseline;
+                    gap: 0.75rem;
+                    font-size: 0.85rem;
+                    color: var(--muted);
+                }
+                .contact-top strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+                .contact-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+                    gap: 4rem 5rem;
+                    align-items: end;
                 }
 
                 .contact-title {
-                    font-family: 'Anton', 'Impact', sans-serif;
+                    margin: 0;
+                    font-family: var(--c-serif);
                     font-weight: 400;
-                    font-size: clamp(3.4rem, 10.5vw, 9rem);
-                    line-height: 0.95;
-                    letter-spacing: 0.005em;
-                    text-transform: uppercase;
-                    margin: 0;
-                    background: linear-gradient(180deg, #ffffff 25%, #8a8a8a 100%);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    color: transparent;
+                    font-size: clamp(3.6rem, 10vw, 8.5rem);
+                    line-height: 0.92;
+                    letter-spacing: -0.025em;
+                    color: var(--ink);
                 }
-
-                .contact-mono { font-family: 'Space Mono', ui-monospace, monospace; }
-
                 .contact-copy {
-                    max-width: 44ch;
-                    font-size: 0.85rem;
-                    line-height: 1.7;
-                    color: rgba(255,255,255,0.72);
-                    margin: 0;
+                    max-width: 40ch;
+                    margin: 1.75rem 0 2rem;
+                    font-size: 1.05rem;
+                    line-height: 1.65;
+                    color: var(--muted);
                 }
 
                 .contact-cta {
                     display: inline-flex;
                     align-items: center;
-                    gap: 0.5rem;
+                    justify-content: center;
                     width: fit-content;
-                    padding: 0.85rem 1.5rem;
+                    padding: 0.9rem 1.7rem;
                     border-radius: 999px;
-                    background: linear-gradient(180deg, #ffffff, #d4d4d4);
-                    color: #000;
-                    font-size: 0.85rem;
-                    font-weight: 700;
-                    text-decoration: none;
-                    box-shadow: 0 10px 30px rgba(255,255,255,0.12), inset 0 1px 0 #fff;
-                    transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
+                    background: var(--ink);
+                    color: var(--bg);
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    transition: transform .25s ease, opacity .2s ease;
                 }
-                .contact-cta:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 14px 38px rgba(255,255,255,0.2), inset 0 1px 0 #fff; }
+                button.contact-cta { border: 0; cursor: pointer; font-family: inherit; }
+                button.contact-cta:hover { transform: translateY(-2px); }
+                button.contact-cta:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
                 .contact-cta:focus-visible,
-                .contact-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+                .contact-pill:focus-visible,
+                .contact-email:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 
-                .contact-label {
-                    font-size: 0.7rem;
-                    letter-spacing: 0.14em;
-                    text-transform: uppercase;
-                    color: rgba(255,255,255,0.45);
-                    margin: 0 0 0.9rem;
-                }
+                .contact-side { display: flex; flex-direction: column; gap: 2rem; padding-bottom: 0.4rem; }
+                .contact-block { padding-top: 1.1rem; border-top: 1px solid var(--hair); }
+                .contact-label { margin: 0 0 0.8rem; font-size: 0.85rem; color: var(--muted); }
 
                 .contact-email {
-                    display: inline-block;
-                    font-family: 'Anton', 'Impact', sans-serif;
-                    font-size: clamp(1.1rem, 2vw, 1.5rem);
-                    letter-spacing: 0.03em;
-                    color: #fff;
+                    font-family: var(--c-serif);
+                    font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+                    line-height: 1.15;
+                    color: var(--ink);
                     text-decoration: none;
-                    text-transform: uppercase;
-                    border-bottom: 1px solid rgba(255,255,255,0.25);
-                    padding-bottom: 2px;
-                    transition: border-color .25s ease, color .25s ease;
-                    word-break: break-all;
+                    border-bottom: 1px solid var(--c-line);
+                    overflow-wrap: anywhere;
+                    transition: border-color .2s ease;
                 }
-                .contact-email:hover { border-color: #fff; }
+                .contact-email:hover { border-color: var(--ink); }
 
-                .contact-details { display: flex; flex-wrap: wrap; gap: 3rem 4.5rem; }
-
-                /* vertical social pills */
-                .contact-socials { display: flex; flex-direction: column; gap: 0.6rem; }
+                .contact-links { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
                 .contact-pill {
                     display: inline-flex;
                     align-items: center;
-                    gap: 0.65rem;
-                    width: 11.5rem;
-                    padding: 0.7rem 1.1rem;
+                    gap: 0.55rem;
+                    padding: 0.65rem 1.05rem;
+                    border: 1px solid var(--hair);
                     border-radius: 999px;
-                    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(226,226,226,0.92));
-                    color: #101010;
-                    font-size: 0.85rem;
-                    font-weight: 600;
+                    background: var(--c-fill);
+                    color: var(--ink);
+                    font-size: 0.9rem;
+                    font-weight: 500;
                     text-decoration: none;
-                    box-shadow: 0 8px 24px rgba(255,255,255,0.06), inset 0 1px 0 #fff;
-                    transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, background .3s ease;
+                    transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .25s ease;
                 }
-                .contact-pill:hover {
-                    transform: translateX(6px);
-                    box-shadow: 0 10px 30px rgba(255,255,255,0.16), inset 0 1px 0 #fff;
-                }
-                .contact-pill svg { flex: none; }
+                .contact-pill:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); transform: translateY(-2px); }
 
-                /* right-hand image */
-                .contact-visual {
-                    position: absolute;
-                    z-index: 1;
-                    top: 0;
-                    right: 0;
-                    bottom: 0;
-                    width: 42%;
-                    pointer-events: none;
-                }
-                .contact-visual img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    filter: grayscale(1) contrast(1.05);
-                }
-                .contact-visual::after {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background:
-                        linear-gradient(90deg, #000 0%, rgba(0,0,0,0.55) 30%, transparent 75%),
-                        linear-gradient(180deg, #000 0%, transparent 28%, transparent 70%, #000 100%);
-                }
-
-                .contact-meta {
-                    position: absolute;
-                    z-index: 3;
-                    top: 2rem;
-                    right: 6vw;
-                    text-align: right;
-                    font-family: 'Space Mono', ui-monospace, monospace;
-                    text-transform: uppercase;
-                    font-size: 0.8rem;
-                    line-height: 1.5;
-                    color: rgba(255,255,255,0.6);
-                }
-                .contact-meta strong { display: block; color: #fff; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.04em; }
+                .contact-foot { margin: 0; padding-top: 1.5rem; border-top: 1px solid var(--hair); font-size: 0.8rem; color: var(--muted); }
 
                 @media (max-width: 900px) {
-                    .section.contact-section { min-height: auto; }
-                    .contact-inner { max-width: 100%; padding: 5.5rem 6vw 2rem; gap: 2rem; }
-                    .contact-meta { top: 1.25rem; left: 6vw; right: auto; text-align: left; }
-                    .contact-visual {
-                        position: relative;
-                        width: 100%;
-                        height: 300px;
-                        margin-bottom: var(--dock-space-mobile, 6rem);
-                    }
-                    .contact-visual::after {
-                        background: linear-gradient(180deg, #000 0%, transparent 40%, transparent 75%, #000 100%);
-                    }
-                    .contact-pill { width: 100%; max-width: 20rem; }
+                    .section.contact-section { padding: 5rem 6vw calc(var(--dock-space-mobile) + 0.75rem); }
+                    .contact-wrap { gap: 2.5rem; }
+                    .contact-top { justify-content: flex-start; }
+                    .contact-grid { grid-template-columns: 1fr; gap: 2.75rem; }
                 }
 
-
                 /* ---------- contact dialog / bottom sheet (portal, so not scoped to the section) ---------- */
-                button.contact-cta { border: 0; cursor: pointer; font-family: inherit; }
-                button.contact-cta:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-                .contact-dialog { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
-                .contact-dialog > button.absolute { color: #fff; }
-                .contact-dialog .sheet-drag-bar { background: rgba(255,255,255,0.3); }
+                .contact-dialog {
+                    background: var(--bg) !important;
+                    color: var(--ink) !important;
+                    border-color: var(--hair) !important;
+                    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+                }
+                .contact-dialog > button.absolute { color: var(--ink); }
+                .contact-dialog .sheet-drag-bar { background: var(--c-line); }
                 .contact-dialog-body { padding: 1.5rem 1.5rem 2rem; }
                 @media (min-width: 640px) { .contact-dialog-body { padding: 2.25rem 2.25rem 2.5rem; } }
 
-                .contact-dialog-title {
-                    font-family: 'Anton', 'Impact', sans-serif;
-                    font-weight: 400;
-                    font-size: 2.1rem;
-                    line-height: 1;
-                    text-transform: uppercase;
-                    background: linear-gradient(180deg, #ffffff 30%, #8a8a8a 100%);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                }
-                .contact-dialog-desc { margin-top: 0.6rem; font-size: 0.875rem; line-height: 1.6; color: rgba(255,255,255,0.6); }
+                .contact-dialog-title { font-family: var(--c-serif); font-weight: 400; font-size: 2.5rem; line-height: 1; letter-spacing: -0.02em; color: var(--ink); }
+                .contact-dialog-desc { margin-top: 0.6rem; font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
 
                 .contact-form { display: grid; gap: 1.1rem; margin-top: 1.75rem; }
-                .contact-field label {
-                    display: block;
-                    margin-bottom: 0.45rem;
-                    font-family: 'Space Mono', ui-monospace, monospace;
-                    font-size: 0.7rem;
-                    letter-spacing: 0.12em;
-                    text-transform: uppercase;
-                    color: rgba(255,255,255,0.5);
-                }
+                .contact-field label { display: block; margin-bottom: 0.45rem; font-size: 0.85rem; font-weight: 500; color: var(--muted); }
                 .contact-input {
                     width: 100%;
                     padding: 0.8rem 1rem;
                     border-radius: 14px;
-                    border: 1px solid rgba(255,255,255,0.14);
-                    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-                    color: #fff;
+                    border: 1px solid var(--c-line);
+                    background: var(--c-fill);
+                    color: var(--ink);
                     font: inherit;
                     font-size: 16px; /* 16px stops iOS from zooming on focus */
                     outline: none;
                     transition: border-color .2s ease, box-shadow .2s ease;
                 }
-                .contact-input::placeholder { color: rgba(255,255,255,0.3); }
-                .contact-input:focus { border-color: rgba(255,255,255,0.6); box-shadow: 0 0 0 3px rgba(255,255,255,0.08); }
-                .contact-input[aria-invalid='true'] { border-color: #ff7a7a; }
+                .contact-input::placeholder { color: var(--muted); opacity: 0.6; }
+                .contact-input:focus { border-color: var(--c-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 22%, transparent); }
+                .contact-input[aria-invalid='true'] { border-color: var(--c-error); }
                 textarea.contact-input { min-height: 8rem; resize: vertical; }
-                .contact-error { margin-top: 0.4rem; font-size: 0.78rem; color: #ff8f8f; }
+                .contact-error { margin-top: 0.4rem; font-size: 0.8rem; color: var(--c-error); }
                 .contact-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-                .contact-submit { width: 100%; justify-content: center; margin-top: 0.4rem; }
+                .contact-submit { width: 100%; margin-top: 0.4rem; }
 
                 .contact-success { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-top: 1.75rem; }
                 .contact-success-icon {
                     display: inline-flex; align-items: center; justify-content: center;
                     width: 3.5rem; height: 3.5rem; border-radius: 999px;
-                    background: linear-gradient(180deg, #ffffff, #cfcfcf); color: #000;
+                    background: var(--ink); color: var(--bg);
                 }
 
                 @media (prefers-reduced-motion: reduce) {
                     .contact-cta, .contact-pill { transition: none; }
-                    .contact-cta:hover, .contact-pill:hover { transform: none; }
+                    button.contact-cta:hover, .contact-pill:hover { transform: none; }
                 }
             `}</style>
 
-            <div className="contact-meta">
-                {LOCATION}
-                <strong>{time}</strong>
-            </div>
-
-            <div className="contact-inner">
-                <h2 className="contact-title">
-                    Let&apos;s
-                    <br />
-                    connect!
-                </h2>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <p className="contact-copy contact-mono">Have a project in mind? Send me a message and we can talk through the details.</p>
-                    <button type="button" className="contact-cta" onClick={() => setDialogOpen(true)}>
-                        Contact me
-                        <ArrowUpRight />
-                    </button>
+            <div className="contact-wrap">
+                <div className="contact-top">
+                    <span>{LOCATION}</span>
+                    <strong>{time}</strong>
                 </div>
 
-                <div className="contact-details">
+                <div className="contact-grid">
                     <div>
-                        <p className="contact-label contact-mono">Email</p>
-                        <a className="contact-email" href={`mailto:${EMAIL}`}>
-                            {EMAIL}
-                        </a>
+                        <h2 className="contact-title">
+                            Let&apos;s
+                            <br />
+                            connect.
+                        </h2>
+                        <p className="contact-copy">Have a project in mind? Send me a message and we can talk through the details.</p>
+                        <button type="button" className="contact-cta" onClick={() => setDialogOpen(true)}>
+                            Contact me
+                        </button>
                     </div>
 
-                    <div>
-                        <p className="contact-label contact-mono">Connect</p>
-                        <div className="contact-socials">
-                            {SOCIALS.map((s) => (
-                                <a key={s.label} className="contact-pill" href={s.href} target="_blank" rel="noreferrer noopener">
-                                    {ICONS[s.icon]}
-                                    {s.label}
-                                </a>
-                            ))}
+                    <div className="contact-side">
+                        <div className="contact-block">
+                            <p className="contact-label">Email</p>
+                            <a className="contact-email" href={`mailto:${EMAIL}`}>
+                                {EMAIL}
+                            </a>
+                        </div>
+
+                        <div className="contact-block">
+                            <p className="contact-label">Find me online</p>
+                            <ul className="contact-links">
+                                {SOCIALS.map((s) => (
+                                    <li key={s.label}>
+                                        <a className="contact-pill" href={s.href} target="_blank" rel="noreferrer noopener">
+                                            {ICONS[s.icon]}
+                                            {s.label}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="contact-visual" aria-hidden="true">
-                <img src={CONTACT_IMAGE} alt="" />
+                <p className="contact-foot">© 2026 — Built with Laravel &amp; React.</p>
             </div>
 
             <ContactDialog open={dialogOpen} onOpenChange={setDialogOpen} />
