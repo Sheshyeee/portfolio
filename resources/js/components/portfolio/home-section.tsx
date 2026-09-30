@@ -24,7 +24,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
 
     /*
      * Scroll-linked expansion. One number, --p (0 -> 1), is written straight to
-     * the section's style. CSS turns it into the clip-path of the card.
+     * the section's style. CSS turns it into the size/position of the card (scale on desktop, clip on mobile).
      * No React state, so scrolling never re-renders anything.
      *
      *  Desktop : the section is a tall "track"; the stage inside is sticky, so the
@@ -41,8 +41,11 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
         const mobile = window.matchMedia('(max-width: 860px)');
         let raf = 0;
 
-        const apply = (p: number) => {
+        // p: overall progress 0 -> 1 (size / corners).  q: 1 -> 0 while the section is still
+        // scrolling into view (card hangs from the top of the stage, then settles to the bottom).
+        const apply = (p: number, q = 0) => {
             section.style.setProperty('--p', p.toFixed(4));
+            section.style.setProperty('--q', q.toFixed(4));
             section.classList.toggle('is-open', p >= 0.999);
         };
 
@@ -59,14 +62,16 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
             const rect = section.getBoundingClientRect();
 
             if (mobile.matches) {
-                apply(clamp((vh - rect.top) / (vh * 0.6)));
+                apply(clamp((vh - rect.top) / (vh * 0.6)), 0);
                 section.dataset.scrollOffset = '0';
                 return;
             }
 
             const travel = Math.max(1, section.offsetHeight - sticky.offsetHeight);
             const span = travel * 0.9; // last 10% of the pin is a short hold at full size
-            apply(clamp(-rect.top / span));
+            // Starts the instant the section's top edge crosses the bottom of the screen
+            // (i.e. on the first scroll from the hero) and ends when the pin is 90% done.
+            apply(clamp((vh - rect.top) / (vh + span)), clamp(rect.top / vh));
             // Lets the dock jump straight to the fully expanded state (see scrollTo in welcome.tsx)
             section.dataset.scrollOffset = String(Math.round(span));
         };
@@ -108,6 +113,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                    ===================================================== */
                 .xp-section {
                     --p: 1; /* 0 = small card, 1 = full screen. Written by the scroll handler */
+                    --q: 0; /* 1 -> 0 while scrolling into view: card hangs from the top, then settles to the bottom */
                     --xp-line: var(--line);
                     --xp-rule: var(--hair);
                     --xp-ink: var(--ink);
@@ -116,8 +122,9 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     --xp-radius: clamp(24px, 3.4vw, 42px);
 
                     /* how the card looks at p = 0 */
-                    --xp-start-top: 30%;
-                    --xp-start-side: 9%;
+                    --xp-start-scale: 0.8;   /* card size at p = 0 (80% of full) */
+                    --xp-shift: calc((1 - var(--xp-start-scale)) * 100%);
+                    --xp-start-side: 5vw;    /* mobile only */
                     --xp-card-radius: clamp(28px, 4vw, 52px);
 
                     --xp-stage-h: 100vh;
@@ -146,25 +153,25 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                         position: sticky;
                         top: 0;
                         height: var(--xp-stage-h);
+                        overflow: hidden; /* the card starts below the fold and rises into view */
                     }
 
+                    /* The card is ONE real box: everything inside (name, panels, text)
+                       lives in it and grows with it. It rises from the bottom centre,
+                       scales up and loses its rounded corners as --p goes 0 -> 1. */
                     .xp-card {
                         position: relative;
                         height: 100%;
+                        overflow: hidden;
                         background: var(--bg);
-                        clip-path: inset(
-                            calc((1 - var(--p)) * var(--xp-start-top))
-                            calc((1 - var(--p)) * var(--xp-start-side))
-                            0
-                            calc((1 - var(--p)) * var(--xp-start-side))
-                            round
-                            calc((1 - var(--p)) * var(--xp-card-radius))
-                            calc((1 - var(--p)) * var(--xp-card-radius))
-                            0
-                            0
-                        );
+                        transform-origin: 50% 100%;
+                        transform: translateY(calc(var(--q) * (var(--p) - 1) * var(--xp-shift)))
+                                   scale(calc(var(--xp-start-scale) + (1 - var(--xp-start-scale)) * var(--p)));
+                        border-radius: calc((1 - var(--p)) * var(--xp-card-radius)) calc((1 - var(--p)) * var(--xp-card-radius)) 0 0;
+                        will-change: transform;
                     }
-                    .xp-section.is-open .xp-card { clip-path: none; }
+                    /* Fully open: plain layout again, no transform (crisp text, no layer) */
+                    .xp-section.is-open .xp-card { transform: none; border-radius: 0; will-change: auto; }
 
                     .xp-stage {
                         --u: max(6px, min(0.6cqw, 1.15cqh));
@@ -182,7 +189,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     inset: 0;
                     z-index: 0;
                     background: var(--ink);
-                    opacity: calc((1 - var(--p)) * 0.07);
+                    opacity: calc((1 - var(--p)) * 0.1);
                     pointer-events: none;
                 }
 
@@ -241,6 +248,14 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
 
                 .xp-list { margin: 0; padding: 0; display: flex; flex-direction: column; }
+                /* Experience text must always be visible, whatever the global reveal styles do */
+                .xp-list, .xp-row, .xp-row > p {
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    transform: none !important;
+                    translate: none !important;
+                    animation: none !important;
+                }
                 .xp-row {
                     display: grid;
                     grid-template-columns: minmax(0, 1fr) auto;
@@ -356,7 +371,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     .xp-section {
                         --xp-bezel: 8px;
                         --xp-radius: 30px;
-                        --xp-start-side: 5vw;
                         --xp-card-radius: 28px;
                         height: auto;
                     }
@@ -441,7 +455,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 @media (prefers-reduced-motion: reduce) {
                     .xp-section { height: auto !important; }
                     .xp-sticky { position: static !important; height: var(--xp-stage-h) !important; }
-                    .xp-card { clip-path: none !important; }
+                    .xp-card { clip-path: none !important; transform: none !important; border-radius: 0 !important; }
                     .xp-card::before { display: none; }
                 }
                 @media (prefers-reduced-motion: reduce) and (max-width: 860px) {
