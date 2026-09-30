@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactElement } from 'react';
 
 /* ------------------------------------------------------------------ */
 /*  Icons                                                              */
@@ -47,6 +47,13 @@ const GridIcon = () => (
     </svg>
 );
 
+const LayersIcon = () => (
+    <svg {...iconProps}>
+        <path d="M12 3 21 8l-9 5-9-5 9-5Z" />
+        <path d="m3 12 9 5 9-5M3 16l9 5 9-5" />
+    </svg>
+);
+
 /* ------------------------------------------------------------------ */
 /*  Nav items                                                          */
 /* ------------------------------------------------------------------ */
@@ -57,13 +64,6 @@ type NavItem = {
     icon: () => ReactElement;
 };
 
-const LayersIcon = () => (
-    <svg {...iconProps}>
-        <path d="M12 3 21 8l-9 5-9-5 9-5Z" />
-        <path d="m3 12 9 5 9-5M3 16l9 5 9-5" />
-    </svg>
-);
-
 export const NAV_ITEMS: NavItem[] = [
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'about', label: 'About', icon: UserIcon },
@@ -72,13 +72,53 @@ export const NAV_ITEMS: NavItem[] = [
     { id: 'projects', label: 'Projects', icon: GridIcon },
 ];
 
+type Box = { x: number; y: number; w: number; h: number };
+
 /* ------------------------------------------------------------------ */
 /*  Dock                                                                */
 /* ------------------------------------------------------------------ */
 
 export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
     const glassRef = useRef<HTMLDivElement | null>(null);
+    const groupRef = useRef<HTMLDivElement | null>(null);
+    const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
     const [hovered, setHovered] = useState<number | null>(null);
+    const [box, setBox] = useState<Box | null>(null);
+    const [settled, setSettled] = useState(false);
+
+    const activeIdx = NAV_ITEMS.findIndex((i) => i.id === active);
+
+    /* Measure the active tab. offsetLeft/Top ignore transforms, so hover magnify can't skew it. */
+    const measure = useCallback(() => {
+        const el = activeIdx >= 0 ? itemRefs.current[activeIdx] : null;
+        if (!el || !el.offsetWidth) {
+            setBox((prev) => (prev === null ? prev : null));
+            return;
+        }
+        const next = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
+        setBox((prev) => (prev && prev.x === next.x && prev.y === next.y && prev.w === next.w && prev.h === next.h ? prev : next));
+    }, [activeIdx]);
+
+    useLayoutEffect(() => {
+        measure();
+    }, [measure]);
+
+    useEffect(() => {
+        const group = groupRef.current;
+        if (!group || typeof ResizeObserver === 'undefined') return;
+        const ro = new ResizeObserver(measure);
+        ro.observe(group);
+        // web fonts change label widths after first paint
+        document.fonts?.ready.then(measure).catch(() => {});
+        return () => ro.disconnect();
+    }, [measure]);
+
+    // Place the indicator without animating the first time, then let it slide.
+    useEffect(() => {
+        if (!box || settled) return;
+        const id = requestAnimationFrame(() => requestAnimationFrame(() => setSettled(true)));
+        return () => cancelAnimationFrame(id);
+    }, [box, settled]);
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const el = glassRef.current;
@@ -96,19 +136,49 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
         setHovered(null);
     };
 
+    const magnify = (i: number) => {
+        const distance = hovered === null ? 99 : Math.abs(hovered - i);
+        return {
+            scale: distance === 0 ? 1.22 : distance === 1 ? 1.08 : 1,
+            lift: distance === 0 ? -8 : distance === 1 ? -3 : 0,
+        };
+    };
+
+    const activeMag = activeIdx >= 0 ? magnify(activeIdx) : { scale: 1, lift: 0 };
+
+    const indicatorStyle: CSSProperties | undefined = box
+        ? ({
+              width: box.w,
+              height: box.h,
+              '--ix': `${box.x}px`,
+              '--iy': `${box.y}px`,
+              '--il': `${activeMag.lift}px`,
+              '--is': activeMag.scale,
+          } as CSSProperties)
+        : undefined;
+
     return (
         <nav className="liquid-dock" aria-label="Section navigation">
             <div ref={glassRef} className="liquid-dock-glass" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-                <div className="dock-group">
+                <div
+                    ref={groupRef}
+                    className="dock-group"
+                    style={{ position: 'relative' }}
+                    data-indicator={box ? 'on' : 'off'}
+                    data-instant={settled ? undefined : ''}
+                >
+                    <span className="dock-indicator" aria-hidden="true" style={indicatorStyle} />
+
                     {NAV_ITEMS.map((item, i) => {
                         const isActive = active === item.id;
-                        const distance = hovered === null ? 99 : Math.abs(hovered - i);
-                        const scale = distance === 0 ? 1.22 : distance === 1 ? 1.08 : 1;
-                        const lift = distance === 0 ? -8 : distance === 1 ? -3 : 0;
+                        const { scale, lift } = magnify(i);
                         const Icon = item.icon;
                         return (
                             <button
                                 key={item.id}
+                                ref={(el) => {
+                                    itemRefs.current[i] = el;
+                                }}
                                 type="button"
                                 className={`dock-item ${isActive ? 'active' : ''}`}
                                 style={{ transform: `translateY(${lift}px) scale(${scale})` }}
@@ -127,7 +197,7 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                     })}
                 </div>
 
-                {/* Bottom spacer — gives the pill height/presence beyond the last icon */}
+                {/* Bottom spacer: gives the pill height/presence beyond the last icon */}
                 <div className="dock-spacer" aria-hidden="true" />
             </div>
         </nav>

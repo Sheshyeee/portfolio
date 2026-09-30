@@ -209,42 +209,37 @@ function WorkCard({ work, centerLast, onOpen }: { work: Work; centerLast: boolea
     };
 
     return (
-        <div
-            role="button"
-            tabIndex={0}
-            aria-label={`View case study: ${work.title}`}
-            onClick={onOpen}
-            onKeyDown={handleKeyDown}
-            className={[
-                'group cursor-pointer overflow-hidden rounded-md border border-[var(--hair)] bg-[var(--bg)] text-[var(--ink)] transition-colors duration-300 outline-none hover:border-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--ink)]',
-                // lone last card: span both columns but keep the width of a single column
-                centerLast ? 'md:col-span-2 md:mx-auto md:w-[calc(50%-0.75rem)]' : '',
-            ].join(' ')}
-        >
-            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--fill)]">
-                <img
-                    src={work.thumbnail}
-                    alt=""
-                    loading="lazy"
-                    className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                />
-                <span className="absolute top-1/2 left-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 scale-90 items-center justify-center rounded-full bg-[var(--ink)] text-[var(--bg)] opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100">
-                    <ArrowUpRightIcon />
-                </span>
-            </div>
+        // outer = scroll reveal only; inner .wc-card = hover states (kept separate so delays never mix)
+        <div data-reveal="up" className={centerLast ? 'wc md:col-span-2 md:mx-auto md:w-[calc(50%-0.75rem)]' : 'wc'}>
+            <div
+                role="button"
+                tabIndex={0}
+                aria-label={`View case study: ${work.title}`}
+                onClick={onOpen}
+                onKeyDown={handleKeyDown}
+                className="wc-card"
+            >
+                <div className="wc-media" data-reveal="clip">
+                    <img src={work.thumbnail} alt="" loading="lazy" data-parallax="0.06" className="wc-img" />
+                    <span className="wc-shade" aria-hidden="true" />
+                    <span className="wc-arrow" aria-hidden="true">
+                        <ArrowUpRightIcon />
+                    </span>
+                </div>
 
-            <div className="flex flex-col gap-3 p-4 sm:p-6">
-                <h3 className="text-[17px] leading-snug font-semibold tracking-tight text-[var(--ink)] sm:text-[20px]">{work.title}</h3>
-                <p className="line-clamp-2 text-[14px] leading-relaxed text-[var(--muted)] sm:text-[14.5px]">{work.desc}</p>
-                <div className="flex flex-wrap gap-2 pt-1">
-                    {work.tags.map((tag) => (
-                        <span
-                            key={tag}
-                            className="rounded-full border border-[var(--hair)] px-3 py-1 text-[12px] font-medium text-[var(--ink)] sm:px-3.5 sm:py-1.5 sm:text-[13px]"
-                        >
-                            {tag}
-                        </span>
-                    ))}
+                <div className="flex flex-col gap-3 p-4 sm:p-6">
+                    <h3 className="wc-title text-[17px] leading-snug font-semibold tracking-tight text-[var(--ink)] sm:text-[20px]">{work.title}</h3>
+                    <p className="line-clamp-2 text-[14px] leading-relaxed text-[var(--muted)] sm:text-[14.5px]">{work.desc}</p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                        {work.tags.map((tag) => (
+                            <span
+                                key={tag}
+                                className="rounded-full border border-[var(--hair)] px-3 py-1 text-[12px] font-medium text-[var(--ink)] sm:px-3.5 sm:py-1.5 sm:text-[13px]"
+                            >
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

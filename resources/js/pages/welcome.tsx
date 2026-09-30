@@ -7,6 +7,8 @@ import { LiquidDock } from '@/components/portfolio/liquid-dock';
 import { ContactSection } from '@/components/portfolio/projects-section';
 import { SkillsSection } from '@/components/portfolio/skills-section';
 import { TechStackSection } from '@/components/portfolio/tech-stack-section';
+import { useMotion } from '@/hooks/use-motion';
+import { MOTION_CSS } from '@/lib/motion-styles';
 import { Head } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -37,6 +39,11 @@ export default function Welcome() {
     const [active, setActive] = useState('home');
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
     const suppressSpyUntil = useRef(0);
+    const rootRef = useRef<HTMLDivElement | null>(null);
+    const progressRef = useRef<HTMLDivElement | null>(null);
+
+    // Reveals, parallax and scroll progress. See hooks/use-motion.ts
+    useMotion(rootRef, progressRef);
 
     useEffect(() => {
         const spy = new IntersectionObserver(
@@ -74,13 +81,15 @@ export default function Welcome() {
         setActive(id);
         suppressSpyUntil.current = Date.now() + 900;
 
+        const behavior: ScrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+
         if (id === 'home') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior });
             return;
         }
 
         const targetId = NAV_TARGET[id] ?? id;
-        sectionRefs.current[targetId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        sectionRefs.current[targetId]?.scrollIntoView({ behavior, block: 'start' });
     };
 
     const setSectionRef = (id: string) => (el: HTMLElement | null) => {
@@ -127,21 +136,21 @@ export default function Welcome() {
                     overflow-x: hidden;
                     overflow-x: clip;
                     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-                    /* no background/color transition: the toggle crossfades the whole page in one go */
                 }
 
                 .site-chrome > * {
-                    transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+                    transition: opacity .6s var(--m-ease), transform .6s var(--m-ease);
                     transform: translateY(0);
                 }
                 .site-chrome.site-chrome-hidden { pointer-events: none; }
                 .site-chrome.site-chrome-hidden > * { opacity: 0; transform: translateY(16px); }
                 .chat-widget-mobile-anchor {
-                    transition: opacity .6s cubic-bezier(.16,1,.3,1) .1s, transform .6s cubic-bezier(.16,1,.3,1) .1s;
+                    transition: opacity .6s var(--m-ease) .1s, transform .6s var(--m-ease) .1s;
                 }
                 .chat-widget-mobile-anchor.site-chrome-hidden { opacity: 0; transform: translateY(16px); pointer-events: none; }
 
                 .portfolio-main { margin-left: 0; min-width: 0; padding-bottom: 0; }
+                /* Sections no longer fade in as a block: individual elements reveal (see motion-styles.ts) */
                 .section {
                     min-height: 100vh;
                     padding: 7rem 6vw 5rem;
@@ -149,11 +158,7 @@ export default function Welcome() {
                     flex-direction: column;
                     justify-content: center;
                     border-bottom: 1px solid var(--hair);
-                    opacity: 0;
-                    transform: translateY(18px);
-                    transition: opacity .7s ease, transform .7s ease;
                 }
-                .section.in-view { opacity: 1; transform: translateY(0); }
                 @media (max-width: 820px) { .section { padding: 5.5rem 5.5vw 3.5rem; min-height: auto; } }
                 @media (max-width: 480px) { .section { padding: 4.5rem 5vw 3rem; } }
 
@@ -195,17 +200,18 @@ export default function Welcome() {
                     border: 1px solid var(--hair);
                     color: var(--bg);
                     cursor: pointer;
-                    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    transition: transform .35s var(--m-ease);
                 }
-                .glass-toggle-btn:hover { transform: scale(1.06); }
+                .glass-toggle-btn:hover { transform: scale(1.05); }
+                .glass-toggle-btn:active { transform: scale(.96); }
                 .glass-toggle-icon {
                     position: absolute;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     opacity: 0;
-                    transform: scale(0.5) rotate(-90deg);
-                    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    transform: scale(0.6) rotate(-70deg);
+                    transition: opacity .3s ease, transform .5s var(--m-ease);
                 }
                 .glass-toggle-icon[data-active='true'] { opacity: 1; transform: scale(1) rotate(0deg); }
                 @media (max-width: 820px) {
@@ -266,11 +272,12 @@ export default function Welcome() {
                     border-radius: 22px; background: transparent; border: none;
                     color: var(--muted); cursor: pointer;
                     -webkit-tap-highlight-color: transparent;
-                    transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease;
+                    transition: transform .45s var(--m-ease), background-color .3s ease, color .3s ease;
                 }
                 .dock-item svg { width: 22px; height: 22px; color: inherit; }
                 .dock-item:hover:not(.active) { color: var(--ink); }
 
+                /* Fallback fill. Once the sliding indicator is measured it takes over (see motion-styles.ts) */
                 .dock-item.active { background: var(--ink); color: var(--bg); }
                 .dock-item.active svg,
                 .dock-item.active .dock-label { color: var(--bg); }
@@ -305,7 +312,7 @@ export default function Welcome() {
                 }
 
                 /* =====================================================
-                   HERO
+                   HERO — layout only. The load sequence lives in motion-styles.ts
                    ===================================================== */
                 .hero-section {
                     position: relative; overflow: hidden; padding: 0;
@@ -336,10 +343,7 @@ export default function Welcome() {
                     object-fit: contain; object-position: bottom center; display: block; margin: 0 auto;
                     margin-bottom: calc(var(--dock-space-mobile) + 0.5rem);
                     filter: drop-shadow(0 30px 50px var(--glow-a));
-                    opacity: 0; transform: translateY(28px);
-                    transition: opacity .8s cubic-bezier(.16,1,.3,1) .15s, transform .8s cubic-bezier(.16,1,.3,1) .15s;
                 }
-                .hero-section.in-view .hero-photo-img { opacity: 1; transform: translateY(0); }
                 @media (max-width: 820px) {
                     .hero-photo-img { width: clamp(220px, 78vw, 360px); max-height: 66vh; margin-bottom: calc(var(--dock-space-mobile) + 0.25rem); }
                 }
@@ -348,11 +352,10 @@ export default function Welcome() {
                 }
                 .hero-caption {
                     position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); z-index: 3;
-                    text-align: center; opacity: 0; transition: opacity .8s ease .4s;
+                    text-align: center;
                 }
-                .hero-section.in-view .hero-caption { opacity: 1; }
                 .hero-role { font-size: 0.8rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--ink); opacity: .9; }
+                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--ink); }
                 @media (max-width: 820px) {
                     .hero-section { align-items: flex-end; min-height: 88vh; min-height: 88svh; }
                     .hero-caption { bottom: 1.75rem; }
@@ -392,10 +395,16 @@ export default function Welcome() {
                 @media (max-width: 1024px) { body.sheet-open { overflow: hidden; } }
                 body.sheet-open .liquid-dock,
                 body.sheet-open .chat-widget-mobile-anchor,
-                body.sheet-open .glass-toggle-dock { display: none; }
+                body.sheet-open .glass-toggle-dock,
+                body.sheet-open .scroll-progress { display: none; }
             `}</style>
 
-            <div className="portfolio-root">
+            {/* Motion language: tokens, reveals, hero sequence, card hovers, dock indicator */}
+            <style>{MOTION_CSS}</style>
+
+            <div ref={rootRef} className={`portfolio-root ${loading ? '' : 'is-ready'}`}>
+                <div ref={progressRef} className="scroll-progress" aria-hidden="true" />
+
                 <div className={`site-chrome ${loading ? 'site-chrome-hidden' : ''}`}>
                     <LiquidDock active={active} onSelect={scrollTo} />
                     <DarkModeToggle />

@@ -6,13 +6,11 @@ export function HeroSection({ sectionRef }: HeroSectionProps) {
     return (
         <section id="hero" ref={sectionRef} className="section hero-section">
             <style>{`
-                /* Light = paper bg / night ink. Dark = night bg / cream ink.
-                   No background or color transition, so it flips in sync with the rest of the page. */
+                /* Light = paper bg / night ink. Dark = night bg / cream ink. */
                 .section.hero-section {
                     background: var(--bg);
                     color: var(--ink);
                     border-bottom-color: var(--hair);
-                    transition: opacity .7s ease, transform .7s ease;
                 }
                 .hero-marquee-text {
                     -webkit-text-stroke-color: color-mix(in srgb, var(--ink) 60%, transparent);
@@ -28,7 +26,9 @@ export function HeroSection({ sectionRef }: HeroSectionProps) {
                 </div>
             </div>
 
-            <img src="/dp2.png" className="hero-photo-img z-10" alt="Dave Michael Clapis" />
+            <div className="hero-photo-wrap" data-parallax="0.08">
+                <img src="/dp2.png" className="hero-photo-img z-10" alt="Dave Michael Clapis" />
+            </div>
 
             <div className="hero-caption">
                 <p className="hero-role">Fullstack Web Developer / App Developer</p>
