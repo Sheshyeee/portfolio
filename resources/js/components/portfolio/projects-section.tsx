@@ -292,20 +292,20 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
             <style>{`
                 @import url('https://fonts.bunny.net/css?family=instrument-serif:400');
 
-                /* Follows the site theme via --bg / --ink / --muted / --hair from welcome.tsx */
+                /* Follows the site theme via --bg / --ink / --muted / --hair / --accent / --glow-* from welcome.tsx */
                 .contact-section,
                 .contact-dialog {
-                    --c-fill: rgba(0,0,0,0.03);
-                    --c-line: rgba(0,0,0,0.14);
-                    --c-accent: #0A84FF;
+                    --c-fill: rgba(47,127,216,0.05);
+                    --c-line: rgba(40,90,150,0.2);
+                    --c-accent: #2f7fd8;
                     --c-error: #dc2626;
                     --c-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
                 }
                 :root.dark .contact-section,
                 :root.dark .contact-dialog {
-                    --c-fill: rgba(255,255,255,0.05);
-                    --c-line: rgba(255,255,255,0.18);
-                    --c-accent: #6cb3ff;
+                    --c-fill: rgba(140,190,255,0.06);
+                    --c-line: rgba(140,190,255,0.2);
+                    --c-accent: #5cc8ff;
                     --c-error: #ff8f8f;
                 }
 
@@ -356,6 +356,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     line-height: 0.92;
                     letter-spacing: -0.025em;
                     color: var(--ink);
+                    text-shadow: 0 0 60px var(--glow-a);
                 }
                 .contact-copy {
                     max-width: 44ch;
@@ -365,6 +366,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     color: var(--muted);
                 }
 
+                /* Glowing road-blue button */
                 .contact-cta {
                     display: inline-flex;
                     align-items: center;
@@ -372,14 +374,16 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     width: fit-content;
                     padding: 0.9rem 1.7rem;
                     border-radius: 999px;
-                    background: var(--ink);
-                    color: var(--bg);
+                    background: linear-gradient(135deg, var(--accent), #1f5fb0);
+                    color: #ffffff;
                     font-size: 0.95rem;
                     font-weight: 600;
-                    transition: transform .25s ease, opacity .2s ease;
+                    box-shadow: 0 0 24px var(--glow-a), 0 8px 20px rgba(30,80,150,0.25);
+                    transition: transform .25s ease, opacity .2s ease, box-shadow .25s ease;
                 }
+                :root.dark .contact-cta { background: linear-gradient(135deg, #5cc8ff, #2f7fd8); color: #06101e; }
                 button.contact-cta { border: 0; cursor: pointer; font-family: inherit; }
-                button.contact-cta:hover { transform: translateY(-2px); }
+                button.contact-cta:hover { transform: translateY(-2px); box-shadow: 0 0 34px var(--glow-a), 0 12px 26px rgba(30,80,150,0.3); }
                 button.contact-cta:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
                 .contact-cta:focus-visible,
                 .contact-pill:focus-visible,
@@ -395,9 +399,9 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     text-decoration: none;
                     border-bottom: 1px solid var(--c-line);
                     overflow-wrap: anywhere;
-                    transition: border-color .2s ease;
+                    transition: border-color .2s ease, color .2s ease;
                 }
-                .contact-email:hover { border-color: var(--ink); }
+                .contact-email:hover { border-color: var(--accent-2); color: var(--accent-2); }
 
                 .contact-links {
                     display: flex;
@@ -420,9 +424,16 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     font-size: 0.9rem;
                     font-weight: 500;
                     text-decoration: none;
-                    transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .25s ease;
+                    transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .25s ease, box-shadow .25s ease;
                 }
-                .contact-pill:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); transform: translateY(-2px); }
+                .contact-pill:hover {
+                    background: var(--accent);
+                    color: #ffffff;
+                    border-color: var(--accent);
+                    transform: translateY(-2px);
+                    box-shadow: 0 0 22px var(--glow-a);
+                }
+                :root.dark .contact-pill:hover { color: #06101e; }
 
                 /* The grey line: sits right under the content with a small gap */
                 .contact-foot {
@@ -455,7 +466,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     background: var(--bg) !important;
                     color: var(--ink) !important;
                     border: 1px solid var(--hair) !important;
-                    box-shadow: 0 30px 80px rgba(0,0,0,0.28), 0 4px 16px rgba(0,0,0,0.08) !important;
+                    box-shadow: 0 30px 80px rgba(30,70,120,0.28), 0 0 40px var(--glow-a), 0 4px 16px rgba(0,0,0,0.08) !important;
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
@@ -530,6 +541,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     width: 3.25rem; height: 3.25rem; border-radius: 999px;
                     background: color-mix(in srgb, var(--c-accent) 14%, transparent);
                     color: var(--c-accent);
+                    box-shadow: 0 0 24px var(--glow-a);
                 }
 
                 /* ---------- Phone: bottom sheet ---------- */

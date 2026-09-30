@@ -115,6 +115,7 @@ const ChartIcon = () => (
 type Tool = { name: string; icon: () => ReactElement; color: string };
 type StackGroup = { label: string; tools: Tool[] };
 
+// Colors that would vanish on the light theme use readable tones / theme vars.
 const STACK_GROUPS: StackGroup[] = [
     {
         label: 'Frontend',
@@ -122,9 +123,9 @@ const STACK_GROUPS: StackGroup[] = [
             { name: 'React', icon: AtomIcon, color: '#61DAFB' },
             { name: 'React Native', icon: MobileIcon, color: '#61DAFB' },
             { name: 'TypeScript', icon: () => <MonogramIcon letters="TS" />, color: '#4B9BF5' },
-            { name: 'JavaScript', icon: () => <MonogramIcon letters="JS" />, color: '#F0DB4F' },
+            { name: 'JavaScript', icon: () => <MonogramIcon letters="JS" />, color: '#D4B106' },
             { name: 'Tailwind CSS', icon: WindIcon, color: '#38BDF8' },
-            { name: 'shadcn/ui', icon: CodeBracketsIcon, color: '#F5F5F5' },
+            { name: 'shadcn/ui', icon: CodeBracketsIcon, color: 'var(--ts-ink)' },
         ],
     },
     {
@@ -133,7 +134,7 @@ const STACK_GROUPS: StackGroup[] = [
             { name: 'Laravel', icon: () => <MonogramIcon letters="L" />, color: '#FF4B3E' },
             { name: 'PHP', icon: ElephantIcon, color: '#9A9EDB' },
             { name: 'Node.js', icon: HexNodeIcon, color: '#5FB85F' },
-            { name: 'Python', icon: HexNodeIcon, color: '#FFD43B' },
+            { name: 'Python', icon: HexNodeIcon, color: '#E0A800' },
         ],
     },
     {
@@ -148,7 +149,7 @@ const STACK_GROUPS: StackGroup[] = [
     {
         label: 'Tools & Analytics',
         tools: [
-            { name: 'GitHub', icon: BranchIcon, color: '#F5F5F5' },
+            { name: 'GitHub', icon: BranchIcon, color: 'var(--ts-ink)' },
             { name: 'Postman', icon: SendIcon, color: '#FF6C37' },
             { name: 'Trello', icon: BoardIcon, color: '#4C8DFF' },
             { name: 'Google Analytics 4', icon: ChartIcon, color: '#F9AB00' },
@@ -192,37 +193,37 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
         <section id="stack" ref={attachRefs} className="section ts-section">
             <style>{`
                 .ts-section {
-                    --ts-accent: #ec5b3f;
-                    /* ---- palette (light mode = dark section; dark mode = graphite, see :root.dark below) ---- */
-                    --ts-bg: #141414;
-                    --ts-ring: transparent;      /* hairline outside the bezel (dark mode only) */
-                    --ts-black: #050505;         /* bezel */
-                    --ts-frame: #1a1a1a;
-                    --ts-ink: #f4f4f4;
-                    --ts-inv: #0a0a0a;           /* text on an ink-coloured button */
-                    --ts-mute: rgba(255,255,255,0.5);
-                    --ts-soft: rgba(255,255,255,0.7);
-                    --ts-dim: rgba(255,255,255,0.35);
-                    --ts-hair-1: rgba(255,255,255,0.14);
-                    --ts-hair-2: rgba(255,255,255,0.1);
-                    --ts-hair-3: rgba(255,255,255,0.16);
-                    --ts-hair-4: rgba(255,255,255,0.08);
-                    --ts-hair-5: rgba(255,255,255,0.12);
-                    --ts-fill: rgba(255,255,255,0.02);
-                    --ts-fill-2: rgba(255,255,255,0.05);
-                    --ts-fill-3: rgba(255,255,255,0.015);
-                    --ts-water: rgba(255,255,255,0.05);
-                    --ts-water-m: rgba(255,255,255,0.035);
-                    --ts-hi: rgba(255,255,255,0.05);
-                    --ts-shadow: rgba(0,0,0,0.45);
-                    --ts-shadow-lg: rgba(0,0,0,0.55);
+                    /* ---- palette: light = icy snow-blue with road-blue bezels; dark = night city (see :root.dark below) ---- */
+                    --ts-accent: #f2582f;
+                    --ts-bg: #e4ecf6;
+                    --ts-ring: rgba(255,255,255,0.9);       /* hairline outside the bezel */
+                    --ts-black: #7fa3cc;                    /* bezel = road blue */
+                    --ts-frame: #f7faff;
+                    --ts-ink: #14243a;
+                    --ts-inv: #ffffff;                      /* text on an ink-coloured button */
+                    --ts-mute: rgba(20,36,58,0.6);
+                    --ts-soft: rgba(20,36,58,0.75);
+                    --ts-dim: rgba(20,36,58,0.45);
+                    --ts-hair-1: rgba(40,90,150,0.18);
+                    --ts-hair-2: rgba(40,90,150,0.14);
+                    --ts-hair-3: rgba(40,90,150,0.22);
+                    --ts-hair-4: rgba(40,90,150,0.12);
+                    --ts-hair-5: rgba(40,90,150,0.18);
+                    --ts-fill: rgba(47,127,216,0.04);
+                    --ts-fill-2: rgba(47,127,216,0.08);
+                    --ts-fill-3: rgba(47,127,216,0.02);
+                    --ts-water: rgba(47,127,216,0.08);
+                    --ts-water-m: rgba(47,127,216,0.06);
+                    --ts-hi: rgba(255,255,255,0.95);
+                    --ts-shadow: rgba(40,80,130,0.20);
+                    --ts-shadow-lg: rgba(40,80,130,0.28);
                     /* top peek: must match Home's bottom panel */
-                    --ts-hp-bg: #171717;
-                    --ts-hp-edu: #1b1b1b;
-                    --ts-hp-cert: #111111;
-                    --ts-hp-glow: rgba(255,255,255,0.09);
+                    --ts-hp-bg: #eff4fa;
+                    --ts-hp-edu: #ffffff;
+                    --ts-hp-cert: #e6eef8;
+                    --ts-hp-glow: rgba(242,88,47,0.20);
                     /* bottom peek: matches the Projects section behind it */
-                    --ts-peek-bg: #ffffff;
+                    --ts-peek-bg: #eef3f9;
                     --ts-bezel: clamp(7px, 0.95vw, 11px);
                     --ts-radius: clamp(24px, 3.4vw, 42px);
                     --ts-peek-h: clamp(8rem, 13vw, 12rem);
@@ -243,24 +244,35 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
-                /* Dark mode: graphite frames on near-black (matches Home). Hairlines keep
-                   their white-based light-mode values, so only surfaces change here. */
+                /* Dark mode: the night-city version — deep navy frames, cyan rim light, warm orange glow. */
                 :root.dark .ts-section {
-                    --ts-bg: #0e0e0f;
-                    --ts-black: #28282c;
-                    --ts-ring: rgba(255,255,255,0.07);
-                    --ts-frame: #151517;
-                    --ts-ink: #f4f4f5;
-                    --ts-water: rgba(255,255,255,0.04);
-                    --ts-water-m: rgba(255,255,255,0.03);
-                    --ts-hi: rgba(255,255,255,0.06);
+                    --ts-bg: #060b14;
+                    --ts-black: #1b2c47;
+                    --ts-ring: rgba(120,180,255,0.16);
+                    --ts-frame: #0d1626;
+                    --ts-ink: #eaf2ff;
+                    --ts-inv: #060b14;
+                    --ts-mute: rgba(200,222,255,0.55);
+                    --ts-soft: rgba(200,222,255,0.75);
+                    --ts-dim: rgba(200,222,255,0.38);
+                    --ts-hair-1: rgba(140,190,255,0.16);
+                    --ts-hair-2: rgba(140,190,255,0.12);
+                    --ts-hair-3: rgba(140,190,255,0.18);
+                    --ts-hair-4: rgba(140,190,255,0.09);
+                    --ts-hair-5: rgba(140,190,255,0.14);
+                    --ts-fill: rgba(140,190,255,0.03);
+                    --ts-fill-2: rgba(140,190,255,0.06);
+                    --ts-fill-3: rgba(140,190,255,0.02);
+                    --ts-water: rgba(92,200,255,0.06);
+                    --ts-water-m: rgba(92,200,255,0.045);
+                    --ts-hi: rgba(92,200,255,0.10);
                     --ts-shadow: rgba(0,0,0,0.6);
                     --ts-shadow-lg: rgba(0,0,0,0.7);
-                    --ts-hp-bg: #131315;
-                    --ts-hp-edu: #18181b;
-                    --ts-hp-cert: #101012;
-                    --ts-hp-glow: rgba(236,91,63,0.14);
-                    --ts-peek-bg: #0a0a0a;
+                    --ts-hp-bg: #0b1322;
+                    --ts-hp-edu: #101c30;
+                    --ts-hp-cert: #0a1120;
+                    --ts-hp-glow: rgba(255,110,64,0.26);
+                    --ts-peek-bg: #060b14;
                 }
 
                 /* ---------- Vertical watermark: far right, cut off top + bottom ---------- */
@@ -289,13 +301,13 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     margin: 0 auto;
                 }
 
-                /* ---------- Device frame: thick black bezel, rounded ---------- */
+                /* ---------- Device frame: thick bezel, rounded ---------- */
                 .ts-frame {
                     position: relative;
                     background: var(--ts-frame);
                     border: var(--ts-bezel) solid var(--ts-black);
                     border-radius: var(--ts-radius);
-                    box-shadow: 0 0 0 1px var(--ts-fill-2), 0 40px 90px var(--ts-shadow-lg);
+                    box-shadow: 0 0 0 1px var(--ts-ring), 0 40px 90px var(--ts-shadow-lg);
                 }
 
                 /* =====================================================
@@ -354,8 +366,8 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
 
                 /* =====================================================
                    BOTTOM PEEK — top slice of the Skills section.
-                   White (the page is white) with a black border, glued
-                   to the bottom edge of this section.
+                   Matches the page background, with a bezel border,
+                   glued to the bottom edge of this section.
                    ===================================================== */
                 .ts-peek-bottom {
                     position: relative;
@@ -402,7 +414,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     width: 55%;
                     aspect-ratio: 1;
                     border-radius: 50%;
-                    background: radial-gradient(circle, rgba(236,91,63,0.2), transparent 68%);
+                    background: radial-gradient(circle, rgba(242,88,47,0.28), transparent 68%);
                     pointer-events: none;
                     animation: ts-drift 9s ease-in-out infinite alternate;
                 }
@@ -498,7 +510,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                 .ts-section.is-visible .ts-chip:hover {
                     transform: translateY(-2px);
                     border-color: var(--ts-accent);
-                    background: rgba(236,91,63,0.1);
+                    background: rgba(242,88,47,0.1);
                     transition-delay: 0s;
                 }
 
@@ -570,7 +582,7 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                         font-weight: 500;
                         color: var(--ts-soft);
                     }
-                    .ts-marquee-track.rev .ts-marquee-item { color: var(--ts-accent); border-color: rgba(236,91,63,0.35); }
+                    .ts-marquee-track.rev .ts-marquee-item { color: var(--ts-accent); border-color: rgba(242,88,47,0.4); }
                     @keyframes ts-scroll { to { transform: translateX(calc(-50% - 0.25rem)); } }
 
                     .ts-groups { grid-template-columns: 1fr; gap: 0.7rem; margin-top: 1.4rem; }

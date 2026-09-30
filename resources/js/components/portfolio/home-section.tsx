@@ -52,30 +52,30 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                    them. Under 860px it switches to a stacked staircase.
                    ===================================================== */
                 .xp-section {
-                    /* ---- palette (light mode = dark sections; dark mode = graphite, see :root.dark below) ---- */
-                    --xp-bg: #141414;
-                    --xp-line: #050505;          /* bezel */
-                    --xp-rule: #050505;          /* row dividers */
-                    --xp-ring: transparent;      /* hairline outside the bezel (dark mode only) */
-                    --xp-panel: #1a1a1a;
-                    --xp-panel-2: #171717;
-                    --xp-edu: #1b1b1b;
-                    --xp-cert: #111111;
-                    --xp-ink: #f6f6f6;
-                    --xp-label-ink: rgba(255,255,255,0.5);
-                    --xp-role-ink: rgba(255,255,255,0.45);
-                    --xp-dates-ink: rgba(255,255,255,0.38);
-                    --xp-body-ink: rgba(255,255,255,0.42);
-                    --xp-water: rgba(255,255,255,0.05);
-                    --xp-hi: rgba(255,255,255,0.06);
-                    --xp-shade: rgba(0,0,0,0.3);
-                    --xp-glow: rgba(255,255,255,0.09);
-                    --xp-shadow: rgba(0,0,0,0.45);
-                    --xp-shadow-up: rgba(0,0,0,0.4);
-                    --xp-badge-bg: rgba(255,255,255,0.08);
-                    --xp-badge-ink: #f0f0f0;
-                    --xp-medal: rgba(255,255,255,0.72);
-                    --xp-medal-drop: drop-shadow(0 18px 30px rgba(0,0,0,0.6));
+                    /* ---- palette: light = icy snow-blue with road-blue bezels; dark = night city (see :root.dark below) ---- */
+                    --xp-bg: #e4ecf6;
+                    --xp-line: #7fa3cc;          /* road-blue bezel */
+                    --xp-rule: rgba(40,90,150,0.14);
+                    --xp-ring: rgba(255,255,255,0.9);
+                    --xp-panel: #f7faff;
+                    --xp-panel-2: #eff4fa;
+                    --xp-edu: #ffffff;
+                    --xp-cert: #e6eef8;
+                    --xp-ink: #14243a;
+                    --xp-label-ink: rgba(20,36,58,0.55);
+                    --xp-role-ink: rgba(20,36,58,0.6);
+                    --xp-dates-ink: rgba(20,36,58,0.45);
+                    --xp-body-ink: rgba(20,36,58,0.55);
+                    --xp-water: rgba(47,127,216,0.08);
+                    --xp-hi: rgba(255,255,255,0.95);
+                    --xp-shade: rgba(70,120,180,0.14);
+                    --xp-glow: rgba(242,88,47,0.20);
+                    --xp-shadow: rgba(40,80,130,0.22);
+                    --xp-shadow-up: rgba(40,80,130,0.18);
+                    --xp-badge-bg: rgba(47,127,216,0.12);
+                    --xp-badge-ink: #1f5fb0;
+                    --xp-medal: #f2582f;
+                    --xp-medal-drop: drop-shadow(0 12px 26px rgba(242,88,47,0.45));
                     /* same bezel + radius as the frames in the Tech Stack section */
                     --xp-bezel: clamp(7px, 0.95vw, 11px);
                     --xp-radius: clamp(24px, 3.4vw, 42px);
@@ -92,32 +92,31 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                 }
 
-                /* Dark mode: graphite panels on near-black, with a warm accent glow.
-                   The bezel becomes a lifted graphite so the frames still read as devices. */
+                /* Dark mode: the same city at night — deep navy panels, cyan rim light, warm orange glow. */
                 :root.dark .xp-section {
-                    --xp-bg: #0e0e0f;
-                    --xp-line: #28282c;
-                    --xp-rule: rgba(255,255,255,0.08);
-                    --xp-ring: rgba(255,255,255,0.07);
-                    --xp-panel: #151517;
-                    --xp-panel-2: #131315;
-                    --xp-edu: #18181b;
-                    --xp-cert: #101012;
-                    --xp-ink: #f4f4f5;
-                    --xp-label-ink: rgba(255,255,255,0.5);
-                    --xp-role-ink: rgba(255,255,255,0.5);
-                    --xp-dates-ink: rgba(255,255,255,0.4);
-                    --xp-body-ink: rgba(255,255,255,0.48);
-                    --xp-water: rgba(255,255,255,0.04);
-                    --xp-hi: rgba(255,255,255,0.07);
-                    --xp-shade: rgba(0,0,0,0.35);
-                    --xp-glow: rgba(236,91,63,0.14);
+                    --xp-bg: #060b14;
+                    --xp-line: #1b2c47;
+                    --xp-rule: rgba(140,190,255,0.10);
+                    --xp-ring: rgba(120,180,255,0.16);
+                    --xp-panel: #0d1626;
+                    --xp-panel-2: #0b1322;
+                    --xp-edu: #101c30;
+                    --xp-cert: #0a1120;
+                    --xp-ink: #eaf2ff;
+                    --xp-label-ink: rgba(200,222,255,0.55);
+                    --xp-role-ink: rgba(200,222,255,0.55);
+                    --xp-dates-ink: rgba(200,222,255,0.42);
+                    --xp-body-ink: rgba(200,222,255,0.5);
+                    --xp-water: rgba(92,200,255,0.06);
+                    --xp-hi: rgba(92,200,255,0.10);
+                    --xp-shade: rgba(0,0,0,0.4);
+                    --xp-glow: rgba(255,110,64,0.26);
                     --xp-shadow: rgba(0,0,0,0.6);
                     --xp-shadow-up: rgba(0,0,0,0.55);
-                    --xp-badge-bg: rgba(255,255,255,0.08);
-                    --xp-badge-ink: #f0f0f0;
-                    --xp-medal: rgba(236,91,63,0.9);
-                    --xp-medal-drop: drop-shadow(0 18px 30px rgba(236,91,63,0.22));
+                    --xp-badge-bg: rgba(92,200,255,0.14);
+                    --xp-badge-ink: #bfe6ff;
+                    --xp-medal: rgba(255,122,77,0.95);
+                    --xp-medal-drop: drop-shadow(0 0 28px rgba(255,110,64,0.45));
                 }
 
                 .xp-stage {
@@ -149,7 +148,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
                 .xp-section.is-visible .xp-watermark { opacity: 1; }
 
-                /* ---------- Shared panel look (thick black bezel) ---------- */
+                /* ---------- Shared panel look (thick bezel) ---------- */
                 .xp-panel {
                     position: absolute;
                     z-index: 1;

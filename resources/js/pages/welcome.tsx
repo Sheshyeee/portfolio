@@ -119,21 +119,40 @@ export default function Welcome() {
             </Head>
 
             <style>{`
+                /* =====================================================
+                   THEME — "Charge fleet" city.
+                   Light: icy snow-blue surfaces, steel-blue road bezels,
+                          chimney-orange + taxi-yellow accents.
+                   Dark : the same city at night — deep navy, cyan glow,
+                          warm orange lights.
+                   ===================================================== */
                 :root {
-                    --bg: #ffffff;
-                    --ink: #101010;
-                    --muted: #5c5a56;
-                    --hair: rgba(0,0,0,0.09);
+                    --bg: #eef3f9;
+                    --ink: #14243a;
+                    --muted: #5b7089;
+                    --hair: rgba(40,90,150,0.16);
                     --dock-space-mobile: 6rem;
+                    --accent: #2f7fd8;      /* road blue */
+                    --accent-2: #f2582f;    /* chimney / bus orange */
+                    --accent-3: #f2d43d;    /* taxi yellow */
+                    --glow-a: rgba(47,127,216,0.22);
+                    --glow-b: rgba(242,88,47,0.16);
                 }
                 :root.dark {
-                    --bg: #0a0a0a;
-                    --ink: #f5f5f5;
-                    --muted: #a1a1a1;
-                    --hair: rgba(255,255,255,0.12);
+                    --bg: #060b14;
+                    --ink: #eaf2ff;
+                    --muted: #8fa6c4;
+                    --hair: rgba(140,190,255,0.14);
+                    --accent: #5cc8ff;
+                    --accent-2: #ff7a4d;
+                    --accent-3: #ffe066;
+                    --glow-a: rgba(60,150,255,0.28);
+                    --glow-b: rgba(255,110,64,0.20);
                 }
                 *, *::before, *::after { box-sizing: border-box; }
                 .portfolio-root {
+                    position: relative;
+                    isolation: isolate;
                     background: var(--bg);
                     color: var(--ink);
                     min-height: 100vh;
@@ -142,6 +161,22 @@ export default function Welcome() {
                     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                     transition: background-color .3s ease, color .3s ease;
                 }
+
+                /* Slow "breathing" ambient glow behind the whole page */
+                .portfolio-root::before {
+                    content: '';
+                    position: fixed;
+                    inset: 0;
+                    z-index: -1;
+                    pointer-events: none;
+                    background:
+                        radial-gradient(55vw 40vw at 88% 6%, var(--glow-a), transparent 65%),
+                        radial-gradient(45vw 35vw at 4% 48%, var(--glow-b), transparent 65%),
+                        radial-gradient(55vw 40vw at 92% 92%, var(--glow-a), transparent 65%);
+                    animation: page-breathe 9s ease-in-out infinite alternate;
+                }
+                @keyframes page-breathe { from { opacity: .65; transform: scale(1); } to { opacity: 1; transform: scale(1.06); } }
+                @media (prefers-reduced-motion: reduce) { .portfolio-root::before { animation: none; } }
 
                 .site-chrome > * {
                     transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
@@ -206,23 +241,23 @@ export default function Welcome() {
                     width: 3.25rem;
                     height: 3.25rem;
                     border-radius: 1.125rem;
-                    background: #101010;
-                    border: 1px solid rgba(16,16,16,0.1);
-                    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                    background: linear-gradient(145deg, #2f6fb8, #1b3a63);
+                    border: 1px solid rgba(255,255,255,0.35);
+                    box-shadow: 0 0 22px var(--glow-a), 0 14px 34px rgba(30,70,120,0.28), inset 0 1px 0 rgba(255,255,255,0.3);
                     color: #ffffff;
                     cursor: pointer;
-                    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, color 0.3s ease;
+                    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, color 0.3s ease;
                 }
-                .glass-toggle-btn:hover { transform: scale(1.06); background: #1a1a1a; }
+                .glass-toggle-btn:hover { transform: scale(1.06); background: linear-gradient(145deg, #3a82d4, #21497b); }
                 :root.dark .glass-toggle-btn,
                 .glass-toggle-btn[data-state='on'] {
-                    background: #ffffff;
-                    border-color: rgba(16,16,16,0.1);
-                    color: #101010;
-                    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+                    background: linear-gradient(145deg, #eaf2ff, #bfe3ff);
+                    border-color: rgba(92,200,255,0.5);
+                    color: #0b1b33;
+                    box-shadow: 0 0 26px rgba(92,200,255,0.45), 0 14px 34px rgba(0,0,0,0.45), inset 0 1px 0 #ffffff;
                 }
                 :root.dark .glass-toggle-btn:hover,
-                .glass-toggle-btn[data-state='on']:hover { background: #f5f5f5; }
+                .glass-toggle-btn[data-state='on']:hover { background: linear-gradient(145deg, #ffffff, #d2ecff); }
                 .glass-toggle-icon {
                     position: absolute;
                     display: flex;
@@ -272,27 +307,27 @@ export default function Welcome() {
                     position: relative; display: inline-flex; flex-direction: row; align-items: center;
                     width: fit-content; max-width: calc(100vw - 2rem); padding: 0.5rem 0.75rem; gap: 0.5rem;
                     border-radius: 999px;
-                    background: rgba(255, 255, 255, 0.5);
-                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    background: rgba(255, 255, 255, 0.55);
+                    border: 1px solid rgba(47, 127, 216, 0.2);
                     backdrop-filter: blur(24px) saturate(180%);
                     -webkit-backdrop-filter: blur(24px) saturate(180%);
                     box-shadow:
-                        0 20px 45px rgba(0, 0, 0, 0.16),
-                        0 3px 12px rgba(0, 0, 0, 0.08),
+                        0 20px 45px rgba(30, 80, 150, 0.18),
+                        0 3px 12px rgba(30, 80, 150, 0.08),
                         inset 0 1px 0 rgba(255, 255, 255, 0.7);
                     overflow: visible;
                     transition: background-color .3s ease, border-color .3s ease;
                 }
                 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-                    .liquid-dock-glass { background: rgba(250,250,250,0.96); }
-                    :root.dark .liquid-dock-glass { background: rgba(20,20,22,0.96); }
+                    .liquid-dock-glass { background: rgba(240,246,253,0.96); }
+                    :root.dark .liquid-dock-glass { background: rgba(12,22,40,0.96); }
                 }
                 :root.dark .liquid-dock-glass {
-                    background: rgba(30, 30, 32, 0.55);
-                    border: 1px solid rgba(255, 255, 255, 0.14);
+                    background: rgba(12, 22, 40, 0.6);
+                    border: 1px solid rgba(120, 190, 255, 0.22);
                     box-shadow:
                         0 20px 45px rgba(0, 0, 0, 0.55),
-                        0 3px 12px rgba(0, 0, 0, 0.35),
+                        0 0 30px rgba(60, 150, 255, 0.12),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
                 }
                 .liquid-dock-glass::before {
@@ -301,7 +336,7 @@ export default function Welcome() {
                     background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.35), transparent 65%);
                 }
                 :root.dark .liquid-dock-glass::before {
-                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.18), transparent 65%);
+                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(92,200,255,0.22), transparent 65%);
                 }
                 .liquid-dock-glass::after {
                     content: ''; position: absolute; top: 0; left: 12%; right: 12%; height: 1px;
@@ -309,36 +344,34 @@ export default function Welcome() {
                     pointer-events: none;
                 }
                 :root.dark .liquid-dock-glass::after {
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+                    background: linear-gradient(90deg, transparent, rgba(140,210,255,0.4), transparent);
                 }
                 .dock-group { display: flex; flex-direction: row; align-items: center; gap: 0.15rem; }
                 .dock-item {
                     position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
                     gap: 0.2rem; min-width: 3.1rem; padding: 0.4rem 0.55rem;
                     border-radius: 1.125rem; background: transparent; border: none;
-                    color: #6b6b6b; cursor: pointer;
-                    transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease;
+                    color: #5b7089; cursor: pointer;
+                    transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease, box-shadow .3s ease;
                 }
-                :root.dark .dock-item { color: #b0b0b0; }
+                :root.dark .dock-item { color: #8fa6c4; }
                 .dock-item svg { width: 21px; height: 21px; color: inherit; }
-                .dock-item:hover:not(.active) svg { color: #101010; }
-                :root.dark .dock-item:hover:not(.active) svg { color: #f0f0f0; }
+                .dock-item:hover:not(.active) svg { color: var(--accent); }
+                :root.dark .dock-item:hover:not(.active) svg { color: var(--accent); }
 
-                /* Solid-ish white/dark capsule for the active tab — deliberately MORE
-                   opaque than the glass behind it, so it reads as a clear highlight
-                   instead of blending into the same translucent fill */
+                /* Active tab: brighter capsule than the glass behind it, with a soft glow */
                 .dock-item.active {
-                    background: rgba(255, 255, 255, 0.9);
-                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1);
+                    background: rgba(255, 255, 255, 0.95);
+                    box-shadow: 0 0 18px var(--glow-a), 0 4px 14px rgba(40, 90, 150, 0.15), inset 0 1px 0 #ffffff;
                 }
                 .dock-item.active svg,
-                .dock-item.active .dock-label { color: #0A84FF; }
+                .dock-item.active .dock-label { color: var(--accent); }
                 :root.dark .dock-item.active {
-                    background: rgba(255, 255, 255, 0.2);
-                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                    background: rgba(92, 200, 255, 0.16);
+                    box-shadow: 0 0 20px rgba(92, 200, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
                 }
                 :root.dark .dock-item.active svg,
-                :root.dark .dock-item.active .dock-label { color: #6cb3ff; }
+                :root.dark .dock-item.active .dock-label { color: var(--accent); }
 
                 .dock-item:active { transform: scale(0.96); }
                 .dock-label {
@@ -363,19 +396,31 @@ export default function Welcome() {
                     display: flex; align-items: center; justify-content: center;
                     min-height: 92vh; min-height: 92svh;
                 }
+                /* Warm glow pool behind the portrait (orange, like the chimney lights) */
+                .hero-section::after {
+                    content: ''; position: absolute; left: 50%; bottom: 8%; width: min(70vw, 720px); aspect-ratio: 1;
+                    transform: translateX(-50%); border-radius: 50%; z-index: 0; pointer-events: none;
+                    background: radial-gradient(circle, var(--glow-b), transparent 65%);
+                }
                 .hero-marquee-wrap { position: absolute; inset: 0; display: flex; align-items: center; overflow: hidden; pointer-events: none; z-index: 1; }
                 .hero-marquee-track { display: flex; width: max-content; will-change: transform; animation: hero-marquee 18s linear infinite; animation-play-state: running !important; }
                 .hero-marquee-text {
                     flex: 0 0 auto; font-size: clamp(4.5rem, 22vw, 18.5rem); font-weight: 900; text-transform: uppercase;
                     letter-spacing: -0.03em; white-space: nowrap; padding-right: 5vw; color: transparent;
-                    -webkit-text-stroke: 2.5px rgba(16,16,16,0.6); opacity: 0.6;
+                    -webkit-text-stroke: 2.5px rgba(47,127,216,0.6);
+                    opacity: 0.85;
+                    filter: drop-shadow(0 0 18px rgba(47,127,216,0.5));
                 }
-                :root.dark .hero-marquee-text { -webkit-text-stroke: 2.5px rgba(255,255,255,0.5); opacity: 0.65; }
+                :root.dark .hero-marquee-text {
+                    -webkit-text-stroke: 2.5px rgba(92,200,255,0.65);
+                    filter: drop-shadow(0 0 24px rgba(92,200,255,0.6));
+                }
                 @keyframes hero-marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
                 .hero-photo-img {
                     position: relative; z-index: 2; width: clamp(300px, 60vw, 700px); max-height: min(90vh, 900px);
                     object-fit: contain; object-position: bottom center; display: block; margin: 0 auto;
                     margin-bottom: calc(var(--dock-space-mobile) + 0.5rem);
+                    filter: drop-shadow(0 30px 50px var(--glow-a));
                     opacity: 0; transform: translateY(28px);
                     transition: opacity .8s cubic-bezier(.16,1,.3,1) .15s, transform .8s cubic-bezier(.16,1,.3,1) .15s;
                 }
@@ -392,21 +437,21 @@ export default function Welcome() {
                 }
                 .hero-section.in-view .hero-caption { opacity: 1; }
                 .hero-role { font-size: 0.8rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--muted); opacity: .7; }
+                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--accent-2); opacity: .9; }
                 @media (max-width: 820px) {
                     .hero-section { align-items: flex-end; min-height: 88vh; min-height: 88svh; }
                     .hero-caption { bottom: 1.75rem; }
-                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); -webkit-text-stroke: 3px rgba(16,16,16,0.65); }
-                    :root.dark .hero-marquee-text { -webkit-text-stroke: 3px rgba(255,255,255,0.55); }
+                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); -webkit-text-stroke: 3px rgba(47,127,216,0.65); }
+                    :root.dark .hero-marquee-text { -webkit-text-stroke: 3px rgba(92,200,255,0.7); }
                 }
 
                 /* ---- Skills section (honor badges) ---- */
                 .honor-badge {
                     display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 3px 9px;
-                    border-radius: 999px; background: rgba(16,16,16,0.06); color: var(--ink);
+                    border-radius: 999px; background: rgba(47,127,216,0.1); color: var(--ink);
                     font-size: 13px; font-weight: 600; letter-spacing: .01em;
                 }
-                :root.dark .honor-badge { background: rgba(255,255,255,0.08); }
+                :root.dark .honor-badge { background: rgba(92,200,255,0.12); }
 
                 /* ---- Projects section (carousel + case-study sheet) ---- */
                 .carousel-edge-fade-left { background: linear-gradient(to left, transparent 55%, var(--bg) 100%); opacity: 0.85; }
@@ -430,8 +475,8 @@ export default function Welcome() {
                 .sheet-drag-handle { display: none; }
                 @media (max-width: 1024px) {
                     .sheet-drag-handle { display: flex; justify-content: center; align-items: center; padding: 0.625rem 0 0.25rem; touch-action: none; cursor: grab; }
-                    .sheet-drag-bar { width: 2.75rem; height: 0.3125rem; border-radius: 999px; background: rgba(0,0,0,0.18); }
-                    :root.dark .sheet-drag-bar { background: rgba(255,255,255,0.25); }
+                    .sheet-drag-bar { width: 2.75rem; height: 0.3125rem; border-radius: 999px; background: rgba(40,90,150,0.25); }
+                    :root.dark .sheet-drag-bar { background: rgba(140,190,255,0.3); }
                 }
                 @media (max-width: 1024px) { body.sheet-open { overflow: hidden; } }
                 body.sheet-open .liquid-dock,
