@@ -20,127 +20,58 @@ const clamp = (n: number) => Math.min(1, Math.max(0, n));
 
 export function HomeSection({ sectionRef }: HomeSectionProps) {
     const localRef = useRef<HTMLElement | null>(null);
-    const stickyRef = useRef<HTMLDivElement | null>(null);
 
     /*
      * Scroll-linked expansion that plays ONCE per page load.
      *
-     * Two numbers are written straight to the section's style (no React state, no re-renders):
-     *   --p  overall progress 0 -> 1  (size, corners, rim)
-     *   --q  1 -> 0 while the card is still scrolling into view (hangs from the top, then settles to the bottom)
+     * The section is a completely normal, full-screen block in the page flow: no pinning,
+     * no extra scroll distance, and the page height / scroll position are never touched.
+     * As it slides into view from the bottom of the screen, one number --p (0 -> 1) is written
+     * straight to its style (no React state, no re-renders) and CSS turns it into the card's
+     * size, corners and frame.
      *
-     *  Desktop : the section is a tall "track" and the stage is sticky, so the card stays pinned while it grows.
-     *  Mobile  : the stacked layout is taller than the screen, so no pin; the card rises, widens and squares off.
-     *
-     * Once --p reaches 1 it is LOCKED at 1: scrolling back up never shrinks it again.
-     * When the section is later off-screen and scrolling has settled, the extra pin distance is removed
-     * (class `xp-done`) so scrolling through it again is completely normal, and the scroll position is
-     * corrected in the same frame so nothing visibly jumps.
+     * When --p reaches 1 it is locked open and every listener is removed, so from then on this
+     * section has zero scroll cost: scrolling to it again (up or down) is plain native scrolling.
      */
     useEffect(() => {
         const section = localRef.current;
-        const sticky = stickyRef.current;
-        if (!section || !sticky) return;
+        if (!section) return;
 
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
         const mobile = window.matchMedia('(max-width: 860px)');
         let raf = 0;
-        let settle = 0;
-        let played = false;
-        let collapsed = false;
 
-        const apply = (p: number, q = 0) => {
+        const apply = (p: number) => {
             section.style.setProperty('--p', p.toFixed(4));
-            section.style.setProperty('--q', q.toFixed(4));
             section.classList.toggle('is-open', p >= 0.999);
         };
 
         const stop = () => {
             if (raf) cancelAnimationFrame(raf);
-            window.clearTimeout(settle);
             window.removeEventListener('scroll', schedule);
             window.removeEventListener('resize', schedule);
             reduce.removeEventListener('change', schedule);
             mobile.removeEventListener('change', schedule);
         };
 
-        // Remove the pin distance for good, without the page visibly jumping.
-        const collapse = () => {
-            const rect = section.getBoundingClientRect();
-            const ref = section.nextElementSibling as HTMLElement | null;
-            const above = rect.bottom <= 0;
-
-            if (above && ref && !mobile.matches) {
-                // Section is entirely above the screen: its height change would push everything up.
-                // Measure a reference below it, collapse, and scroll back by exactly the difference.
-                const root = document.documentElement;
-                const prev = root.style.overflowAnchor;
-                root.style.overflowAnchor = 'none'; // we do the correction ourselves (Safari has no scroll anchoring)
-                const y0 = ref.getBoundingClientRect().top;
-                section.classList.add('xp-done');
-                const y1 = ref.getBoundingClientRect().top;
-                if (y1 !== y0) window.scrollBy(0, y1 - y0);
-                requestAnimationFrame(() => {
-                    root.style.overflowAnchor = prev;
-                });
-            } else {
-                section.classList.add('xp-done');
-            }
-
-            collapsed = true;
-            section.dataset.scrollOffset = '0';
-            stop();
-        };
-
-        // Wait until scrolling has stopped (so a smooth "scroll to" from the dock is never interrupted).
-        const armSettle = () => {
-            window.clearTimeout(settle);
-            settle = window.setTimeout(() => {
-                if (!played || collapsed || reduce.matches) return;
-                const r = section.getBoundingClientRect();
-                if (mobile.matches || r.bottom <= 0 || r.top >= window.innerHeight) collapse();
-            }, 160);
-        };
-
         const update = () => {
             raf = 0;
-            if (collapsed) return;
 
             if (reduce.matches) {
-                apply(1, 0);
-                section.dataset.scrollOffset = '0';
-                return;
-            }
-
-            if (played) {
-                armSettle();
+                apply(1);
+                stop();
                 return;
             }
 
             const vh = window.innerHeight;
-            const rect = section.getBoundingClientRect();
-            let p: number;
-            let q = 0;
+            const top = section.getBoundingClientRect().top;
+            // Starts on the first scroll from the hero (section top at the bottom of the screen).
+            // Desktop: done just before the section fills the screen.
+            // Phone: done when the card's top edge is a quarter of the way down the screen.
+            const p = clamp((vh - top) / (vh * (mobile.matches ? 0.75 : 0.9)));
 
-            if (mobile.matches) {
-                // starts on the first scroll from the hero, done when the card top reaches 40% of the screen
-                p = clamp((vh - rect.top) / (vh * 0.6));
-                section.dataset.scrollOffset = '0';
-            } else {
-                const travel = Math.max(1, section.offsetHeight - sticky.offsetHeight);
-                const span = travel * 0.9; // last 10% of the pin is a short hold at full size
-                p = clamp((vh - rect.top) / (vh + span));
-                q = clamp(rect.top / vh);
-                // lets the dock jump straight to the fully expanded state (see scrollTo in welcome.tsx)
-                section.dataset.scrollOffset = String(Math.round(span));
-            }
-
-            apply(p, q);
-            if (p >= 0.999) {
-                played = true;
-                apply(1, 0); // locked open for the rest of this page load
-            }
-            armSettle();
+            apply(p);
+            if (p >= 0.999) stop(); // played: locked open for the rest of this page load
         };
 
         function schedule() {
@@ -166,15 +97,13 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
             <style>{`
                 /* =====================================================
                    Structure
-                     section.xp-section   tall scroll "track" (desktop)
-                       .xp-sticky         pinned to the viewport
-                         .xp-card         ONE box: scales / rounds / rims as --p goes 0 -> 1
-                           .xp-stage      the actual layout (never animated itself)
+                     section.xp-section   normal full-screen block in the page flow
+                       .xp-card           ONE box: scales / rounds / rims as --p goes 0 -> 1
+                         .xp-stage        the actual layout (never animated itself)
                    Colours: only --bg / --ink (and mixes of them). No gradients.
                    ===================================================== */
                 .xp-section {
                     --p: 1; /* 0 = small card, 1 = full screen. Written by the scroll handler */
-                    --q: 0; /* 1 -> 0 while scrolling into view: card hangs from the top, then settles to the bottom */
                     --xp-line: var(--line);
                     --xp-rule: var(--hair);
                     --xp-ink: var(--ink);
@@ -189,7 +118,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     --xp-rim: var(--xp-bezel); /* thickness of the frame around the small card */
 
                     --xp-stage-h: 100vh;
-                    --xp-pin: 90vh; /* extra scroll distance spent expanding */
 
                     position: relative;
                     display: block;
@@ -203,7 +131,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
                 }
                 @supports (height: 100svh) {
-                    .xp-section { --xp-stage-h: 100svh; --xp-pin: 90svh; }
+                    .xp-section { --xp-stage-h: 100svh; }
                 }
 
                 /* The card has NO fill of its own: it is the page colour, outlined by the same
@@ -224,29 +152,23 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
                 .xp-section.is-open .xp-card::after { display: none; }
 
-                /* ---------- Desktop: pinned + expanding ---------- */
+                /* ---------- Desktop: expands while it scrolls into view (no pin) ---------- */
                 @media (min-width: 861px) {
-                    .xp-section { height: calc(var(--xp-stage-h) + var(--xp-pin)); }
-                    /* after the first play the extra pin distance is removed for good */
-                    .xp-section.xp-done { height: auto; }
-
-                    .xp-sticky {
-                        position: sticky;
-                        top: 0;
+                    .xp-section {
                         height: var(--xp-stage-h);
-                        overflow: hidden; /* the card starts below the fold and rises into view */
+                        overflow: clip;
                     }
-                    .xp-section.xp-done .xp-sticky { position: static; }
 
                     /* One real box: name, panels and text all live in it and grow with it.
-                       Rises from the bottom centre, scales up and loses its rounded corners. */
+                       It hangs from the top edge of the section, so it is visible from the very
+                       first scroll, then scales up and loses its rounded corners as --p -> 1. */
                     .xp-card {
                         position: relative;
                         height: 100%;
                         overflow: hidden;
                         background: var(--bg);
                         transform-origin: 50% 100%;
-                        transform: translateY(calc(var(--q) * (var(--p) - 1) * var(--xp-shift)))
+                        transform: translateY(calc((1 - var(--p)) * (var(--p) - 1) * var(--xp-shift)))
                                    scale(calc(var(--xp-start-scale) + (1 - var(--xp-start-scale)) * var(--p)));
                         border-radius: calc((1 - var(--p)) * var(--xp-card-radius)) calc((1 - var(--p)) * var(--xp-card-radius)) 0 0;
                         will-change: transform;
@@ -435,35 +357,46 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
 
                 /* =====================================================
                    Phones + small tablets: stacked staircase, no pin.
-                   The whole card rises in from the bottom slightly narrower and
-                   rounded, then widens to full width and squares off.
-                   Scaling from the top edge keeps the text inside in sync and never reflows.
+
+                   The card is a floating, framed, rounded card that sits inset from the
+                   screen edges and a little lower than the page. As you scroll it rises up
+                   to meet the page, its side margins close, its corners square off and its
+                   frame thins out until it is a full-width section.
+
+                   The stage inside keeps its full width the whole time (only the card's
+                   window widens), so text never reflows or jitters and the panels look like
+                   they are bleeding off the card's edges, exactly like the desktop design.
                    ===================================================== */
                 @media (max-width: 860px) {
                     .xp-section {
                         --xp-bezel: 8px;
                         --xp-radius: 30px;
-                        --xp-start-scale: 0.9;
-                        --xp-card-radius: 30px;
-                        --xp-rim: 6px;
+                        --xp-card-radius: 34px;
+                        --xp-rim: 7px;
+                        --xp-inset: 6vw;   /* side margin at p = 0 */
+                        --xp-lift: 48px;   /* how far below its final spot the card starts */
+                        --xp-m: calc((1 - var(--p)) * var(--xp-inset));
                         height: auto;
+                        overflow: clip;
                     }
-                    .xp-sticky { position: static; height: auto; }
 
                     .xp-card {
                         position: relative;
                         overflow: hidden;
                         background: var(--bg);
-                        transform-origin: 50% 0;
-                        transform: scale(calc(var(--xp-start-scale) + (1 - var(--xp-start-scale)) * var(--p)));
+                        margin: 0 var(--xp-m);
                         border-radius: calc((1 - var(--p)) * var(--xp-card-radius));
+                        transform: translateY(calc((1 - var(--p)) * var(--xp-lift)));
                         will-change: transform;
                     }
-                    .xp-section.is-open .xp-card { transform: none; border-radius: 0; will-change: auto; }
+                    .xp-section.is-open .xp-card { margin: 0; border-radius: 0; transform: none; will-change: auto; }
 
                     .xp-stage {
                         --u: clamp(0.36rem, 1.5vw, 0.55rem);
                         position: relative;
+                        /* always exactly the screen width, whatever the card's window is doing */
+                        width: calc(100% + 2 * var(--xp-m));
+                        margin-left: calc(-1 * var(--xp-m));
                         height: auto;
                         display: flex;
                         flex-direction: column;
@@ -523,85 +456,79 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     }
                 }
 
-                /* Reduced motion: no pin, no expansion, just the finished layout */
+                /* Reduced motion: no expansion, just the finished layout */
                 @media (prefers-reduced-motion: reduce) {
-                    .xp-section { height: auto !important; }
-                    .xp-sticky { position: static !important; height: var(--xp-stage-h) !important; }
-                    .xp-card { transform: none !important; border-radius: 0 !important; }
+                    .xp-card { transform: none !important; border-radius: 0 !important; margin: 0 !important; }
+                    .xp-stage { width: 100% !important; margin-left: 0 !important; }
                     .xp-card::after { display: none; }
-                }
-                @media (prefers-reduced-motion: reduce) and (max-width: 860px) {
-                    .xp-sticky { height: auto !important; }
                 }
             `}</style>
 
-            <div ref={stickyRef} className="xp-sticky">
-                <div className="xp-card">
-                    <div className="xp-stage">
-                        <p className="xp-watermark" aria-hidden="true">
-                            Dave Michael Clapis
-                        </p>
+            <div className="xp-card">
+                <div className="xp-stage">
+                    <p className="xp-watermark" aria-hidden="true">
+                        Dave Michael Clapis
+                    </p>
 
-                        {/* TOP PANEL — Experience */}
-                        <div className="xp-panel xp-top">
-                            <p className="xp-label">{'{Experience}'}</p>
+                    {/* TOP PANEL — Experience */}
+                    <div className="xp-panel xp-top">
+                        <p className="xp-label">{'{Experience}'}</p>
 
-                            <div className="xp-list">
-                                {EXPERIENCE.map((item) => (
-                                    <div className="xp-row" key={item.company}>
-                                        <p className="xp-company">{item.company}</p>
-                                        <p className="xp-role">{item.role}</p>
-                                        {item.dates && <p className="xp-dates">{item.dates}</p>}
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="xp-list">
+                            {EXPERIENCE.map((item) => (
+                                <div className="xp-row" key={item.company}>
+                                    <p className="xp-company">{item.company}</p>
+                                    <p className="xp-role">{item.role}</p>
+                                    {item.dates && <p className="xp-dates">{item.dates}</p>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* BOTTOM PANEL — Education | Certification */}
+                    <div className="xp-panel xp-bottom">
+                        <div className="xp-col xp-col-edu">
+                            <p className="xp-label">{'{2022 – 2026}'}</p>
+                            <h3 className="xp-title">BS Computer Science</h3>
+                            <p className="xp-body">Bicol University</p>
+                            <span className="xp-badge">
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <circle cx="12" cy="8" r="6" />
+                                    <path d="M9 14 7 22l5-3 5 3-2-8" />
+                                </svg>
+                                Cum Laude
+                            </span>
                         </div>
 
-                        {/* BOTTOM PANEL — Education | Certification */}
-                        <div className="xp-panel xp-bottom">
-                            <div className="xp-col xp-col-edu">
-                                <p className="xp-label">{'{2022 – 2026}'}</p>
-                                <h3 className="xp-title">BS Computer Science</h3>
-                                <p className="xp-body">Bicol University</p>
-                                <span className="xp-badge">
-                                    <svg
-                                        width="12"
-                                        height="12"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                    >
-                                        <circle cx="12" cy="8" r="6" />
-                                        <path d="M9 14 7 22l5-3 5 3-2-8" />
-                                    </svg>
-                                    Cum Laude
-                                </span>
-                            </div>
+                        <div className="xp-col xp-col-cert">
+                            <p className="xp-label">{'{November 2024}'}</p>
+                            <h3 className="xp-title">NC III Programming</h3>
+                            <p className="xp-body">Certification</p>
 
-                            <div className="xp-col xp-col-cert">
-                                <p className="xp-label">{'{November 2024}'}</p>
-                                <h3 className="xp-title">NC III Programming</h3>
-                                <p className="xp-body">Certification</p>
-
-                                <div className="xp-medal" aria-hidden="true">
-                                    <svg
-                                        viewBox="0 0 120 120"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.6"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <circle cx="60" cy="46" r="30" />
-                                        <circle cx="60" cy="46" r="21" opacity="0.55" />
-                                        <circle cx="60" cy="46" r="12" opacity="0.35" />
-                                        <path d="M40 72 32 112l28-15 28 15-8-40" />
-                                    </svg>
-                                </div>
+                            <div className="xp-medal" aria-hidden="true">
+                                <svg
+                                    viewBox="0 0 120 120"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.6"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="60" cy="46" r="30" />
+                                    <circle cx="60" cy="46" r="21" opacity="0.55" />
+                                    <circle cx="60" cy="46" r="12" opacity="0.35" />
+                                    <path d="M40 72 32 112l28-15 28 15-8-40" />
+                                </svg>
                             </div>
                         </div>
                     </div>
