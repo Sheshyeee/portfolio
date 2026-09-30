@@ -112,47 +112,47 @@ const ChartIcon = () => (
 /*  Data                                                                */
 /* ------------------------------------------------------------------ */
 
-// Icons inherit the ink colour — the theme only has two colours, so no brand tints.
-type Tool = { name: string; icon: () => ReactElement };
+// Colors that would vanish on the light theme use readable tones / theme vars.
+type Tool = { name: string; icon: () => ReactElement; color: string };
 type StackGroup = { label: string; tools: Tool[] };
 
 const STACK_GROUPS: StackGroup[] = [
     {
         label: 'Frontend',
         tools: [
-            { name: 'React', icon: AtomIcon },
-            { name: 'React Native', icon: MobileIcon },
-            { name: 'TypeScript', icon: () => <MonogramIcon letters="TS" /> },
-            { name: 'JavaScript', icon: () => <MonogramIcon letters="JS" /> },
-            { name: 'Tailwind CSS', icon: WindIcon },
-            { name: 'shadcn/ui', icon: CodeBracketsIcon },
+            { name: 'React', icon: AtomIcon, color: '#61DAFB' },
+            { name: 'React Native', icon: MobileIcon, color: '#61DAFB' },
+            { name: 'TypeScript', icon: () => <MonogramIcon letters="TS" />, color: '#4B9BF5' },
+            { name: 'JavaScript', icon: () => <MonogramIcon letters="JS" />, color: '#D4B106' },
+            { name: 'Tailwind CSS', icon: WindIcon, color: '#38BDF8' },
+            { name: 'shadcn/ui', icon: CodeBracketsIcon, color: 'var(--ink)' },
         ],
     },
     {
         label: 'Backend',
         tools: [
-            { name: 'Laravel', icon: () => <MonogramIcon letters="L" /> },
-            { name: 'PHP', icon: ElephantIcon },
-            { name: 'Node.js', icon: HexNodeIcon },
-            { name: 'Python', icon: HexNodeIcon },
+            { name: 'Laravel', icon: () => <MonogramIcon letters="L" />, color: '#FF4B3E' },
+            { name: 'PHP', icon: ElephantIcon, color: '#9A9EDB' },
+            { name: 'Node.js', icon: HexNodeIcon, color: '#5FB85F' },
+            { name: 'Python', icon: HexNodeIcon, color: '#E0A800' },
         ],
     },
     {
         label: 'Cloud & DevOps',
         tools: [
-            { name: 'Laravel Cloud', icon: CloudIcon },
-            { name: 'Google Cloud', icon: CloudIcon },
-            { name: 'AWS', icon: BoxIcon },
-            { name: 'Docker', icon: ContainerIcon },
+            { name: 'Laravel Cloud', icon: CloudIcon, color: '#FF4B3E' },
+            { name: 'Google Cloud', icon: CloudIcon, color: '#5B9BFF' },
+            { name: 'AWS', icon: BoxIcon, color: '#FF9900' },
+            { name: 'Docker', icon: ContainerIcon, color: '#3BA9F0' },
         ],
     },
     {
         label: 'Tools & Analytics',
         tools: [
-            { name: 'GitHub', icon: BranchIcon },
-            { name: 'Postman', icon: SendIcon },
-            { name: 'Trello', icon: BoardIcon },
-            { name: 'Google Analytics 4', icon: ChartIcon },
+            { name: 'GitHub', icon: BranchIcon, color: 'var(--ink)' },
+            { name: 'Postman', icon: SendIcon, color: '#FF6C37' },
+            { name: 'Trello', icon: BoardIcon, color: '#4C8DFF' },
+            { name: 'Google Analytics 4', icon: ChartIcon, color: '#F9AB00' },
         ],
     },
 ];
@@ -592,11 +592,11 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                                     <span className="ts-count">{String(group.tools.length).padStart(2, '0')}</span>
                                 </p>
                                 <div className="ts-chips">
-                                    {group.tools.map(({ name, icon: Icon }) => {
+                                    {group.tools.map(({ name, icon: Icon, color }) => {
                                         const d = chipIndex++;
                                         return (
                                             <span key={name} className="ts-chip" tabIndex={0} style={{ '--d': d } as CSSProperties}>
-                                                <span className="ts-chip-icon">
+                                                <span className="ts-chip-icon" style={{ color }}>
                                                     <Icon />
                                                 </span>
                                                 {name}

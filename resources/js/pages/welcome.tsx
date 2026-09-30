@@ -122,7 +122,7 @@ export default function Welcome() {
                      light : night ink on paper (cream)
                      dark  : paper ink on night (near-black)
                    Everything below is a mix of those two.
-                   The ONLY gradients on the page live in the hero.
+                   Gradients/glows are only used in the hero.
                    ===================================================== */
                 :root {
                     --muted: color-mix(in srgb, var(--ink) 62%, var(--bg));
@@ -134,8 +134,8 @@ export default function Welcome() {
                     /* legacy names some untouched components may still read */
                     --accent-2: var(--ink);
                     --accent-3: var(--ink);
-                    --glow-a: transparent;
-                    --glow-b: transparent;
+                    --glow-a: color-mix(in srgb, var(--ink) 22%, transparent);
+                    --glow-b: color-mix(in srgb, var(--ink) 14%, transparent);
                 }
                 *, *::before, *::after { box-sizing: border-box; }
                 .portfolio-root {
@@ -312,48 +312,43 @@ export default function Welcome() {
                 }
 
                 /* =====================================================
-                   HERO — the only place gradients are used.
-                   Same recipe as the reference: the photo is desaturated
-                   and dimmed, then black (here: --bg) gradients fade it
-                   out on the left, right, top and bottom so it melts
-                   into the page. Huge solid type sits behind the cut-out.
+                   HERO — original design, recoloured to the two-colour theme
+                   (outlined marquee name + cut-out photo + soft glow).
                    ===================================================== */
                 .hero-section {
                     position: relative; overflow: hidden; padding: 0;
                     display: flex; align-items: center; justify-content: center;
                     min-height: 92vh; min-height: 92svh;
                 }
+                /* Glow pool behind the portrait */
+                .hero-section::after {
+                    content: ''; position: absolute; left: 50%; bottom: 8%; width: min(70vw, 720px); aspect-ratio: 1;
+                    transform: translateX(-50%); border-radius: 50%; z-index: 0; pointer-events: none;
+                    background: radial-gradient(circle, var(--glow-b), transparent 65%);
+                }
                 .hero-marquee-wrap { position: absolute; inset: 0; display: flex; align-items: center; overflow: hidden; pointer-events: none; z-index: 1; }
                 .hero-marquee-track { display: flex; width: max-content; will-change: transform; animation: hero-marquee 18s linear infinite; animation-play-state: running !important; }
                 .hero-marquee-text {
-                    flex: 0 0 auto; font-size: clamp(4.5rem, 22vw, 18.5rem); font-weight: 800; text-transform: uppercase;
-                    letter-spacing: -0.045em; white-space: nowrap; padding-right: 5vw;
-                    color: var(--ink);
-                    line-height: 0.9;
+                    flex: 0 0 auto; font-size: clamp(4.5rem, 22vw, 18.5rem); font-weight: 900; text-transform: uppercase;
+                    letter-spacing: -0.03em; white-space: nowrap; padding-right: 5vw; color: transparent;
+                    -webkit-text-stroke: 2.5px color-mix(in srgb, var(--ink) 60%, transparent);
+                    opacity: 0.85;
+                    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--ink) 50%, transparent));
+                }
+                :root.dark .hero-marquee-text {
+                    -webkit-text-stroke: 2.5px color-mix(in srgb, var(--ink) 65%, transparent);
+                    filter: drop-shadow(0 0 24px color-mix(in srgb, var(--ink) 60%, transparent));
                 }
                 @keyframes hero-marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
-
                 .hero-photo-img {
                     position: relative; z-index: 2; width: clamp(300px, 60vw, 700px); max-height: min(90vh, 900px);
                     object-fit: contain; object-position: bottom center; display: block; margin: 0 auto;
                     margin-bottom: calc(var(--dock-space-mobile) + 0.5rem);
-                    /* monochrome, warm-toned, dimmed — like the reference photo */
-                    filter: grayscale(1) sepia(0.35) contrast(1.05) brightness(0.72);
+                    filter: drop-shadow(0 30px 50px var(--glow-a));
                     opacity: 0; transform: translateY(28px);
                     transition: opacity .8s cubic-bezier(.16,1,.3,1) .15s, transform .8s cubic-bezier(.16,1,.3,1) .15s;
                 }
-                :root:not(.dark) .hero-photo-img { filter: grayscale(1) sepia(0.35) contrast(1.05) brightness(0.95); mix-blend-mode: multiply; }
                 .hero-section.in-view .hero-photo-img { opacity: 1; transform: translateY(0); }
-
-                /* Edge vignette: --bg fades in from every side, heaviest at the bottom */
-                .hero-vignette {
-                    position: absolute; inset: 0; z-index: 3; pointer-events: none;
-                    background:
-                        linear-gradient(to top, var(--bg) 0%, transparent 42%),
-                        linear-gradient(to bottom, var(--bg) 0%, transparent 16%),
-                        linear-gradient(to right, var(--bg) 0%, transparent 26%, transparent 74%, var(--bg) 100%);
-                }
-
                 @media (max-width: 820px) {
                     .hero-photo-img { width: clamp(220px, 78vw, 360px); max-height: 66vh; margin-bottom: calc(var(--dock-space-mobile) + 0.25rem); }
                 }
@@ -361,16 +356,17 @@ export default function Welcome() {
                     .hero-photo-img { width: clamp(200px, 82vw, 300px); max-height: 60vh; }
                 }
                 .hero-caption {
-                    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); z-index: 4;
+                    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); z-index: 3;
                     text-align: center; opacity: 0; transition: opacity .8s ease .4s;
                 }
                 .hero-section.in-view .hero-caption { opacity: 1; }
-                .hero-role { font-size: 0.8rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
-                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--muted); }
+                .hero-role { font-size: 0.8rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--ink); opacity: .9; }
                 @media (max-width: 820px) {
                     .hero-section { align-items: flex-end; min-height: 88vh; min-height: 88svh; }
                     .hero-caption { bottom: 1.75rem; }
-                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); }
+                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); -webkit-text-stroke: 3px color-mix(in srgb, var(--ink) 65%, transparent); }
+                    :root.dark .hero-marquee-text { -webkit-text-stroke: 3px color-mix(in srgb, var(--ink) 70%, transparent); }
                 }
 
                 /* ---- Skills section (honor badges) ---- */

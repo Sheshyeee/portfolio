@@ -70,13 +70,13 @@
 
 /* =====================================================================
    THEME — exactly two colours.
-     paper : warm cream  #d8c9a5
+     paper : soft light cream  #efe9da
      night : warm black  #0e0d0b
    Light mode = night ink on paper.  Dark mode = paper ink on night.
    Every other shade (muted text, hairlines, fills) is a mix of these two.
    ===================================================================== */
 :root {
-    --paper: #d8c9a5;
+    --paper: #efe9da;
     --night: #0e0d0b;
 
     /* the two live colours (swapped in .dark) */
