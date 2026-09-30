@@ -10,7 +10,7 @@ const iconProps = {
     viewBox: '0 0 24 24',
     fill: 'none',
     stroke: 'currentColor',
-    strokeWidth: 1.8,
+    strokeWidth: 1.6,
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
 };
@@ -73,7 +73,7 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Dock (iOS App Store style: bordered capsule on the active tab)      */
+/*  Dock (iOS App Store style: soft capsule on the active tab)          */
 /* ------------------------------------------------------------------ */
 
 export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
@@ -83,7 +83,7 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                 /* Higher specificity than the older dock rules in welcome.tsx / motion-styles.ts */
                 .liquid-dock .dock-indicator { display: none; }
 
-                /* Outer pill: thin glass rim like the reference */
+                /* Outer pill: thin glass rim */
                 .liquid-dock .liquid-dock-glass {
                     border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
                     box-shadow:
@@ -91,7 +91,7 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                         inset 0 1px 0 color-mix(in srgb, var(--ink) 14%, transparent);
                 }
 
-                /* Every tab has a reserved 1px border so nothing shifts when it becomes active */
+                /* Every tab reserves a 1px border so nothing shifts when it becomes active */
                 .liquid-dock .dock-item,
                 .liquid-dock .dock-item:hover {
                     background: transparent;
@@ -103,17 +103,17 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                 }
                 .liquid-dock .dock-item:hover:not(.active) { color: color-mix(in srgb, var(--ink) 82%, var(--bg)); }
 
-                /* Active: soft translucent capsule with a visible border; icon + label go full ink */
+                /* Active: soft filled capsule, no border line; icon + label go full ink */
                 .liquid-dock .dock-item.active,
                 .liquid-dock .dock-item.active:hover {
                     background: color-mix(in srgb, var(--ink) 8%, transparent);
-                    border-color: color-mix(in srgb, var(--ink) 26%, transparent);
-                    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 12%, transparent);
+                    border-color: transparent;
+                    box-shadow: none;
                     color: var(--ink);
                 }
                 .liquid-dock .dock-item.active svg,
                 .liquid-dock .dock-item.active .dock-label { color: var(--ink); }
-                .liquid-dock .dock-item.active svg { stroke-width: 2.2; }
+                .liquid-dock .dock-item.active svg { stroke-width: 1.9; }
                 .liquid-dock .dock-item.active .dock-label { font-weight: 700; }
 
                 .liquid-dock .dock-item svg { transition: stroke-width .2s ease; }
