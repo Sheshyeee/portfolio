@@ -19,8 +19,6 @@ const SOCIALS = [
 /**
  * Alignment — works like the align buttons in Word.
  * Set each row to 'left', 'center' or 'right'.
- * Every row spans the full width of the content, so this is
- * "hard left" / "middle" / "hard right" from start to end.
  */
 type Align = 'left' | 'center' | 'right';
 
@@ -290,24 +288,15 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
     return (
         <section id="contact-us" ref={sectionRef} className="section contact-section">
             <style>{`
-                @import url('https://fonts.bunny.net/css?family=instrument-serif:400');
-
-                /* Follows the site theme via --bg / --ink / --muted / --hair / --accent / --glow-* from welcome.tsx */
+                /* Two colours only: --bg / --ink (from app.css) and mixes of them. No gradients, no glows. */
                 .contact-section,
                 .contact-dialog {
-                    --c-fill: rgba(47,127,216,0.05);
-                    --c-line: rgba(40,90,150,0.2);
-                    --c-accent: #2f7fd8;
-                    --c-error: #dc2626;
-                    --c-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+                    --c-fill: var(--fill);
+                    --c-line: var(--line);
+                    --c-error: #c0392b;
                 }
                 :root.dark .contact-section,
-                :root.dark .contact-dialog {
-                    --c-fill: rgba(140,190,255,0.06);
-                    --c-line: rgba(140,190,255,0.2);
-                    --c-accent: #5cc8ff;
-                    --c-error: #ff8f8f;
-                }
+                :root.dark .contact-dialog { --c-error: #ff8f8f; }
 
                 /* .section.contact-section beats the generic .section rules in welcome.tsx.
                    The bottom padding is the only dock clearance on the page. */
@@ -350,13 +339,13 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
 
                 .contact-title {
                     margin: 0;
-                    font-family: var(--c-serif);
-                    font-weight: 400;
+                    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+                    font-weight: 800;
                     font-size: clamp(3.6rem, 10vw, 8.5rem);
                     line-height: 0.92;
-                    letter-spacing: -0.025em;
+                    letter-spacing: -0.045em;
+                    text-transform: uppercase;
                     color: var(--ink);
-                    text-shadow: 0 0 60px var(--glow-a);
                 }
                 .contact-copy {
                     max-width: 44ch;
@@ -366,34 +355,34 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     color: var(--muted);
                 }
 
-                /* Glowing road-blue button */
+                /* Solid ink button — same idea as the "Let's talk" button in the reference */
                 .contact-cta {
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
                     width: fit-content;
                     padding: 0.9rem 1.7rem;
-                    border-radius: 999px;
-                    background: linear-gradient(135deg, var(--accent), #1f5fb0);
-                    color: #ffffff;
+                    border-radius: 10px;
+                    background: var(--ink);
+                    color: var(--bg);
                     font-size: 0.95rem;
-                    font-weight: 600;
-                    box-shadow: 0 0 24px var(--glow-a), 0 8px 20px rgba(30,80,150,0.25);
-                    transition: transform .25s ease, opacity .2s ease, box-shadow .25s ease;
+                    font-weight: 700;
+                    transition: transform .25s ease, opacity .2s ease;
                 }
-                :root.dark .contact-cta { background: linear-gradient(135deg, #5cc8ff, #2f7fd8); color: #06101e; }
                 button.contact-cta { border: 0; cursor: pointer; font-family: inherit; }
-                button.contact-cta:hover { transform: translateY(-2px); box-shadow: 0 0 34px var(--glow-a), 0 12px 26px rgba(30,80,150,0.3); }
+                button.contact-cta:hover { transform: translateY(-2px); }
                 button.contact-cta:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
                 .contact-cta:focus-visible,
                 .contact-pill:focus-visible,
-                .contact-email:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+                .contact-email:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
                 .contact-label { margin: 0 0 0.7rem; font-size: 0.85rem; color: var(--muted); }
 
                 .contact-email {
-                    font-family: var(--c-serif);
-                    font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+                    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+                    font-weight: 600;
+                    letter-spacing: -0.02em;
+                    font-size: clamp(1.3rem, 2.4vw, 2rem);
                     line-height: 1.15;
                     color: var(--ink);
                     text-decoration: none;
@@ -401,7 +390,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     overflow-wrap: anywhere;
                     transition: border-color .2s ease, color .2s ease;
                 }
-                .contact-email:hover { border-color: var(--accent-2); color: var(--accent-2); }
+                .contact-email:hover { border-color: var(--ink); }
 
                 .contact-links {
                     display: flex;
@@ -418,24 +407,21 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     gap: 0.55rem;
                     padding: 0.65rem 1.05rem;
                     border: 1px solid var(--hair);
-                    border-radius: 999px;
-                    background: var(--c-fill);
+                    border-radius: 10px;
+                    background: transparent;
                     color: var(--ink);
                     font-size: 0.9rem;
                     font-weight: 500;
                     text-decoration: none;
-                    transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .25s ease, box-shadow .25s ease;
+                    transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .25s ease;
                 }
                 .contact-pill:hover {
-                    background: var(--accent);
-                    color: #ffffff;
-                    border-color: var(--accent);
+                    background: var(--ink);
+                    color: var(--bg);
+                    border-color: var(--ink);
                     transform: translateY(-2px);
-                    box-shadow: 0 0 22px var(--glow-a);
                 }
-                :root.dark .contact-pill:hover { color: #06101e; }
 
-                /* The grey line: sits right under the content with a small gap */
                 .contact-foot {
                     margin: 0.25rem 0 0;
                     padding-top: 1rem;
@@ -466,8 +452,8 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     background: var(--bg) !important;
                     color: var(--ink) !important;
                     border: 1px solid var(--hair) !important;
-                    box-shadow: 0 30px 80px rgba(30,70,120,0.28), 0 0 40px var(--glow-a), 0 4px 16px rgba(0,0,0,0.08) !important;
-                    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+                    box-shadow: 0 30px 80px rgba(0,0,0,0.35) !important;
+                    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
                 }
 
                 /* Desktop close button (the shadcn X). Hidden on phones below. */
@@ -493,11 +479,10 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
 
                 .contact-header { text-align: left; gap: 0.5rem; padding-right: 2rem; }
                 .contact-dialog-title {
-                    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
                     font-size: 1.5rem;
-                    font-weight: 600;
+                    font-weight: 700;
                     line-height: 1.2;
-                    letter-spacing: -0.02em;
+                    letter-spacing: -0.03em;
                     color: var(--ink);
                 }
                 .contact-dialog-desc { font-size: 0.925rem; line-height: 1.55; color: var(--muted); }
@@ -510,7 +495,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                 .contact-input {
                     width: 100%;
                     padding: 0.8rem 0.95rem;
-                    border-radius: 12px;
+                    border-radius: 10px;
                     border: 1px solid var(--c-line);
                     background: var(--c-fill);
                     color: var(--ink);
@@ -518,30 +503,25 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     font-size: 16px; /* 16px stops iOS from zooming on focus */
                     line-height: 1.4;
                     outline: none;
-                    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+                    transition: border-color .2s ease, background-color .2s ease;
                 }
                 .contact-input::placeholder { color: var(--muted); opacity: 0.65; }
-                .contact-input:hover { border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
-                .contact-input:focus {
-                    border-color: var(--c-accent);
-                    background: var(--bg);
-                    box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-accent) 20%, transparent);
-                }
+                .contact-input:hover { border-color: color-mix(in srgb, var(--ink) 50%, transparent); }
+                .contact-input:focus { border-color: var(--ink); background: var(--bg); }
                 .contact-input[aria-invalid='true'] { border-color: var(--c-error); }
                 textarea.contact-input { min-height: 8rem; resize: none; }
                 .contact-error { margin-top: 0.4rem; font-size: 0.8rem; color: var(--c-error); }
                 .contact-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 
-                .contact-submit { width: 100%; margin-top: 0.35rem; padding: 0.95rem 1.5rem; border-radius: 14px; }
+                .contact-submit { width: 100%; margin-top: 0.35rem; padding: 0.95rem 1.5rem; border-radius: 10px; }
 
                 .contact-success { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-top: 1.75rem; }
                 .contact-success .contact-submit { margin-top: 0; }
                 .contact-success-icon {
                     display: inline-flex; align-items: center; justify-content: center;
                     width: 3.25rem; height: 3.25rem; border-radius: 999px;
-                    background: color-mix(in srgb, var(--c-accent) 14%, transparent);
-                    color: var(--c-accent);
-                    box-shadow: 0 0 24px var(--glow-a);
+                    background: var(--ink);
+                    color: var(--bg);
                 }
 
                 /* ---------- Phone: bottom sheet ---------- */
@@ -653,4 +633,4 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
             <ContactDialog open={dialogOpen} onOpenChange={setDialogOpen} />
         </section>
     );
-} 
+}

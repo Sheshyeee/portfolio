@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 /* ------------------------------------------------------------------ */
 
 /**
- * The DOM section ids don't map 1:1 onto the 4 nav buttons — this table is
+ * The DOM section ids don't map 1:1 onto the nav buttons — this table is
  * the single source of truth for which nav button should light up for each
  * section:
  *   hero    (top marquee/photo intro)         → Home
@@ -51,10 +51,9 @@ export default function Welcome() {
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
     // While a nav click is smooth-scrolling the page, sections it scrolls
-    // *past* (e.g. About while heading to Projects) can also briefly cross
-    // the spy's intersection band and hijack `active` mid-flight. This ref
-    // marks a short window after a manual click during which the scroll-spy
-    // defers to the click's own target instead of what's passing by.
+    // *past* can also briefly cross the spy's intersection band and hijack
+    // `active` mid-flight. This ref marks a short window after a manual click
+    // during which the scroll-spy defers to the click's own target.
     const suppressSpyUntil = useRef(0);
 
     useEffect(() => {
@@ -93,9 +92,7 @@ export default function Welcome() {
         setActive(id); // instant feedback — don't wait on the scroll-spy to catch up
         suppressSpyUntil.current = Date.now() + 900; // clears once the smooth scroll has settled
 
-        // "Home" always means the very top of the page — window.scrollTo(0)
-        // is more reliable than scrolling to the hero ref, since it can't be
-        // thrown off by fixed/sticky offsets above it.
+        // "Home" always means the very top of the page.
         if (id === 'home') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
@@ -115,39 +112,30 @@ export default function Welcome() {
 
             <Head title="Portfolio">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800" rel="stylesheet" />
+                <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
             </Head>
 
             <style>{`
                 /* =====================================================
-                   THEME — "Charge fleet" city.
-                   Light: icy snow-blue surfaces, steel-blue road bezels,
-                          chimney-orange + taxi-yellow accents.
-                   Dark : the same city at night — deep navy, cyan glow,
-                          warm orange lights.
+                   THEME — two colours only.
+                   --bg and --ink are defined in app.css:
+                     light : night ink on paper (cream)
+                     dark  : paper ink on night (near-black)
+                   Everything below is a mix of those two.
+                   The ONLY gradients on the page live in the hero.
                    ===================================================== */
                 :root {
-                    --bg: #eef3f9;
-                    --ink: #14243a;
-                    --muted: #5b7089;
-                    --hair: rgba(40,90,150,0.16);
+                    --muted: color-mix(in srgb, var(--ink) 62%, var(--bg));
+                    --hair: color-mix(in srgb, var(--ink) 20%, transparent);
+                    --line: color-mix(in srgb, var(--ink) 34%, var(--bg));
+                    --fill: color-mix(in srgb, var(--ink) 6%, transparent);
                     --dock-space-mobile: 6rem;
-                    --accent: #2f7fd8;      /* road blue */
-                    --accent-2: #f2582f;    /* chimney / bus orange */
-                    --accent-3: #f2d43d;    /* taxi yellow */
-                    --glow-a: rgba(47,127,216,0.22);
-                    --glow-b: rgba(242,88,47,0.16);
-                }
-                :root.dark {
-                    --bg: #060b14;
-                    --ink: #eaf2ff;
-                    --muted: #8fa6c4;
-                    --hair: rgba(140,190,255,0.14);
-                    --accent: #5cc8ff;
-                    --accent-2: #ff7a4d;
-                    --accent-3: #ffe066;
-                    --glow-a: rgba(60,150,255,0.28);
-                    --glow-b: rgba(255,110,64,0.20);
+
+                    /* legacy names some untouched components may still read */
+                    --accent-2: var(--ink);
+                    --accent-3: var(--ink);
+                    --glow-a: transparent;
+                    --glow-b: transparent;
                 }
                 *, *::before, *::after { box-sizing: border-box; }
                 .portfolio-root {
@@ -158,25 +146,9 @@ export default function Welcome() {
                     min-height: 100vh;
                     width: 100%;
                     overflow-x: hidden;
-                    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+                    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
                     transition: background-color .3s ease, color .3s ease;
                 }
-
-                /* Slow "breathing" ambient glow behind the whole page */
-                .portfolio-root::before {
-                    content: '';
-                    position: fixed;
-                    inset: 0;
-                    z-index: -1;
-                    pointer-events: none;
-                    background:
-                        radial-gradient(55vw 40vw at 88% 6%, var(--glow-a), transparent 65%),
-                        radial-gradient(45vw 35vw at 4% 48%, var(--glow-b), transparent 65%),
-                        radial-gradient(55vw 40vw at 92% 92%, var(--glow-a), transparent 65%);
-                    animation: page-breathe 9s ease-in-out infinite alternate;
-                }
-                @keyframes page-breathe { from { opacity: .65; transform: scale(1); } to { opacity: 1; transform: scale(1.06); } }
-                @media (prefers-reduced-motion: reduce) { .portfolio-root::before { animation: none; } }
 
                 .site-chrome > * {
                     transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
@@ -231,7 +203,7 @@ export default function Welcome() {
                     padding: .3rem .7rem;
                 }
 
-                /* ---------- Floating liquid glass dark mode toggle ---------- */
+                /* ---------- Floating dark mode toggle (solid ink button) ---------- */
                 .glass-toggle-dock { position: fixed; top: 1.375rem; right: 1.375rem; z-index: 60; }
                 .glass-toggle-btn {
                     position: relative;
@@ -241,23 +213,13 @@ export default function Welcome() {
                     width: 3.25rem;
                     height: 3.25rem;
                     border-radius: 1.125rem;
-                    background: linear-gradient(145deg, #2f6fb8, #1b3a63);
-                    border: 1px solid rgba(255,255,255,0.35);
-                    box-shadow: 0 0 22px var(--glow-a), 0 14px 34px rgba(30,70,120,0.28), inset 0 1px 0 rgba(255,255,255,0.3);
-                    color: #ffffff;
+                    background: var(--ink);
+                    border: 1px solid var(--hair);
+                    color: var(--bg);
                     cursor: pointer;
                     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, color 0.3s ease;
                 }
-                .glass-toggle-btn:hover { transform: scale(1.06); background: linear-gradient(145deg, #3a82d4, #21497b); }
-                :root.dark .glass-toggle-btn,
-                .glass-toggle-btn[data-state='on'] {
-                    background: linear-gradient(145deg, #eaf2ff, #bfe3ff);
-                    border-color: rgba(92,200,255,0.5);
-                    color: #0b1b33;
-                    box-shadow: 0 0 26px rgba(92,200,255,0.45), 0 14px 34px rgba(0,0,0,0.45), inset 0 1px 0 #ffffff;
-                }
-                :root.dark .glass-toggle-btn:hover,
-                .glass-toggle-btn[data-state='on']:hover { background: linear-gradient(145deg, #ffffff, #d2ecff); }
+                .glass-toggle-btn:hover { transform: scale(1.06); }
                 .glass-toggle-icon {
                     position: absolute;
                     display: flex;
@@ -273,8 +235,7 @@ export default function Welcome() {
                     .glass-toggle-btn { width: 2.875rem; height: 2.875rem; border-radius: 1rem; }
                 }
 
-                /* ---------- Chat widget: pinned to the true bottom edge, stacked
-                   above the dock/toggle so an open chat panel visually covers them. ---------- */
+                /* ---------- Chat widget: pinned to the true bottom edge ---------- */
                 .chat-widget-mobile-anchor {
                     display: block;
                     position: fixed;
@@ -290,7 +251,7 @@ export default function Welcome() {
                 }
                 .chat-widget-mobile-anchor > * { pointer-events: auto; }
 
-                /* ---- Liquid dock (bottom nav) ---- */
+                /* ---- Dock (bottom nav) — flat, matches the reference's dark bar ---- */
                 .liquid-dock {
                     position: fixed;
                     z-index: 50;
@@ -305,80 +266,40 @@ export default function Welcome() {
                 .liquid-dock-glass {
                     --mx: 50%; --my: 0%; --glow: 0;
                     position: relative; display: inline-flex; flex-direction: row; align-items: center;
-                    width: fit-content; max-width: calc(100vw - 2rem); padding: 0.5rem 0.75rem; gap: 0.5rem;
-                    border-radius: 999px;
-                    background: rgba(255, 255, 255, 0.55);
-                    border: 1px solid rgba(47, 127, 216, 0.2);
-                    backdrop-filter: blur(24px) saturate(180%);
-                    -webkit-backdrop-filter: blur(24px) saturate(180%);
-                    box-shadow:
-                        0 20px 45px rgba(30, 80, 150, 0.18),
-                        0 3px 12px rgba(30, 80, 150, 0.08),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+                    width: fit-content; max-width: calc(100vw - 2rem); padding: 0.4rem 0.5rem; gap: 0.5rem;
+                    border-radius: 14px;
+                    background: color-mix(in srgb, var(--bg) 82%, transparent);
+                    border: 1px solid var(--hair);
+                    backdrop-filter: blur(20px) saturate(140%);
+                    -webkit-backdrop-filter: blur(20px) saturate(140%);
                     overflow: visible;
                     transition: background-color .3s ease, border-color .3s ease;
                 }
                 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-                    .liquid-dock-glass { background: rgba(240,246,253,0.96); }
-                    :root.dark .liquid-dock-glass { background: rgba(12,22,40,0.96); }
-                }
-                :root.dark .liquid-dock-glass {
-                    background: rgba(12, 22, 40, 0.6);
-                    border: 1px solid rgba(120, 190, 255, 0.22);
-                    box-shadow:
-                        0 20px 45px rgba(0, 0, 0, 0.55),
-                        0 0 30px rgba(60, 150, 255, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-                }
-                .liquid-dock-glass::before {
-                    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-                    opacity: var(--glow); transition: opacity .35s ease;
-                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(255,255,255,0.35), transparent 65%);
-                }
-                :root.dark .liquid-dock-glass::before {
-                    background: radial-gradient(110px 110px at var(--mx) var(--my), rgba(92,200,255,0.22), transparent 65%);
-                }
-                .liquid-dock-glass::after {
-                    content: ''; position: absolute; top: 0; left: 12%; right: 12%; height: 1px;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
-                    pointer-events: none;
-                }
-                :root.dark .liquid-dock-glass::after {
-                    background: linear-gradient(90deg, transparent, rgba(140,210,255,0.4), transparent);
+                    .liquid-dock-glass { background: var(--bg); }
                 }
                 .dock-group { display: flex; flex-direction: row; align-items: center; gap: 0.15rem; }
                 .dock-item {
                     position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
                     gap: 0.2rem; min-width: 3.1rem; padding: 0.4rem 0.55rem;
-                    border-radius: 1.125rem; background: transparent; border: none;
-                    color: #5b7089; cursor: pointer;
-                    transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease, box-shadow .3s ease;
+                    border-radius: 10px; background: transparent; border: none;
+                    color: var(--muted); cursor: pointer;
+                    transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease;
                 }
-                :root.dark .dock-item { color: #8fa6c4; }
                 .dock-item svg { width: 21px; height: 21px; color: inherit; }
-                .dock-item:hover:not(.active) svg { color: var(--accent); }
-                :root.dark .dock-item:hover:not(.active) svg { color: var(--accent); }
+                .dock-item:hover:not(.active) { color: var(--ink); }
 
-                /* Active tab: brighter capsule than the glass behind it, with a soft glow */
-                .dock-item.active {
-                    background: rgba(255, 255, 255, 0.95);
-                    box-shadow: 0 0 18px var(--glow-a), 0 4px 14px rgba(40, 90, 150, 0.15), inset 0 1px 0 #ffffff;
-                }
+                /* Active tab: solid ink capsule, bg-coloured content (like the "Let's talk" button) */
+                .dock-item.active { background: var(--ink); color: var(--bg); }
                 .dock-item.active svg,
-                .dock-item.active .dock-label { color: var(--accent); }
-                :root.dark .dock-item.active {
-                    background: rgba(92, 200, 255, 0.16);
-                    box-shadow: 0 0 20px rgba(92, 200, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-                }
-                :root.dark .dock-item.active svg,
-                :root.dark .dock-item.active .dock-label { color: var(--accent); }
+                .dock-item.active .dock-label { color: var(--bg); }
 
                 .dock-item:active { transform: scale(0.96); }
                 .dock-label {
                     display: block; font-size: 10.5px; font-weight: 500; line-height: 1; letter-spacing: 0.01em;
                     color: inherit; transition: color .25s ease, font-weight .25s ease;
                 }
-                .dock-item.active .dock-label { font-weight: 600; }
+                .dock-item.active .dock-label { font-weight: 700; }
                 .dock-tooltip { display: none; }
                 @media (prefers-reduced-motion: reduce) {
                     .dock-item { transition: none; }
@@ -386,45 +307,53 @@ export default function Welcome() {
                 }
                 @media (max-width: 380px) {
                     .liquid-dock { bottom: 0.875rem; padding: 0 0.75rem; }
-                    .liquid-dock-glass { padding: 0.4rem 0.6rem; gap: 0.35rem; }
+                    .liquid-dock-glass { padding: 0.35rem 0.4rem; gap: 0.35rem; }
                     .dock-item { min-width: 2.85rem; padding: 0.35rem 0.4rem; }
                 }
 
-                /* ---- Hero section ---- */
+                /* =====================================================
+                   HERO — the only place gradients are used.
+                   Same recipe as the reference: the photo is desaturated
+                   and dimmed, then black (here: --bg) gradients fade it
+                   out on the left, right, top and bottom so it melts
+                   into the page. Huge solid type sits behind the cut-out.
+                   ===================================================== */
                 .hero-section {
                     position: relative; overflow: hidden; padding: 0;
                     display: flex; align-items: center; justify-content: center;
                     min-height: 92vh; min-height: 92svh;
                 }
-                /* Warm glow pool behind the portrait (orange, like the chimney lights) */
-                .hero-section::after {
-                    content: ''; position: absolute; left: 50%; bottom: 8%; width: min(70vw, 720px); aspect-ratio: 1;
-                    transform: translateX(-50%); border-radius: 50%; z-index: 0; pointer-events: none;
-                    background: radial-gradient(circle, var(--glow-b), transparent 65%);
-                }
                 .hero-marquee-wrap { position: absolute; inset: 0; display: flex; align-items: center; overflow: hidden; pointer-events: none; z-index: 1; }
                 .hero-marquee-track { display: flex; width: max-content; will-change: transform; animation: hero-marquee 18s linear infinite; animation-play-state: running !important; }
                 .hero-marquee-text {
-                    flex: 0 0 auto; font-size: clamp(4.5rem, 22vw, 18.5rem); font-weight: 900; text-transform: uppercase;
-                    letter-spacing: -0.03em; white-space: nowrap; padding-right: 5vw; color: transparent;
-                    -webkit-text-stroke: 2.5px rgba(47,127,216,0.6);
-                    opacity: 0.85;
-                    filter: drop-shadow(0 0 18px rgba(47,127,216,0.5));
-                }
-                :root.dark .hero-marquee-text {
-                    -webkit-text-stroke: 2.5px rgba(92,200,255,0.65);
-                    filter: drop-shadow(0 0 24px rgba(92,200,255,0.6));
+                    flex: 0 0 auto; font-size: clamp(4.5rem, 22vw, 18.5rem); font-weight: 800; text-transform: uppercase;
+                    letter-spacing: -0.045em; white-space: nowrap; padding-right: 5vw;
+                    color: var(--ink);
+                    line-height: 0.9;
                 }
                 @keyframes hero-marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+
                 .hero-photo-img {
                     position: relative; z-index: 2; width: clamp(300px, 60vw, 700px); max-height: min(90vh, 900px);
                     object-fit: contain; object-position: bottom center; display: block; margin: 0 auto;
                     margin-bottom: calc(var(--dock-space-mobile) + 0.5rem);
-                    filter: drop-shadow(0 30px 50px var(--glow-a));
+                    /* monochrome, warm-toned, dimmed — like the reference photo */
+                    filter: grayscale(1) sepia(0.35) contrast(1.05) brightness(0.72);
                     opacity: 0; transform: translateY(28px);
                     transition: opacity .8s cubic-bezier(.16,1,.3,1) .15s, transform .8s cubic-bezier(.16,1,.3,1) .15s;
                 }
+                :root:not(.dark) .hero-photo-img { filter: grayscale(1) sepia(0.35) contrast(1.05) brightness(0.95); mix-blend-mode: multiply; }
                 .hero-section.in-view .hero-photo-img { opacity: 1; transform: translateY(0); }
+
+                /* Edge vignette: --bg fades in from every side, heaviest at the bottom */
+                .hero-vignette {
+                    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+                    background:
+                        linear-gradient(to top, var(--bg) 0%, transparent 42%),
+                        linear-gradient(to bottom, var(--bg) 0%, transparent 16%),
+                        linear-gradient(to right, var(--bg) 0%, transparent 26%, transparent 74%, var(--bg) 100%);
+                }
+
                 @media (max-width: 820px) {
                     .hero-photo-img { width: clamp(220px, 78vw, 360px); max-height: 66vh; margin-bottom: calc(var(--dock-space-mobile) + 0.25rem); }
                 }
@@ -432,30 +361,26 @@ export default function Welcome() {
                     .hero-photo-img { width: clamp(200px, 82vw, 300px); max-height: 60vh; }
                 }
                 .hero-caption {
-                    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); z-index: 3;
+                    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); z-index: 4;
                     text-align: center; opacity: 0; transition: opacity .8s ease .4s;
                 }
                 .hero-section.in-view .hero-caption { opacity: 1; }
-                .hero-role { font-size: 0.8rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--accent-2); opacity: .9; }
+                .hero-role { font-size: 0.8rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
+                .hero-scroll-hint { margin-top: .4rem; font-size: .75rem; color: var(--muted); }
                 @media (max-width: 820px) {
                     .hero-section { align-items: flex-end; min-height: 88vh; min-height: 88svh; }
                     .hero-caption { bottom: 1.75rem; }
-                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); -webkit-text-stroke: 3px rgba(47,127,216,0.65); }
-                    :root.dark .hero-marquee-text { -webkit-text-stroke: 3px rgba(92,200,255,0.7); }
+                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); }
                 }
 
                 /* ---- Skills section (honor badges) ---- */
                 .honor-badge {
                     display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 3px 9px;
-                    border-radius: 999px; background: rgba(47,127,216,0.1); color: var(--ink);
+                    border-radius: 999px; background: var(--fill); color: var(--ink);
                     font-size: 13px; font-weight: 600; letter-spacing: .01em;
                 }
-                :root.dark .honor-badge { background: rgba(92,200,255,0.12); }
 
-                /* ---- Projects section (carousel + case-study sheet) ---- */
-                .carousel-edge-fade-left { background: linear-gradient(to left, transparent 55%, var(--bg) 100%); opacity: 0.85; }
-                .carousel-edge-fade-right { background: linear-gradient(to right, transparent 55%, var(--bg) 100%); opacity: 0.85; }
+                /* ---- Projects section (case-study sheet) ---- */
                 @media (max-width: 1024px) {
                     .case-study-sheet {
                         position: fixed !important; left: 0 !important; right: 0 !important;
@@ -475,8 +400,7 @@ export default function Welcome() {
                 .sheet-drag-handle { display: none; }
                 @media (max-width: 1024px) {
                     .sheet-drag-handle { display: flex; justify-content: center; align-items: center; padding: 0.625rem 0 0.25rem; touch-action: none; cursor: grab; }
-                    .sheet-drag-bar { width: 2.75rem; height: 0.3125rem; border-radius: 999px; background: rgba(40,90,150,0.25); }
-                    :root.dark .sheet-drag-bar { background: rgba(140,190,255,0.3); }
+                    .sheet-drag-bar { width: 2.75rem; height: 0.3125rem; border-radius: 999px; background: var(--line); }
                 }
                 @media (max-width: 1024px) { body.sheet-open { overflow: hidden; } }
                 body.sheet-open .liquid-dock,

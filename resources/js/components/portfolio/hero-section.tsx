@@ -12,7 +12,11 @@ export function HeroSection({ sectionRef }: HeroSectionProps) {
                 </div>
             </div>
 
-            <img src="/dp2.png" className="hero-photo-img z-10" alt="Dave Michael Clapis" />
+            {/* NOTE: no `z-10` here — the photo must stay below the vignette (z-index 3) */}
+            <img src="/dp2.png" className="hero-photo-img" alt="Dave Michael Clapis" />
+
+            {/* The hero's only gradient layer: fades the photo into the page background */}
+            <div className="hero-vignette" aria-hidden="true" />
 
             <div className="hero-caption">
                 <p className="hero-role">Fullstack Web Developer / App Developer</p>
@@ -21,5 +25,3 @@ export function HeroSection({ sectionRef }: HeroSectionProps) {
         </section>
     );
 }
-
-

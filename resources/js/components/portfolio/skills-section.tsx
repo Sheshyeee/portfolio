@@ -216,31 +216,31 @@ function WorkCard({ work, centerLast, onOpen }: { work: Work; centerLast: boolea
             onClick={onOpen}
             onKeyDown={handleKeyDown}
             className={[
-                'group cursor-pointer overflow-hidden rounded-md border border-[var(--hair)] bg-[#F7F7F7] transition-shadow duration-300 outline-none hover:shadow-[0_14px_32px_rgba(0,0,0,0.08)] focus-visible:ring-2 focus-visible:ring-[#101010] dark:bg-neutral-900 dark:focus-visible:ring-neutral-100',
+                'group cursor-pointer overflow-hidden rounded-md border border-[var(--hair)] bg-[var(--bg)] text-[var(--ink)] transition-colors duration-300 outline-none hover:border-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--ink)]',
                 // lone last card: span both columns but keep the width of a single column
                 centerLast ? 'md:col-span-2 md:mx-auto md:w-[calc(50%-0.75rem)]' : '',
             ].join(' ')}
         >
-            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#ECECEC] dark:bg-neutral-800">
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--fill)]">
                 <img
                     src={work.thumbnail}
                     alt=""
                     loading="lazy"
                     className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                 />
-                <span className="absolute top-1/2 left-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 scale-90 items-center justify-center rounded-full bg-white text-[#101010] opacity-0 shadow-md transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100">
+                <span className="absolute top-1/2 left-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 scale-90 items-center justify-center rounded-full bg-[var(--ink)] text-[var(--bg)] opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100">
                     <ArrowUpRightIcon />
                 </span>
             </div>
 
             <div className="flex flex-col gap-3 p-4 sm:p-6">
-                <h3 className="text-[17px] leading-snug font-medium text-[#101010] sm:text-[20px] dark:text-neutral-50">{work.title}</h3>
-                <p className="line-clamp-2 text-[14px] leading-relaxed text-[#5c5a56] sm:text-[14.5px] dark:text-neutral-400">{work.desc}</p>
+                <h3 className="text-[17px] leading-snug font-semibold tracking-tight text-[var(--ink)] sm:text-[20px]">{work.title}</h3>
+                <p className="line-clamp-2 text-[14px] leading-relaxed text-[var(--muted)] sm:text-[14.5px]">{work.desc}</p>
                 <div className="flex flex-wrap gap-2 pt-1">
                     {work.tags.map((tag) => (
                         <span
                             key={tag}
-                            className="rounded-full border border-[var(--hair)] bg-white px-3 py-1 text-[12px] font-medium text-[#101010] sm:px-3.5 sm:py-1.5 sm:text-[13px] dark:bg-neutral-800 dark:text-neutral-100"
+                            className="rounded-full border border-[var(--hair)] px-3 py-1 text-[12px] font-medium text-[var(--ink)] sm:px-3.5 sm:py-1.5 sm:text-[13px]"
                         >
                             {tag}
                         </span>
@@ -287,11 +287,14 @@ function CaseStudyDialog({ work, open, onOpenChange }: { work: Work | null; open
 
     const dragStyle = dragY || isDragging ? ({ '--sheet-drag-y': `${dragY}px`, transition: 'none' } as CSSProperties) : undefined;
 
-    const label = 'text-[11px] font-semibold tracking-[0.16em] text-[#5c5a56] uppercase dark:text-neutral-400';
+    const label = 'text-[11px] font-semibold tracking-[0.16em] text-[var(--muted)] uppercase';
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="case-study-sheet max-h-[88vh] overflow-y-auto rounded-[24px] p-0 sm:max-w-[720px]" style={dragStyle}>
+            <DialogContent
+                className="case-study-sheet max-h-[88vh] overflow-y-auto rounded-[24px] border-[var(--hair)] bg-[var(--bg)] p-0 text-[var(--ink)] sm:max-w-[720px]"
+                style={dragStyle}
+            >
                 <div
                     className="sheet-drag-handle"
                     onPointerDown={handlePointerDown}
@@ -301,30 +304,27 @@ function CaseStudyDialog({ work, open, onOpenChange }: { work: Work | null; open
                 >
                     <span className="sheet-drag-bar" aria-hidden="true" />
                 </div>
-                <div className="relative h-[200px] w-full overflow-hidden bg-[#F3EFE9] sm:h-[240px] dark:bg-neutral-800">
+                <div className="relative h-[200px] w-full overflow-hidden bg-[var(--fill)] sm:h-[240px]">
                     <img src={work.thumbnail} alt="" className="h-full w-full object-cover object-top" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
                 </div>
 
                 <div className="px-6 py-6 sm:px-8 sm:py-8">
                     <DialogHeader className="items-start text-left">
-                        <DialogTitle className="text-[1.5rem] leading-tight font-semibold tracking-tight text-[#101010] sm:text-[1.75rem] dark:text-neutral-50">
+                        <DialogTitle className="text-[1.5rem] leading-tight font-semibold tracking-tight text-[var(--ink)] sm:text-[1.75rem]">
                             {work.title}
                         </DialogTitle>
-                        <DialogDescription className="mt-2 text-[15px] leading-relaxed text-[#4b4b4b] dark:text-neutral-400">
-                            {work.overview}
-                        </DialogDescription>
+                        <DialogDescription className="mt-2 text-[15px] leading-relaxed text-[var(--muted)]">{work.overview}</DialogDescription>
                     </DialogHeader>
 
-                    <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-[var(--hair)] bg-[#FAF9F7] p-4 dark:bg-neutral-900">
+                    <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-[var(--hair)] bg-[var(--fill)] p-4">
                         {[
                             ['Role', work.role],
                             ['Duration', work.duration],
                             ['Team', work.team],
                         ].map(([k, v]) => (
                             <div key={k}>
-                                <p className="text-[10px] font-semibold tracking-[0.12em] text-[#5c5a56] uppercase dark:text-neutral-400">{k}</p>
-                                <p className="mt-1 text-sm font-medium text-[#101010] dark:text-neutral-100">{v}</p>
+                                <p className="text-[10px] font-semibold tracking-[0.12em] text-[var(--muted)] uppercase">{k}</p>
+                                <p className="mt-1 text-sm font-medium text-[var(--ink)]">{v}</p>
                             </div>
                         ))}
                     </div>
@@ -342,15 +342,15 @@ function CaseStudyDialog({ work, open, onOpenChange }: { work: Work | null; open
 
                     <div className="mt-6">
                         <p className={`mb-2 ${label}`}>The Problem</p>
-                        <p className="text-[14.5px] leading-relaxed text-[#4b4b4b] dark:text-neutral-400">{work.problem}</p>
+                        <p className="text-[14.5px] leading-relaxed text-[var(--muted)]">{work.problem}</p>
                     </div>
 
                     <div className="mt-6">
                         <p className={`mb-2.5 ${label}`}>Key Features</p>
                         <ul className="flex flex-col gap-2">
                             {work.features.map((f) => (
-                                <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-[#101010] dark:text-neutral-100">
-                                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#101010] text-white dark:bg-neutral-100 dark:text-neutral-900">
+                                <li key={f} className="flex items-start gap-2.5 text-[14.5px] text-[var(--ink)]">
+                                    <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[var(--ink)] text-[var(--bg)]">
                                         <CheckIcon />
                                     </span>
                                     {f}
@@ -363,17 +363,17 @@ function CaseStudyDialog({ work, open, onOpenChange }: { work: Work | null; open
                         <p className={`mb-2.5 ${label}`}>Responsibilities</p>
                         <ul className="flex flex-col gap-2">
                             {work.myContributions.map((c) => (
-                                <li key={c} className="flex items-start gap-2.5 text-[14.5px] text-[#4b4b4b] dark:text-neutral-400">
-                                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#101010] dark:bg-neutral-100" />
+                                <li key={c} className="flex items-start gap-2.5 text-[14.5px] text-[var(--muted)]">
+                                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--ink)]" />
                                     {c}
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    <div className="mt-6 rounded-2xl bg-[#101010] p-5 text-white dark:bg-neutral-100 dark:text-neutral-900">
-                        <p className="mb-1.5 text-[11px] font-semibold tracking-[0.16em] text-white/60 uppercase dark:text-neutral-900/60">Outcome</p>
-                        <p className="text-[14.5px] leading-relaxed text-white/90 dark:text-neutral-900/90">{work.outcome}</p>
+                    <div className="mt-6 rounded-2xl bg-[var(--ink)] p-5 text-[var(--bg)]">
+                        <p className="mb-1.5 text-[11px] font-semibold tracking-[0.16em] uppercase opacity-60">Outcome</p>
+                        <p className="text-[14.5px] leading-relaxed opacity-90">{work.outcome}</p>
                     </div>
                 </div>
             </DialogContent>
@@ -393,17 +393,9 @@ type SkillsSectionProps = {
     contactRef?: (el: HTMLElement | null) => void; // unused
 };
 
-// Header height — kept smaller than before. The holder reserves this exact
-// space in the flow while the header itself is pinned (position: fixed).
+// Header height. The holder reserves this exact space in the flow while the
+// header itself is pinned (position: fixed).
 const HEADER_H = 'h-[76px] sm:h-[104px] lg:h-[120px]';
-// Same values as plain numbers, used by the scroll listener and by the
-// scroll-margin-top classes below so nav-click landing always clears the
-// pinned header instead of tucking the first card row underneath it.
-const HEADER_H_PX = { base: 76, sm: 104, lg: 120 };
-// Extra breathing room added on top of the header height for scroll-margin,
-// so a fast fling/overscroll still stops with clear air above the first
-// row of cards instead of landing them flush against the header edge.
-const SCROLL_BUFFER_PX = 32;
 
 export function SkillsSection({ sectionRef }: SkillsSectionProps) {
     const [openWork, setOpenWork] = useState<Work | null>(null);
@@ -466,26 +458,25 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
     return (
         // id="about" is kept from the old skills section so existing nav links still land here.
         // scroll-mt-* matches the pinned header height so scrollIntoView({block:'start'}) always
-        // stops with the header flush at the top and the first card row fully visible below it —
-        // instead of landing a few pixels off and making the top row feel like it flashes by.
+        // stops with the header flush at the top and the first card row fully visible below it.
         <section
             id="about"
             ref={(el) => {
                 innerRef.current = el;
                 sectionRef(el);
             }}
-            className="relative scroll-mt-[108px] sm:scroll-mt-[136px] lg:scroll-mt-[152px]"
+            className="relative scroll-mt-[108px] bg-[var(--bg)] sm:scroll-mt-[136px] lg:scroll-mt-[152px]"
         >
             {/* Placeholder that keeps the header's space in the layout */}
             <div ref={holderRef} className={`relative w-full ${HEADER_H}`}>
                 <div
                     ref={headerRef}
-                    className="absolute top-0 right-4 left-4 z-30 h-full bg-[var(--bg)] text-[#101010] sm:right-8 sm:left-8 lg:right-10 lg:left-10 dark:text-neutral-50"
+                    className="absolute top-0 right-4 left-4 z-30 h-full border-b border-[var(--hair)] bg-[var(--bg)] text-[var(--ink)] sm:right-8 sm:left-8 lg:right-10 lg:left-10"
                 >
                     <div className="relative flex h-full items-center justify-center overflow-hidden px-4">
                         <span
                             aria-hidden="true"
-                            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center leading-none font-semibold tracking-tight whitespace-nowrap select-none"
+                            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center leading-none font-bold tracking-tight whitespace-nowrap select-none"
                             style={{
                                 fontSize: 'clamp(2.25rem, 11vw, 7.5rem)',
                                 // 6% of the current text color, so it adapts to light and dark mode
@@ -494,12 +485,8 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
                         >
                             PORTFOLIO
                         </span>
-                        <h2 className="relative text-[clamp(1.15rem,3.6vw,2.1rem)] leading-none font-semibold tracking-tight uppercase">
-                            Selected Work
-                        </h2>
+                        <h2 className="relative text-[clamp(1.15rem,3.6vw,2.1rem)] leading-none font-bold tracking-tight uppercase">Selected Work</h2>
                     </div>
-                    {/* soft fade so cards dissolve under the header instead of being cut off */}
-                    <div className="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-[var(--bg)] to-transparent" />
                 </div>
             </div>
 
@@ -520,8 +507,6 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
 /*  Styles this section needs                                          */
 /* ------------------------------------------------------------------ */
 /*
-   The case study sheet uses the same CSS as your old Projects section:
+   The case study sheet uses these global rules (now in welcome.tsx):
    .case-study-sheet, .sheet-drag-handle, .sheet-drag-bar, body.sheet-open, and .tag.
-   Keep those rules in your global stylesheet. If you delete the old ProjectsSection file,
-   do NOT delete that CSS (it lives in your stylesheet, not in the component).
 */

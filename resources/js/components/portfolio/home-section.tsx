@@ -47,35 +47,15 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 /* =====================================================
                    One "stage". Panels are placed with percentages and
                    every size is a multiple of --u, which follows BOTH the
-                   stage width and height. So on any large screen the
-                   panels stay glued to the edges AND the type grows with
-                   them. Under 860px it switches to a stacked staircase.
+                   stage width and height. Under 860px it switches to a
+                   stacked staircase.
+                   Colours: only --bg / --ink (and mixes of them). No gradients.
                    ===================================================== */
                 .xp-section {
-                    /* ---- palette: light = icy snow-blue with road-blue bezels; dark = night city (see :root.dark below) ---- */
-                    --xp-bg: #e4ecf6;
-                    --xp-line: #7fa3cc;          /* road-blue bezel */
-                    --xp-rule: rgba(40,90,150,0.14);
-                    --xp-ring: rgba(255,255,255,0.9);
-                    --xp-panel: #f7faff;
-                    --xp-panel-2: #eff4fa;
-                    --xp-edu: #ffffff;
-                    --xp-cert: #e6eef8;
-                    --xp-ink: #14243a;
-                    --xp-label-ink: rgba(20,36,58,0.55);
-                    --xp-role-ink: rgba(20,36,58,0.6);
-                    --xp-dates-ink: rgba(20,36,58,0.45);
-                    --xp-body-ink: rgba(20,36,58,0.55);
-                    --xp-water: rgba(47,127,216,0.08);
-                    --xp-hi: rgba(255,255,255,0.95);
-                    --xp-shade: rgba(70,120,180,0.14);
-                    --xp-glow: rgba(242,88,47,0.20);
-                    --xp-shadow: rgba(40,80,130,0.22);
-                    --xp-shadow-up: rgba(40,80,130,0.18);
-                    --xp-badge-bg: rgba(47,127,216,0.12);
-                    --xp-badge-ink: #1f5fb0;
-                    --xp-medal: #f2582f;
-                    --xp-medal-drop: drop-shadow(0 12px 26px rgba(242,88,47,0.45));
+                    --xp-line: var(--line);                         /* bezel */
+                    --xp-rule: var(--hair);
+                    --xp-ink: var(--ink);
+                    --xp-soft: var(--muted);
                     /* same bezel + radius as the frames in the Tech Stack section */
                     --xp-bezel: clamp(7px, 0.95vw, 11px);
                     --xp-radius: clamp(24px, 3.4vw, 42px);
@@ -83,40 +63,13 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     display: block;
                     min-height: 0;
                     padding: 0 !important;
-                    background: var(--xp-bg);
+                    background: var(--bg);
                     overflow: hidden;
-                    border-bottom: 0 !important;      /* no seam line under Home */
-                    opacity: 1 !important;            /* don't fade/slide the section itself, only its panels animate */
+                    border-bottom: 0 !important;
+                    opacity: 1 !important;
                     transform: none !important;
                     transition: none !important;
-                    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-                }
-
-                /* Dark mode: the same city at night — deep navy panels, cyan rim light, warm orange glow. */
-                :root.dark .xp-section {
-                    --xp-bg: #060b14;
-                    --xp-line: #1b2c47;
-                    --xp-rule: rgba(140,190,255,0.10);
-                    --xp-ring: rgba(120,180,255,0.16);
-                    --xp-panel: #0d1626;
-                    --xp-panel-2: #0b1322;
-                    --xp-edu: #101c30;
-                    --xp-cert: #0a1120;
-                    --xp-ink: #eaf2ff;
-                    --xp-label-ink: rgba(200,222,255,0.55);
-                    --xp-role-ink: rgba(200,222,255,0.55);
-                    --xp-dates-ink: rgba(200,222,255,0.42);
-                    --xp-body-ink: rgba(200,222,255,0.5);
-                    --xp-water: rgba(92,200,255,0.06);
-                    --xp-hi: rgba(92,200,255,0.10);
-                    --xp-shade: rgba(0,0,0,0.4);
-                    --xp-glow: rgba(255,110,64,0.26);
-                    --xp-shadow: rgba(0,0,0,0.6);
-                    --xp-shadow-up: rgba(0,0,0,0.55);
-                    --xp-badge-bg: rgba(92,200,255,0.14);
-                    --xp-badge-ink: #bfe6ff;
-                    --xp-medal: rgba(255,122,77,0.95);
-                    --xp-medal-drop: drop-shadow(0 0 28px rgba(255,110,64,0.45));
+                    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
                 }
 
                 .xp-stage {
@@ -135,11 +88,11 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     top: 36%;
                     margin: 0;
                     font-size: min(12.5cqw, 27cqh);
-                    font-weight: 600;
-                    letter-spacing: -0.03em;
+                    font-weight: 700;
+                    letter-spacing: -0.04em;
                     line-height: 1;
                     white-space: nowrap;
-                    color: var(--xp-water);
+                    color: var(--fill);
                     pointer-events: none;
                     user-select: none;
                     z-index: 0;
@@ -153,14 +106,14 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     position: absolute;
                     z-index: 1;
                     border: var(--xp-bezel) solid var(--xp-line);
-                    background: var(--xp-panel);
+                    background: var(--bg);
                 }
 
                 .xp-label {
                     margin: 0;
                     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
                     font-size: max(11px, calc(1.5 * var(--u)));
-                    color: var(--xp-label-ink);
+                    color: var(--xp-soft);
                     letter-spacing: 0.02em;
                 }
 
@@ -176,11 +129,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    background:
-                        radial-gradient(70% 80% at 28% 0%, var(--xp-hi), transparent 65%),
-                        radial-gradient(60% 70% at 95% 100%, var(--xp-shade), transparent 70%),
-                        var(--xp-panel);
-                    box-shadow: 0 0 0 1px var(--xp-ring), 0 30px 70px var(--xp-shadow);
                     opacity: 0;
                     transform: translateY(-3%);
                     transition: opacity .8s cubic-bezier(.19,1,.22,1), transform .8s cubic-bezier(.19,1,.22,1);
@@ -203,7 +151,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     font-size: calc(3.3 * var(--u));
                     font-weight: 600;
                     line-height: 1.1;
-                    letter-spacing: -0.025em;
+                    letter-spacing: -0.03em;
                     color: var(--xp-ink);
                 }
                 .xp-role {
@@ -212,7 +160,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     margin: calc(0.6 * var(--u)) 0 0;
                     font-size: max(11.5px, calc(1.7 * var(--u)));
                     line-height: 1.4;
-                    color: var(--xp-role-ink);
+                    color: var(--xp-soft);
                 }
                 .xp-dates {
                     grid-column: 2;
@@ -220,7 +168,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     margin: 0;
                     white-space: nowrap;
                     font-size: max(11px, calc(1.5 * var(--u)));
-                    color: var(--xp-dates-ink);
+                    color: var(--xp-soft);
                 }
 
                 /* ---------- BOTTOM PANEL: bleeds off the right + bottom edges ---------- */
@@ -236,8 +184,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     display: grid;
                     grid-template-columns: 39fr 61fr;
                     gap: calc(0.6 * var(--u));
-                    background: var(--xp-panel-2);
-                    box-shadow: 0 0 0 1px var(--xp-ring), 0 -20px 60px var(--xp-shadow-up);
                     opacity: 0;
                     transform: translate(3%, 3%);
                     transition: opacity .8s cubic-bezier(.19,1,.22,1) .15s, transform .8s cubic-bezier(.19,1,.22,1) .15s;
@@ -254,22 +200,20 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 }
                 .xp-col-edu {
                     border-radius: calc(2.6 * var(--u)) calc(0.8 * var(--u)) 0 0;
-                    background: var(--xp-edu);
+                    background: var(--bg);
                 }
                 .xp-col-cert {
                     border-right: none;
                     border-radius: calc(0.8 * var(--u)) 0 0 0;
-                    background:
-                        radial-gradient(60% 55% at 62% 78%, var(--xp-glow), transparent 70%),
-                        var(--xp-cert);
+                    background: var(--fill);
                 }
 
                 .xp-title {
                     margin: calc(3.6 * var(--u)) 0 0;
                     font-size: calc(3.6 * var(--u));
-                    font-weight: 500;
+                    font-weight: 600;
                     line-height: 1.08;
-                    letter-spacing: -0.03em;
+                    letter-spacing: -0.035em;
                     color: var(--xp-ink);
                 }
                 .xp-col-cert .xp-title { max-width: 55%; }
@@ -277,7 +221,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     margin: calc(1.6 * var(--u)) 0 0;
                     font-size: max(12px, calc(1.5 * var(--u)));
                     line-height: 1.6;
-                    color: var(--xp-body-ink);
+                    color: var(--xp-soft);
                 }
                 .xp-badge {
                     display: inline-flex;
@@ -286,28 +230,25 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     margin-top: calc(2.2 * var(--u));
                     padding: calc(0.6 * var(--u)) calc(1.4 * var(--u));
                     border-radius: 999px;
-                    background: var(--xp-badge-bg);
-                    color: var(--xp-badge-ink);
+                    background: var(--xp-ink);
+                    color: var(--bg);
                     font-size: max(11.5px, calc(1.4 * var(--u)));
                     font-weight: 600;
                 }
 
-                /* Medal art in the "media" column (plays the role of the can in the reference) */
+                /* Medal art in the "media" column */
                 .xp-medal {
                     position: absolute;
                     right: 14%;
                     bottom: calc(5 * var(--u));
                     width: calc(18 * var(--u));
                     height: calc(18 * var(--u));
-                    color: var(--xp-medal);
-                    filter: var(--xp-medal-drop);
+                    color: var(--xp-ink);
                 }
                 .xp-medal svg { width: 100%; height: 100%; display: block; }
 
                 /* =====================================================
                    Phones + small tablets: stacked staircase.
-                   Top panel hangs off the top-left, bottom panel bleeds
-                   off the bottom-right, watermark peeks out between them.
                    ===================================================== */
                 @media (max-width: 860px) {
                     .xp-section { --xp-bezel: 8px; --xp-radius: 30px; }
