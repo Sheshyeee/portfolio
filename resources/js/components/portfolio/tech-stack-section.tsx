@@ -499,10 +499,14 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                         gap: 0.5rem;
                         margin: 1.4rem -1.1rem 0;
                         overflow: hidden;
-                        -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
-                        mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
                     }
-                    .ts-marquee-track { display: flex; width: max-content; gap: 0.5rem; animation: ts-scroll 26s linear infinite; }
+                    /* edge fade drawn with overlays (a CSS mask on moving content is costly on phones) */
+                    .ts-marquee::before, .ts-marquee::after {
+                        content: ''; position: absolute; top: 0; bottom: 0; width: 14%; z-index: 1; pointer-events: none;
+                    }
+                    .ts-marquee::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+                    .ts-marquee::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+                    .ts-marquee-track { display: flex; width: max-content; gap: 0.5rem; will-change: transform; animation: ts-scroll 26s linear infinite; }
                     .ts-marquee-track.rev { animation-direction: reverse; animation-duration: 32s; }
                     .ts-marquee-item {
                         flex: 0 0 auto;

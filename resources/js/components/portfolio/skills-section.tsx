@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import type { CSSProperties, KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /* ------------------------------------------------------------------ */
 /*  Icons                                                              */
@@ -393,103 +393,38 @@ type SkillsSectionProps = {
     contactRef?: (el: HTMLElement | null) => void; // unused
 };
 
-// Header height. The holder reserves this exact space in the flow while the
-// header itself is pinned (position: fixed).
+// Header height. The header is pinned with plain CSS `position: sticky` — no scroll
+// listeners, no JS layout work while scrolling (that was a big cause of stutter on phones).
+// This works because the page root uses `overflow-x: clip` (not `hidden`), so it is not a
+// scroll container.
 const HEADER_H = 'h-[76px] sm:h-[104px] lg:h-[120px]';
 
 export function SkillsSection({ sectionRef }: SkillsSectionProps) {
     const [openWork, setOpenWork] = useState<Work | null>(null);
     const lastIsAlone = WORKS.length % 2 === 1;
 
-    const innerRef = useRef<HTMLElement | null>(null);
-    const holderRef = useRef<HTMLDivElement>(null);
-    const headerRef = useRef<HTMLDivElement>(null);
-
-    /*
-     * Pin the header while this section is on screen.
-     * `position: sticky` silently fails when any ancestor has overflow hidden/auto, so this
-     * uses `position: fixed` driven by scroll position instead. It only pins while the section
-     * covers the top of the viewport, and slides out as the section's bottom edge arrives.
-     * The scroll listener uses capture so it also works if the page scrolls inside a container.
-     */
-    useLayoutEffect(() => {
-        let raf = 0;
-
-        const update = () => {
-            raf = 0;
-            const section = innerRef.current;
-            const holder = holderRef.current;
-            const header = headerRef.current;
-            if (!section || !holder || !header) return;
-
-            const h = holder.offsetHeight;
-            const rect = section.getBoundingClientRect();
-            const w = window.innerWidth;
-            const inset = w >= 1024 ? '40px' : w >= 640 ? '32px' : '16px';
-
-            if (rect.top <= 0 && rect.bottom > 0) {
-                header.style.position = 'fixed';
-                header.style.left = inset;
-                header.style.right = inset;
-                header.style.height = `${h}px`;
-                header.style.top = `${Math.min(0, rect.bottom - h)}px`;
-            } else {
-                header.style.position = 'absolute';
-                header.style.left = '';
-                header.style.right = '';
-                header.style.height = '';
-                header.style.top = '0px';
-            }
-        };
-        const schedule = () => {
-            if (!raf) raf = requestAnimationFrame(update);
-        };
-
-        update();
-        window.addEventListener('scroll', schedule, { passive: true, capture: true });
-        window.addEventListener('resize', schedule);
-        return () => {
-            window.removeEventListener('scroll', schedule, true);
-            window.removeEventListener('resize', schedule);
-            if (raf) cancelAnimationFrame(raf);
-        };
-    }, []);
-
     return (
         // id="about" is kept from the old skills section so existing nav links still land here.
-        // scroll-mt-* matches the pinned header height so scrollIntoView({block:'start'}) always
-        // stops with the header flush at the top and the first card row fully visible below it.
-        <section
-            id="about"
-            ref={(el) => {
-                innerRef.current = el;
-                sectionRef(el);
-            }}
-            className="relative scroll-mt-[108px] bg-[var(--bg)] sm:scroll-mt-[136px] lg:scroll-mt-[152px]"
-        >
-            {/* Placeholder that keeps the header's space in the layout */}
-            <div ref={holderRef} className={`relative w-full ${HEADER_H}`}>
-                <div
-                    ref={headerRef}
-                    className="absolute top-0 right-4 left-4 z-30 h-full bg-[var(--bg)] text-[var(--ink)] sm:right-8 sm:left-8 lg:right-10 lg:left-10"
-                >
-                    <div className="relative flex h-full items-center justify-center overflow-hidden px-4">
-                        <span
-                            aria-hidden="true"
-                            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center leading-none font-bold tracking-tight whitespace-nowrap select-none"
-                            style={{
-                                fontSize: 'clamp(2.25rem, 11vw, 7.5rem)',
-                                // 6% of the current text color, so it adapts to light and dark mode
-                                color: 'color-mix(in srgb, currentColor 6%, transparent)',
-                            }}
-                        >
-                            PORTFOLIO
-                        </span>
-                        <h2 className="relative text-[clamp(1.15rem,3.6vw,2.1rem)] leading-none font-bold tracking-tight uppercase">Selected Work</h2>
-                    </div>
-                    {/* soft fade so cards dissolve under the header instead of being cut off */}
-                    <div className="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-[var(--bg)] to-transparent" />
+        // scroll-mt-* matches the pinned header height so scrollIntoView({block:'start'}) stops
+        // with the header flush at the top and the first card row fully visible below it.
+        <section id="about" ref={sectionRef} className="relative scroll-mt-[108px] bg-[var(--bg)] sm:scroll-mt-[136px] lg:scroll-mt-[152px]">
+            <div className={`sticky top-0 z-30 mx-4 bg-[var(--bg)] text-[var(--ink)] sm:mx-8 lg:mx-10 ${HEADER_H}`}>
+                <div className="relative flex h-full items-center justify-center overflow-hidden px-4">
+                    <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center leading-none font-bold tracking-tight whitespace-nowrap select-none"
+                        style={{
+                            fontSize: 'clamp(2.25rem, 11vw, 7.5rem)',
+                            // 6% of the current text color, so it adapts to light and dark mode
+                            color: 'color-mix(in srgb, currentColor 6%, transparent)',
+                        }}
+                    >
+                        PORTFOLIO
+                    </span>
+                    <h2 className="relative text-[clamp(1.15rem,3.6vw,2.1rem)] leading-none font-bold tracking-tight uppercase">Selected Work</h2>
                 </div>
+                {/* soft fade so cards dissolve under the header instead of being cut off */}
+                <div className="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-[var(--bg)] to-transparent" />
             </div>
 
             <div className="relative z-0 mx-auto max-w-[1100px] px-4 pt-32 pb-24 sm:px-6 sm:pt-28 md:px-8 lg:pt-46">

@@ -138,6 +138,7 @@ export default function Welcome() {
                     --glow-b: color-mix(in srgb, var(--ink) 14%, transparent);
                 }
                 *, *::before, *::after { box-sizing: border-box; }
+                html { overscroll-behavior-y: none; }
                 .portfolio-root {
                     position: relative;
                     isolation: isolate;
@@ -145,7 +146,8 @@ export default function Welcome() {
                     color: var(--ink);
                     min-height: 100vh;
                     width: 100%;
-                    overflow-x: hidden;
+                    overflow-x: hidden;   /* fallback for old browsers */
+                    overflow-x: clip;     /* no scroll container -> smooth iOS scrolling, sticky works */
                     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
                     transition: background-color .3s ease, color .3s ease;
                 }
@@ -251,64 +253,82 @@ export default function Welcome() {
                 }
                 .chat-widget-mobile-anchor > * { pointer-events: auto; }
 
-                /* ---- Dock (bottom nav) — flat, matches the reference's dark bar ---- */
+                /* ---- Dock (bottom nav) — iOS-style: big rounded glass, rounded-square tabs ---- */
                 .liquid-dock {
                     position: fixed;
                     z-index: 50;
                     left: 0;
                     right: 0;
                     top: auto;
-                    bottom: calc(16px + env(safe-area-inset-bottom));
+                    bottom: calc(14px + env(safe-area-inset-bottom));
                     display: flex;
                     justify-content: center;
                     padding: 0 1rem;
+                    pointer-events: none;
                 }
                 .liquid-dock-glass {
                     --mx: 50%; --my: 0%; --glow: 0;
+                    pointer-events: auto;
                     position: relative; display: inline-flex; flex-direction: row; align-items: center;
-                    width: fit-content; max-width: calc(100vw - 2rem); padding: 0.4rem 0.5rem; gap: 0.5rem;
-                    border-radius: 14px;
-                    background: color-mix(in srgb, var(--bg) 82%, transparent);
+                    width: fit-content; max-width: calc(100vw - 1.5rem); padding: 0.45rem 0.5rem; gap: 0.25rem;
+                    border-radius: 32px;
+                    background: color-mix(in srgb, var(--bg) 78%, transparent);
                     border: 1px solid var(--hair);
-                    backdrop-filter: blur(20px) saturate(140%);
-                    -webkit-backdrop-filter: blur(20px) saturate(140%);
+                    backdrop-filter: blur(22px) saturate(170%);
+                    -webkit-backdrop-filter: blur(22px) saturate(170%);
+                    box-shadow: 0 12px 32px rgba(0,0,0,0.18), inset 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent);
                     overflow: visible;
                     transition: background-color .3s ease, border-color .3s ease;
                 }
                 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
                     .liquid-dock-glass { background: var(--bg); }
                 }
-                .dock-group { display: flex; flex-direction: row; align-items: center; gap: 0.15rem; }
+                .dock-group { display: flex; flex-direction: row; align-items: center; gap: 0.2rem; }
                 .dock-item {
                     position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
-                    gap: 0.2rem; min-width: 3.1rem; padding: 0.4rem 0.55rem;
-                    border-radius: 10px; background: transparent; border: none;
+                    gap: 0.2rem; min-width: 3.3rem; padding: 0.5rem 0.55rem;
+                    border-radius: 22px; background: transparent; border: none;
                     color: var(--muted); cursor: pointer;
+                    -webkit-tap-highlight-color: transparent;
                     transition: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease;
                 }
-                .dock-item svg { width: 21px; height: 21px; color: inherit; }
+                .dock-item svg { width: 22px; height: 22px; color: inherit; }
                 .dock-item:hover:not(.active) { color: var(--ink); }
 
-                /* Active tab: solid ink capsule, bg-coloured content (like the "Let's talk" button) */
+                /* Active tab: solid ink rounded square */
                 .dock-item.active { background: var(--ink); color: var(--bg); }
                 .dock-item.active svg,
                 .dock-item.active .dock-label { color: var(--bg); }
 
-                .dock-item:active { transform: scale(0.96); }
+                .dock-item:active { transform: scale(0.94); }
                 .dock-label {
                     display: block; font-size: 10.5px; font-weight: 500; line-height: 1; letter-spacing: 0.01em;
                     color: inherit; transition: color .25s ease, font-weight .25s ease;
                 }
                 .dock-item.active .dock-label { font-weight: 700; }
                 .dock-tooltip { display: none; }
+
+                /* Touch screens: no hover-magnify (it sticks after a tap), just a press effect */
+                @media (hover: none) {
+                    .dock-item { transform: none !important; }
+                    .dock-item:active { transform: scale(0.94) !important; }
+                }
+                /* Phones: skip the live blur behind a fixed bar — it makes scrolling stutter on many devices */
+                @media (max-width: 820px) {
+                    .liquid-dock-glass {
+                        backdrop-filter: none;
+                        -webkit-backdrop-filter: none;
+                        background: color-mix(in srgb, var(--bg) 92%, transparent);
+                    }
+                }
                 @media (prefers-reduced-motion: reduce) {
                     .dock-item { transition: none; }
                     .dock-item:active { transform: none; }
                 }
                 @media (max-width: 380px) {
-                    .liquid-dock { bottom: 0.875rem; padding: 0 0.75rem; }
-                    .liquid-dock-glass { padding: 0.35rem 0.4rem; gap: 0.35rem; }
-                    .dock-item { min-width: 2.85rem; padding: 0.35rem 0.4rem; }
+                    .liquid-dock { bottom: calc(0.75rem + env(safe-area-inset-bottom)); padding: 0 0.5rem; }
+                    .liquid-dock-glass { padding: 0.4rem 0.4rem; gap: 0.1rem; border-radius: 28px; }
+                    .dock-item { min-width: 2.9rem; padding: 0.45rem 0.4rem; border-radius: 20px; }
                 }
 
                 /* =====================================================
@@ -365,8 +385,8 @@ export default function Welcome() {
                 @media (max-width: 820px) {
                     .hero-section { align-items: flex-end; min-height: 88vh; min-height: 88svh; }
                     .hero-caption { bottom: 1.75rem; }
-                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); -webkit-text-stroke: 3px color-mix(in srgb, var(--ink) 65%, transparent); }
-                    :root.dark .hero-marquee-text { -webkit-text-stroke: 3px color-mix(in srgb, var(--ink) 70%, transparent); }
+                    .hero-marquee-text { font-size: clamp(5rem, 27vw, 12rem); -webkit-text-stroke: 3px color-mix(in srgb, var(--ink) 65%, transparent); filter: none; }
+                    :root.dark .hero-marquee-text { -webkit-text-stroke: 3px color-mix(in srgb, var(--ink) 70%, transparent); filter: none; }
                 }
 
                 /* ---- Skills section (honor badges) ---- */

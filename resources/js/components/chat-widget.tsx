@@ -283,19 +283,11 @@ export default function ChatWidget() {
                  */
 
                 .chatbot-icon-border {
-                    background: conic-gradient(
-                        from 0deg,
-                        #a855f7,
-                        #c084fc,
-                        #818cf8,
-                        #7c3aed,
-                        #6d28d9,
-                        #a855f7
-                    );
-                    animation: chatbot-border-spin 7s linear infinite;
-                    filter: blur(0.2px);
-                    opacity: 0.95;
-                }
+    background: conic-gradient(/* unchanged */);
+    animation: chatbot-border-spin 7s linear infinite;
+    will-change: transform;   /* replaces: filter: blur(0.2px); */
+    opacity: 0.95;
+}
 
                 .dark .chatbot-icon-border {
                     background: conic-gradient(
