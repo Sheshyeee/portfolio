@@ -16,24 +16,78 @@ const EXPERIENCE: ExperienceItem[] = [
     { company: 'Capstone & school software projects', role: 'Lead Developer', dates: '' },
 ];
 
+const clamp = (n: number) => Math.min(1, Math.max(0, n));
+
 export function HomeSection({ sectionRef }: HomeSectionProps) {
     const localRef = useRef<HTMLElement | null>(null);
+    const stickyRef = useRef<HTMLDivElement | null>(null);
 
-    // Toggles a class on the DOM node whenever the section enters/leaves view,
-    // so the reveal replays. No React state -> no render loop.
+    /*
+     * Scroll-linked expansion. One number, --p (0 -> 1), is written straight to
+     * the section's style. CSS turns it into the clip-path of the card.
+     * No React state, so scrolling never re-renders anything.
+     *
+     *  Desktop : the section is a tall "track"; the stage inside is sticky, so the
+     *            card stays pinned while --p goes 0 -> 1, then the page moves on.
+     *  Mobile  : the stacked layout is taller than the screen so it can't be pinned;
+     *            the card simply widens/squares off while it scrolls into view.
+     */
     useEffect(() => {
-        const el = localRef.current;
-        if (!el) return;
+        const section = localRef.current;
+        const sticky = stickyRef.current;
+        if (!section || !sticky) return;
 
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                el.classList.toggle('is-visible', entry.isIntersecting);
-            },
-            { threshold: 0.2 },
-        );
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const mobile = window.matchMedia('(max-width: 860px)');
+        let raf = 0;
 
-        observer.observe(el);
-        return () => observer.disconnect();
+        const apply = (p: number) => {
+            section.style.setProperty('--p', p.toFixed(4));
+            section.classList.toggle('is-open', p >= 0.999);
+        };
+
+        const update = () => {
+            raf = 0;
+
+            if (reduce.matches) {
+                apply(1);
+                section.dataset.scrollOffset = '0';
+                return;
+            }
+
+            const vh = window.innerHeight;
+            const rect = section.getBoundingClientRect();
+
+            if (mobile.matches) {
+                apply(clamp((vh - rect.top) / (vh * 0.6)));
+                section.dataset.scrollOffset = '0';
+                return;
+            }
+
+            const travel = Math.max(1, section.offsetHeight - sticky.offsetHeight);
+            const span = travel * 0.9; // last 10% of the pin is a short hold at full size
+            apply(clamp(-rect.top / span));
+            // Lets the dock jump straight to the fully expanded state (see scrollTo in welcome.tsx)
+            section.dataset.scrollOffset = String(Math.round(span));
+        };
+
+        const schedule = () => {
+            if (!raf) raf = requestAnimationFrame(update);
+        };
+
+        update();
+        window.addEventListener('scroll', schedule, { passive: true });
+        window.addEventListener('resize', schedule);
+        reduce.addEventListener('change', schedule);
+        mobile.addEventListener('change', schedule);
+
+        return () => {
+            if (raf) cancelAnimationFrame(raf);
+            window.removeEventListener('scroll', schedule);
+            window.removeEventListener('resize', schedule);
+            reduce.removeEventListener('change', schedule);
+            mobile.removeEventListener('change', schedule);
+        };
     }, []);
 
     const attachRefs = (el: HTMLElement | null) => {
@@ -45,40 +99,91 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
         <section id="home" ref={attachRefs} className="section xp-section">
             <style>{`
                 /* =====================================================
-                   One "stage". Panels are placed with percentages and
-                   every size is a multiple of --u, which follows BOTH the
-                   stage width and height. Under 860px it switches to a
-                   stacked staircase.
+                   Structure
+                     section.xp-section   tall scroll "track" (desktop)
+                       .xp-sticky         pinned to the viewport
+                         .xp-card         clipped by --p: small rounded card -> full screen
+                           .xp-stage      the actual layout (never animated)
                    Colours: only --bg / --ink (and mixes of them). No gradients.
                    ===================================================== */
                 .xp-section {
-                    --xp-line: var(--line);                         /* bezel */
+                    --p: 1; /* 0 = small card, 1 = full screen. Written by the scroll handler */
+                    --xp-line: var(--line);
                     --xp-rule: var(--hair);
                     --xp-ink: var(--ink);
                     --xp-soft: var(--muted);
-                    /* same bezel + radius as the frames in the Tech Stack section */
                     --xp-bezel: clamp(7px, 0.95vw, 11px);
                     --xp-radius: clamp(24px, 3.4vw, 42px);
+
+                    /* how the card looks at p = 0 */
+                    --xp-start-top: 30%;
+                    --xp-start-side: 9%;
+                    --xp-card-radius: clamp(28px, 4vw, 52px);
+
+                    --xp-stage-h: 100vh;
+                    --xp-pin: 90vh; /* extra scroll distance spent expanding */
+
                     position: relative;
                     display: block;
                     min-height: 0;
                     padding: 0 !important;
                     background: var(--bg);
-                    overflow: hidden;
                     border-bottom: 0 !important;
                     opacity: 1 !important;
                     transform: none !important;
                     transition: none !important;
                     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
                 }
+                @supports (height: 100svh) {
+                    .xp-section { --xp-stage-h: 100svh; --xp-pin: 90svh; }
+                }
 
-                .xp-stage {
-                    --u: max(6px, min(0.6cqw, 1.15cqh));
-                    position: relative;
-                    width: 100%;
-                    height: 100vh;
-                    height: max(100svh, 52rem);
-                    container-type: size;
+                /* ---------- Desktop: pinned + expanding ---------- */
+                @media (min-width: 861px) {
+                    .xp-section { height: calc(var(--xp-stage-h) + var(--xp-pin)); }
+
+                    .xp-sticky {
+                        position: sticky;
+                        top: 0;
+                        height: var(--xp-stage-h);
+                    }
+
+                    .xp-card {
+                        position: relative;
+                        height: 100%;
+                        background: var(--bg);
+                        clip-path: inset(
+                            calc((1 - var(--p)) * var(--xp-start-top))
+                            calc((1 - var(--p)) * var(--xp-start-side))
+                            0
+                            calc((1 - var(--p)) * var(--xp-start-side))
+                            round
+                            calc((1 - var(--p)) * var(--xp-card-radius))
+                            calc((1 - var(--p)) * var(--xp-card-radius))
+                            0
+                            0
+                        );
+                    }
+                    .xp-section.is-open .xp-card { clip-path: none; }
+
+                    .xp-stage {
+                        --u: max(6px, min(0.6cqw, 1.15cqh));
+                        position: relative;
+                        width: 100%;
+                        height: 100%;
+                        container-type: size;
+                    }
+                }
+
+                /* Soft tint so the small card reads against the page; fades out as it opens */
+                .xp-card::before {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    z-index: 0;
+                    background: var(--ink);
+                    opacity: calc((1 - var(--p)) * 0.07);
+                    pointer-events: none;
                 }
 
                 /* ---------- Ghost watermark ---------- */
@@ -96,10 +201,14 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     pointer-events: none;
                     user-select: none;
                     z-index: 0;
-                    opacity: 0;
-                    transition: opacity 1s cubic-bezier(.19,1,.22,1);
+                    /* Completely static: never scrolls, rolls, fades or parallaxes.
+                       (The hero name is a marquee; this one is deliberately not.) */
+                    animation: none !important;
+                    transition: none !important;
+                    transform: none !important;
+                    translate: none !important;
+                    will-change: auto;
                 }
-                .xp-section.is-visible .xp-watermark { opacity: 1; }
 
                 /* ---------- Shared panel look (thick bezel) ---------- */
                 .xp-panel {
@@ -129,11 +238,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    opacity: 0;
-                    transform: translateY(-3%);
-                    transition: opacity .8s cubic-bezier(.19,1,.22,1), transform .8s cubic-bezier(.19,1,.22,1);
                 }
-                .xp-section.is-visible .xp-top { opacity: 1; transform: translateY(0); }
 
                 .xp-list { margin: 0; padding: 0; display: flex; flex-direction: column; }
                 .xp-row {
@@ -184,11 +289,7 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     display: grid;
                     grid-template-columns: 39fr 61fr;
                     gap: calc(0.6 * var(--u));
-                    opacity: 0;
-                    transform: translate(3%, 3%);
-                    transition: opacity .8s cubic-bezier(.19,1,.22,1) .15s, transform .8s cubic-bezier(.19,1,.22,1) .15s;
                 }
-                .xp-section.is-visible .xp-bottom { opacity: 1; transform: translate(0, 0); }
 
                 .xp-col {
                     position: relative;
@@ -248,14 +349,36 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 .xp-medal svg { width: 100%; height: 100%; display: block; }
 
                 /* =====================================================
-                   Phones + small tablets: stacked staircase.
+                   Phones + small tablets: stacked staircase, no pin.
+                   The card widens / squares off as it scrolls into view.
                    ===================================================== */
                 @media (max-width: 860px) {
-                    .xp-section { --xp-bezel: 8px; --xp-radius: 30px; }
+                    .xp-section {
+                        --xp-bezel: 8px;
+                        --xp-radius: 30px;
+                        --xp-start-side: 5vw;
+                        --xp-card-radius: 28px;
+                        height: auto;
+                    }
+                    .xp-sticky { position: static; height: auto; }
+                    .xp-card {
+                        position: relative;
+                        background: var(--bg);
+                        clip-path: inset(
+                            0
+                            calc((1 - var(--p)) * var(--xp-start-side))
+                            0
+                            calc((1 - var(--p)) * var(--xp-start-side))
+                            round
+                            calc((1 - var(--p)) * var(--xp-card-radius))
+                        );
+                    }
+                    .xp-section.is-open .xp-card { clip-path: none; }
+
                     .xp-stage {
                         --u: clamp(0.36rem, 1.5vw, 0.55rem);
+                        position: relative;
                         height: auto;
-                        container-type: normal;
                         display: flex;
                         flex-direction: column;
                     }
@@ -314,75 +437,86 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                     }
                 }
 
+                /* Reduced motion: no pin, no expansion, just the finished layout */
                 @media (prefers-reduced-motion: reduce) {
-                    .xp-top, .xp-bottom, .xp-watermark { transition: none; }
+                    .xp-section { height: auto !important; }
+                    .xp-sticky { position: static !important; height: var(--xp-stage-h) !important; }
+                    .xp-card { clip-path: none !important; }
+                    .xp-card::before { display: none; }
+                }
+                @media (prefers-reduced-motion: reduce) and (max-width: 860px) {
+                    .xp-sticky { height: auto !important; }
                 }
             `}</style>
 
-            <div className="xp-stage">
-                <p className="xp-watermark" aria-hidden="true">
-                    Dave Michael Clapis
-                </p>
+            <div ref={stickyRef} className="xp-sticky">
+                <div className="xp-card">
+                    <div className="xp-stage">
+                        <p className="xp-watermark" aria-hidden="true">
+                            Dave Michael Clapis
+                        </p>
 
-                {/* TOP PANEL — Experience */}
-                <div className="xp-panel xp-top">
-                    <p className="xp-label">{'{Experience}'}</p>
+                        {/* TOP PANEL — Experience */}
+                        <div className="xp-panel xp-top">
+                            <p className="xp-label">{'{Experience}'}</p>
 
-                    <div className="xp-list">
-                        {EXPERIENCE.map((item) => (
-                            <div className="xp-row" key={item.company}>
-                                <p className="xp-company">{item.company}</p>
-                                <p className="xp-role">{item.role}</p>
-                                {item.dates && <p className="xp-dates">{item.dates}</p>}
+                            <div className="xp-list">
+                                {EXPERIENCE.map((item) => (
+                                    <div className="xp-row" key={item.company}>
+                                        <p className="xp-company">{item.company}</p>
+                                        <p className="xp-role">{item.role}</p>
+                                        {item.dates && <p className="xp-dates">{item.dates}</p>}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                </div>
+                        </div>
 
-                {/* BOTTOM PANEL — Education | Certification */}
-                <div className="xp-panel xp-bottom">
-                    <div className="xp-col xp-col-edu">
-                        <p className="xp-label">{'{2022 – 2026}'}</p>
-                        <h3 className="xp-title">BS Computer Science</h3>
-                        <p className="xp-body">Bicol University</p>
-                        <span className="xp-badge">
-                            <svg
-                                width="12"
-                                height="12"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                            >
-                                <circle cx="12" cy="8" r="6" />
-                                <path d="M9 14 7 22l5-3 5 3-2-8" />
-                            </svg>
-                            Cum Laude
-                        </span>
-                    </div>
+                        {/* BOTTOM PANEL — Education | Certification */}
+                        <div className="xp-panel xp-bottom">
+                            <div className="xp-col xp-col-edu">
+                                <p className="xp-label">{'{2022 – 2026}'}</p>
+                                <h3 className="xp-title">BS Computer Science</h3>
+                                <p className="xp-body">Bicol University</p>
+                                <span className="xp-badge">
+                                    <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <circle cx="12" cy="8" r="6" />
+                                        <path d="M9 14 7 22l5-3 5 3-2-8" />
+                                    </svg>
+                                    Cum Laude
+                                </span>
+                            </div>
 
-                    <div className="xp-col xp-col-cert">
-                        <p className="xp-label">{'{November 2024}'}</p>
-                        <h3 className="xp-title">NC III Programming</h3>
-                        <p className="xp-body">Certification</p>
+                            <div className="xp-col xp-col-cert">
+                                <p className="xp-label">{'{November 2024}'}</p>
+                                <h3 className="xp-title">NC III Programming</h3>
+                                <p className="xp-body">Certification</p>
 
-                        <div className="xp-medal" aria-hidden="true">
-                            <svg
-                                viewBox="0 0 120 120"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.6"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <circle cx="60" cy="46" r="30" />
-                                <circle cx="60" cy="46" r="21" opacity="0.55" />
-                                <circle cx="60" cy="46" r="12" opacity="0.35" />
-                                <path d="M40 72 32 112l28-15 28 15-8-40" />
-                            </svg>
+                                <div className="xp-medal" aria-hidden="true">
+                                    <svg
+                                        viewBox="0 0 120 120"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.6"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <circle cx="60" cy="46" r="30" />
+                                        <circle cx="60" cy="46" r="21" opacity="0.55" />
+                                        <circle cx="60" cy="46" r="12" opacity="0.35" />
+                                        <path d="M40 72 32 112l28-15 28 15-8-40" />
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

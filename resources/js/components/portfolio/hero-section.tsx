@@ -10,7 +10,15 @@ export function HeroSection({ sectionRef }: HeroSectionProps) {
                 .section.hero-section {
                     background: var(--bg);
                     color: var(--ink);
-                    border-bottom-color: var(--hair);
+                    /* no line between the hero and the next section */
+                    border-bottom: 0;
+                    padding: 0;
+                    /* Always exactly one full screen: laptop, big monitor, phone.
+                       100vh first as a fallback, svh so mobile browser bars don't cut it. */
+                    height: 100vh;
+                    height: 100svh;
+                    min-height: 100vh;
+                    min-height: 100svh;
                 }
                 .hero-marquee-text {
                     -webkit-text-stroke-color: color-mix(in srgb, var(--ink) 60%, transparent);
@@ -64,7 +72,6 @@ export function HeroSection({ sectionRef }: HeroSectionProps) {
 
                 /* ---------- Large desktops ---------- */
                 @media (min-width: 1600px) {
-                    .section.hero-section { min-height: 90vh; min-height: 90svh; }
                     .section.hero-section .hero-photo-img {
                         width: clamp(640px, 44vw, 860px);
                         max-height: min(88svh, 1000px);
