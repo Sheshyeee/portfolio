@@ -2,43 +2,23 @@
 
 import { useEffect, useState } from 'react';
 
-/* ------------------------------------------------------------------ */
-/*  IntroAnimation                                                     */
-/* ------------------------------------------------------------------ */
-/*
- * Logo intro for the wordmark "dave studio", mimicking the reference
- * video exactly:
- *
- *   Phase 1 — a gray square "chip" falls straight down from the top of
- *   the viewport, tumbling / wobbling like a die under gravity and
- *   shrinking as it approaches its resting spot above the wordmark.
- *
- *   Phase 2 — while it falls, "dave" is revealed left-to-right as a
- *   continuous width-wipe (not letter typing) in orange, and the
- *   stacked "STU / DIO" block fades in to the right and stays static.
- *
- *   Phase 3 — the instant the chip lands it "stamps": colors snap in
- *   one abrupt cut — "dave" -> near-black, "STUDIO" -> gray, chip ->
- *   orange — then the chip fades so the clean wordmark is left, exactly
- *   like the video's final frame.
- *
- * Motion is pure CSS @keyframes so it runs on mount without any
- * measurement — it always plays. One timer flips the `landed` class
- * for the color snap.
- */
+/* Logo intro: chip falls, wordmark wipes in, colours snap on landing.
+   The settled wordmark uses the theme's --ink so it stays readable in both modes. */
 
-const FALL_MS = 1500; // square fall + wordmark wipe both finish here
-const REVEAL_START_MS = 360; // wipe begins partway into the fall
-const HOLD_MS = 650; // hold on the finished logo before handoff
+const FALL_MS = 1500;
+const REVEAL_START_MS = 360;
+const HOLD_MS = 650;
 
 export const INTRO_DURATION_MS = FALL_MS + HOLD_MS;
 
-/* exact hex from the brief */
+/* brand colours (same in both themes) */
 const GRAY_CHIP = '#a6a6ab';
 const ACCENT = '#f58b2f';
 const ACCENT_DOT = '#f5981a';
-const INK = '#121212';
-const SUB_GRAY = '#b0afb4';
+
+/* theme colours */
+const WORD_SETTLED = 'var(--ink, #efe9da)';
+const SUB_SETTLED = 'color-mix(in srgb, var(--ink, #efe9da) 45%, var(--bg, #0e0d0b))';
 
 type Props = {
     onFinished?: () => void;
@@ -68,16 +48,15 @@ export default function IntroAnimation({ onFinished }: Props) {
                     --word: ${ACCENT};
                     --sub: ${ACCENT};
                 }
-                .intro.is-landed { --chip: ${ACCENT_DOT}; --word: ${INK}; --sub: ${SUB_GRAY}; }
+                .intro.is-landed { --chip: ${ACCENT_DOT}; --word: ${WORD_SETTLED}; --sub: ${SUB_SETTLED}; }
 
-                /* ---- wordmark "dave": revealed by a left->right width wipe ---- */
                 .intro__word {
                     font-weight: 800;
                     font-size: clamp(78px, 15vw, 180px);
                     line-height: .9;
                     letter-spacing: -0.03em;
                     color: var(--word);
-                    transition: color 90ms linear;                 /* the snap */
+                    transition: color 90ms linear;
                     clip-path: inset(0 100% 0 -0.06em);
                     animation: intro-reveal ${FALL_MS - REVEAL_START_MS}ms cubic-bezier(.45,0,.2,1) ${REVEAL_START_MS}ms forwards;
                 }
@@ -85,7 +64,6 @@ export default function IntroAnimation({ onFinished }: Props) {
                     to { clip-path: inset(0 -0.06em 0 -0.06em); }
                 }
 
-                /* ---- stacked "STU / DIO": fades in early, stays static ---- */
                 .intro__sub {
                     display: flex;
                     flex-direction: column;
@@ -95,7 +73,7 @@ export default function IntroAnimation({ onFinished }: Props) {
                     letter-spacing: .1em;
                     text-transform: uppercase;
                     color: var(--sub);
-                    transition: color 90ms linear;                 /* the snap */
+                    transition: color 90ms linear;
                     opacity: 0;
                     transform: translateY(6px);
                     animation: intro-sub-in 640ms cubic-bezier(.16,1,.3,1) 300ms forwards;
@@ -104,7 +82,6 @@ export default function IntroAnimation({ onFinished }: Props) {
                     to { opacity: 1; transform: translateY(0); }
                 }
 
-                /* ---- falling chip: outer = gravity fall, inner = tumble ---- */
                 .intro__faller {
                     position: absolute;
                     left: clamp(18px, 4vw, 52px);
@@ -127,7 +104,7 @@ export default function IntroAnimation({ onFinished }: Props) {
                     animation: intro-tumble ${FALL_MS}ms linear forwards;
                     will-change: transform;
                 }
-                .intro.is-landed .intro__chip { opacity: 0; }      /* clears to match the video's final frame */
+                .intro.is-landed .intro__chip { opacity: 0; }
                 @keyframes intro-tumble {
                     0%   { transform: rotate(48deg)  scale(2.7); }
                     12%  { transform: rotate(-30deg) scale(2.4); }
@@ -142,7 +119,7 @@ export default function IntroAnimation({ onFinished }: Props) {
                 }
 
                 @media (prefers-reduced-motion: reduce) {
-                    .intro { --chip: ${ACCENT_DOT}; --word: ${INK}; --sub: ${SUB_GRAY}; }
+                    .intro { --chip: ${ACCENT_DOT}; --word: ${WORD_SETTLED}; --sub: ${SUB_SETTLED}; }
                     .intro__word { clip-path: none; animation: none; }
                     .intro__sub  { opacity: 1; transform: none; animation: none; }
                     .intro__faller, .intro__chip { animation: none; }

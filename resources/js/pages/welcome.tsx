@@ -14,17 +14,6 @@ import { useEffect, useRef, useState } from 'react';
 /*  Nav routing helpers                                                 */
 /* ------------------------------------------------------------------ */
 
-/**
- * The DOM section ids don't map 1:1 onto the nav buttons — this table is
- * the single source of truth for which nav button should light up for each
- * section:
- *   hero    (top marquee/photo intro)         → Home
- *   home    (avatar, name, bio — "about me")   → About
- *   about   (tech stack / experience / edu)    → Skills
- *   skills  (Tech Stack card, nested in About) → Skills
- *   contact (Get-in-touch card, nested there)  → Skills
- *   projects                                   → Projects
- */
 const SECTION_TO_NAV: Record<string, string> = {
     hero: 'home',
     home: 'about',
@@ -35,8 +24,6 @@ const SECTION_TO_NAV: Record<string, string> = {
     projects: 'projects',
 };
 
-/** Where each nav button should actually scroll to. "home" is a special
- *  case handled separately (always the literal top of the page). */
 const NAV_TARGET: Record<string, string> = {
     home: 'hero',
     about: 'home',
@@ -49,17 +36,12 @@ export default function Welcome() {
     const [loading, setLoading] = useState(true);
     const [active, setActive] = useState('home');
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
-
-    // While a nav click is smooth-scrolling the page, sections it scrolls
-    // *past* can also briefly cross the spy's intersection band and hijack
-    // `active` mid-flight. This ref marks a short window after a manual click
-    // during which the scroll-spy defers to the click's own target.
     const suppressSpyUntil = useRef(0);
 
     useEffect(() => {
         const spy = new IntersectionObserver(
             (entries) => {
-                if (Date.now() < suppressSpyUntil.current) return; // a manual nav click is still settling
+                if (Date.now() < suppressSpyUntil.current) return;
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) setActive(SECTION_TO_NAV[entry.target.id] ?? entry.target.id);
                 });
@@ -89,10 +71,9 @@ export default function Welcome() {
     }, []);
 
     const scrollTo = (id: string) => {
-        setActive(id); // instant feedback — don't wait on the scroll-spy to catch up
-        suppressSpyUntil.current = Date.now() + 900; // clears once the smooth scroll has settled
+        setActive(id);
+        suppressSpyUntil.current = Date.now() + 900;
 
-        // "Home" always means the very top of the page.
         if (id === 'home') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
@@ -120,9 +101,7 @@ export default function Welcome() {
                    THEME — two colours only.
                    --bg and --ink are defined in app.css:
                      light : night ink on paper (cream)
-                     dark  : paper ink on night (near-black)
-                   Everything below is a mix of those two.
-                   Gradients/glows are only used in the hero.
+                     dark  : cream ink on night (near-black)
                    ===================================================== */
                 :root {
                     --muted: color-mix(in srgb, var(--ink) 62%, var(--bg));
@@ -131,7 +110,6 @@ export default function Welcome() {
                     --fill: color-mix(in srgb, var(--ink) 6%, transparent);
                     --dock-space-mobile: 6rem;
 
-                    /* legacy names some untouched components may still read */
                     --accent-2: var(--ink);
                     --accent-3: var(--ink);
                     --glow-a: color-mix(in srgb, var(--ink) 22%, transparent);
@@ -146,10 +124,10 @@ export default function Welcome() {
                     color: var(--ink);
                     min-height: 100vh;
                     width: 100%;
-                    overflow-x: hidden;   /* fallback for old browsers */
-                    overflow-x: clip;     /* no scroll container -> smooth iOS scrolling, sticky works */
+                    overflow-x: hidden;
+                    overflow-x: clip;
                     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-                    transition: background-color .3s ease, color .3s ease;
+                    /* no background/color transition: the toggle crossfades the whole page in one go */
                 }
 
                 .site-chrome > * {
@@ -163,8 +141,6 @@ export default function Welcome() {
                 }
                 .chat-widget-mobile-anchor.site-chrome-hidden { opacity: 0; transform: translateY(16px); pointer-events: none; }
 
-                /* No bottom padding here: the contact section (last section)
-                   already reserves its own space for the dock. */
                 .portfolio-main { margin-left: 0; min-width: 0; padding-bottom: 0; }
                 .section {
                     min-height: 100vh;
@@ -219,7 +195,7 @@ export default function Welcome() {
                     border: 1px solid var(--hair);
                     color: var(--bg);
                     cursor: pointer;
-                    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, color 0.3s ease;
+                    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
                 }
                 .glass-toggle-btn:hover { transform: scale(1.06); }
                 .glass-toggle-icon {
@@ -253,7 +229,7 @@ export default function Welcome() {
                 }
                 .chat-widget-mobile-anchor > * { pointer-events: auto; }
 
-                /* ---- Dock (bottom nav) — iOS-style: big rounded glass, rounded-square tabs ---- */
+                /* ---- Dock (bottom nav) ---- */
                 .liquid-dock {
                     position: fixed;
                     z-index: 50;
@@ -278,7 +254,7 @@ export default function Welcome() {
                     -webkit-backdrop-filter: blur(22px) saturate(170%);
                     box-shadow: 0 12px 32px rgba(0,0,0,0.18), inset 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent);
                     overflow: visible;
-                    transition: background-color .3s ease, border-color .3s ease;
+                    transition: none;
                 }
                 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
                     .liquid-dock-glass { background: var(--bg); }
@@ -295,7 +271,6 @@ export default function Welcome() {
                 .dock-item svg { width: 22px; height: 22px; color: inherit; }
                 .dock-item:hover:not(.active) { color: var(--ink); }
 
-                /* Active tab: solid ink rounded square */
                 .dock-item.active { background: var(--ink); color: var(--bg); }
                 .dock-item.active svg,
                 .dock-item.active .dock-label { color: var(--bg); }
@@ -308,12 +283,10 @@ export default function Welcome() {
                 .dock-item.active .dock-label { font-weight: 700; }
                 .dock-tooltip { display: none; }
 
-                /* Touch screens: no hover-magnify (it sticks after a tap), just a press effect */
                 @media (hover: none) {
                     .dock-item { transform: none !important; }
                     .dock-item:active { transform: scale(0.94) !important; }
                 }
-                /* Phones: skip the live blur behind a fixed bar — it makes scrolling stutter on many devices */
                 @media (max-width: 820px) {
                     .liquid-dock-glass {
                         backdrop-filter: none;
@@ -332,15 +305,13 @@ export default function Welcome() {
                 }
 
                 /* =====================================================
-                   HERO — original design, recoloured to the two-colour theme
-                   (outlined marquee name + cut-out photo + soft glow).
+                   HERO
                    ===================================================== */
                 .hero-section {
                     position: relative; overflow: hidden; padding: 0;
                     display: flex; align-items: center; justify-content: center;
                     min-height: 92vh; min-height: 92svh;
                 }
-                /* Glow pool behind the portrait */
                 .hero-section::after {
                     content: ''; position: absolute; left: 50%; bottom: 8%; width: min(70vw, 720px); aspect-ratio: 1;
                     transform: translateX(-50%); border-radius: 50%; z-index: 0; pointer-events: none;
@@ -425,9 +396,6 @@ export default function Welcome() {
             `}</style>
 
             <div className="portfolio-root">
-                {/* Hidden only while the intro (LoadingScreen) animation is
-                    playing — reveals with a smooth slide+fade the moment it
-                    completes, regardless of scroll position afterward. */}
                 <div className={`site-chrome ${loading ? 'site-chrome-hidden' : ''}`}>
                     <LiquidDock active={active} onSelect={scrollTo} />
                     <DarkModeToggle />
