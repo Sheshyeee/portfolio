@@ -653,4 +653,4 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
             <ContactDialog open={dialogOpen} onOpenChange={setDialogOpen} />
         </section>
     );
-}
+} 
