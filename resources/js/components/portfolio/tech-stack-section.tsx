@@ -383,18 +383,18 @@ export function TechStackSection({ sectionRef, onSeeWork }: TechStackSectionProp
                     text-align: left;
                 }
                 .ts-side p { margin: 0; font-size: clamp(0.72rem, 0.95vw, 0.82rem); line-height: 1.6; color: var(--muted); }
-                .ts-btn {
-                    margin-top: clamp(1rem, 2vw, 1.6rem);
-                    padding: 0.7rem 1.6rem;
-                    border-radius: 10px;
-                    border: 1px solid var(--ink);
-                    background: var(--ink);
-                    color: var(--bg);
-                    font: 600 0.78rem 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-                    cursor: pointer;
-                    transition: background-color .25s ease, color .25s ease;
-                }
-                .ts-btn:hover { background: transparent; color: var(--ink); }
+               .ts-btn {
+    margin-top: clamp(1rem, 2vw, 1.6rem);
+    padding: 0.7rem 1.6rem;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--ink) 45%, var(--bg));
+    background: transparent;
+    color: var(--ink);
+    font: 600 0.78rem 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    cursor: pointer;
+    transition: border-color .25s ease, transform .35s var(--m-ease, ease);
+}
+.ts-btn:hover { background: transparent; color: var(--ink); border-color: var(--ink); }
                 .ts-btn:focus-visible, .ts-chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
                 /* ---------- Stack groups ---------- */

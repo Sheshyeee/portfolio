@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 /* ------------------------------------------------------------------ */
 /*  Icons                                                              */
 /* ------------------------------------------------------------------ */
 
 const iconProps = {
-    width: 21,
-    height: 21,
+    width: 22,
+    height: 22,
     viewBox: '0 0 24 24',
     fill: 'none',
     stroke: 'currentColor',
@@ -72,120 +72,55 @@ export const NAV_ITEMS: NavItem[] = [
     { id: 'projects', label: 'Projects', icon: GridIcon },
 ];
 
-type Box = { x: number; y: number; w: number; h: number };
-
 /* ------------------------------------------------------------------ */
-/*  Dock                                                                */
+/*  Dock (App Store style: only icon + label change colour)            */
 /* ------------------------------------------------------------------ */
 
 export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
-    const glassRef = useRef<HTMLDivElement | null>(null);
-    const groupRef = useRef<HTMLDivElement | null>(null);
-    const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
-    const [hovered, setHovered] = useState<number | null>(null);
-    const [box, setBox] = useState<Box | null>(null);
-    const [settled, setSettled] = useState(false);
-
-    const activeIdx = NAV_ITEMS.findIndex((i) => i.id === active);
-
-    /* Measure the active tab. offsetLeft/Top ignore transforms, so hover magnify can't skew it. */
-    const measure = useCallback(() => {
-        const el = activeIdx >= 0 ? itemRefs.current[activeIdx] : null;
-        if (!el || !el.offsetWidth) {
-            setBox((prev) => (prev === null ? prev : null));
-            return;
-        }
-        const next = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
-        setBox((prev) => (prev && prev.x === next.x && prev.y === next.y && prev.w === next.w && prev.h === next.h ? prev : next));
-    }, [activeIdx]);
-
-    useLayoutEffect(() => {
-        measure();
-    }, [measure]);
-
-    useEffect(() => {
-        const group = groupRef.current;
-        if (!group || typeof ResizeObserver === 'undefined') return;
-        const ro = new ResizeObserver(measure);
-        ro.observe(group);
-        // web fonts change label widths after first paint
-        document.fonts?.ready.then(measure).catch(() => {});
-        return () => ro.disconnect();
-    }, [measure]);
-
-    // Place the indicator without animating the first time, then let it slide.
-    useEffect(() => {
-        if (!box || settled) return;
-        const id = requestAnimationFrame(() => requestAnimationFrame(() => setSettled(true)));
-        return () => cancelAnimationFrame(id);
-    }, [box, settled]);
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        const el = glassRef.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        el.style.setProperty('--mx', `${x}%`);
-        el.style.setProperty('--my', `${y}%`);
-        el.style.setProperty('--glow', '1');
-    };
-
-    const handleMouseLeave = () => {
-        glassRef.current?.style.setProperty('--glow', '0');
-        setHovered(null);
-    };
-
-    const magnify = (i: number) => {
-        const distance = hovered === null ? 99 : Math.abs(hovered - i);
-        return {
-            scale: distance === 0 ? 1.22 : distance === 1 ? 1.08 : 1,
-            lift: distance === 0 ? -8 : distance === 1 ? -3 : 0,
-        };
-    };
-
-    const activeMag = activeIdx >= 0 ? magnify(activeIdx) : { scale: 1, lift: 0 };
-
-    const indicatorStyle: CSSProperties | undefined = box
-        ? ({
-              width: box.w,
-              height: box.h,
-              '--ix': `${box.x}px`,
-              '--iy': `${box.y}px`,
-              '--il': `${activeMag.lift}px`,
-              '--is': activeMag.scale,
-          } as CSSProperties)
-        : undefined;
-
     return (
         <nav className="liquid-dock" aria-label="Section navigation">
-            <div ref={glassRef} className="liquid-dock-glass" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-                <div
-                    ref={groupRef}
-                    className="dock-group"
-                    style={{ position: 'relative' }}
-                    data-indicator={box ? 'on' : 'off'}
-                    data-instant={settled ? undefined : ''}
-                >
-                    <span className="dock-indicator" aria-hidden="true" style={indicatorStyle} />
+            <style>{`
+                /* Higher specificity than the older dock rules in welcome.tsx / motion-styles.ts */
+                .liquid-dock .dock-indicator { display: none; }
 
-                    {NAV_ITEMS.map((item, i) => {
+                .liquid-dock .dock-item,
+                .liquid-dock .dock-item.active,
+                .liquid-dock .dock-item:hover,
+                .liquid-dock .dock-item.active:hover {
+                    background: transparent;
+                    transform: none;
+                }
+                .liquid-dock .dock-item {
+                    color: var(--muted);
+                    transition: color .25s ease, transform .3s var(--m-ease, ease);
+                }
+                .liquid-dock .dock-item:hover:not(.active) { color: color-mix(in srgb, var(--ink) 82%, var(--bg)); }
+
+                /* Active: icon + label take the full ink colour, nothing is filled */
+                .liquid-dock .dock-item.active,
+                .liquid-dock .dock-item.active svg,
+                .liquid-dock .dock-item.active .dock-label { color: var(--ink); }
+                .liquid-dock .dock-item.active svg { stroke-width: 2.2; }
+                .liquid-dock .dock-item.active .dock-label { font-weight: 700; }
+
+                .liquid-dock .dock-item svg { transition: stroke-width .2s ease; }
+                .liquid-dock .dock-item:active { transform: scale(.92); }
+                .liquid-dock .dock-item:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+            `}</style>
+
+            <div className="liquid-dock-glass">
+                <div className="dock-group">
+                    {NAV_ITEMS.map((item) => {
                         const isActive = active === item.id;
-                        const { scale, lift } = magnify(i);
                         const Icon = item.icon;
                         return (
                             <button
                                 key={item.id}
-                                ref={(el) => {
-                                    itemRefs.current[i] = el;
-                                }}
                                 type="button"
                                 className={`dock-item ${isActive ? 'active' : ''}`}
-                                style={{ transform: `translateY(${lift}px) scale(${scale})` }}
-                                onMouseEnter={() => setHovered(i)}
                                 onClick={() => onSelect(item.id)}
                                 aria-label={item.label}
-                                aria-current={isActive}
+                                aria-current={isActive ? 'page' : undefined}
                             >
                                 <Icon />
                                 <span className="dock-tooltip">{item.label}</span>
@@ -197,7 +132,6 @@ export function LiquidDock({ active, onSelect }: { active: string; onSelect: (id
                     })}
                 </div>
 
-                {/* Bottom spacer: gives the pill height/presence beyond the last icon */}
                 <div className="dock-spacer" aria-hidden="true" />
             </div>
         </nav>

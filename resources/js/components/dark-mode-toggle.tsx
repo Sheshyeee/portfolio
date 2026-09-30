@@ -48,8 +48,6 @@ export default function DarkModeToggle() {
         const doc = document as ViewTransitionDoc;
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        // Freeze every element transition while the theme flips, in both paths,
-        // so nothing animates at a different speed than the rest of the page.
         root.classList.add('theme-switching');
         const done = () => root.classList.remove('theme-switching');
 
@@ -66,14 +64,21 @@ export default function DarkModeToggle() {
     return (
         <div className="glass-toggle-dock">
             <style>{`
-                .glass-toggle-btn,
-                .glass-toggle-btn[data-state='on'],
-                .glass-toggle-btn[data-state='off'],
-                .glass-toggle-btn:hover {
-                    background: var(--ink);
-                    color: var(--bg);
+                /* Same family as the page background, nudged toward the text colour so it stays visible:
+                   light = cream a touch darker, dark = near-black a touch lighter. */
+                .glass-toggle-dock .glass-toggle-btn,
+                .glass-toggle-dock .glass-toggle-btn[data-state='on'],
+                .glass-toggle-dock .glass-toggle-btn[data-state='off'],
+                .glass-toggle-dock .glass-toggle-btn:hover {
+                    background: color-mix(in srgb, var(--ink) 7%, var(--bg)) !important;
+                    color: var(--ink) !important;
+                    border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--bg));
+                    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
                 }
-                .glass-toggle-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+                .glass-toggle-dock .glass-toggle-btn:hover {
+                    background: color-mix(in srgb, var(--ink) 11%, var(--bg)) !important;
+                }
+                .glass-toggle-dock .glass-toggle-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
                 ::view-transition-old(root),
                 ::view-transition-new(root) {
