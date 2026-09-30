@@ -67,8 +67,8 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
             const top = section.getBoundingClientRect().top;
             // Starts on the first scroll from the hero (section top at the bottom of the screen).
             // Desktop: done just before the section fills the screen.
-            // Phone: done when the card's top edge is a quarter of the way down the screen.
-            const p = clamp((vh - top) / (vh * (mobile.matches ? 0.75 : 0.9)));
+            // Phone: done when the card's top edge is about a fifth of the way down the screen.
+            const p = clamp((vh - top) / (vh * (mobile.matches ? 0.8 : 0.9)));
 
             apply(p);
             if (p >= 0.999) stop(); // played: locked open for the rest of this page load
@@ -358,45 +358,42 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 /* =====================================================
                    Phones + small tablets: stacked staircase, no pin.
 
-                   The card is a floating, framed, rounded card that sits inset from the
-                   screen edges and a little lower than the page. As you scroll it rises up
-                   to meet the page, its side margins close, its corners square off and its
-                   frame thins out until it is a full-width section.
-
-                   The stage inside keeps its full width the whole time (only the card's
-                   window widens), so text never reflows or jitters and the panels look like
-                   they are bleeding off the card's edges, exactly like the desktop design.
+                   The card starts SMALL (70% size, rounded, framed) and a little lower than
+                   the page. As you scroll it grows up and outward: it rises faster than the
+                   page, scales up to full width, its corners square off and its frame thins
+                   out until it is the full-width section. Everything inside is part of the
+                   card, so the text grows with it.
                    ===================================================== */
                 @media (max-width: 860px) {
                     .xp-section {
                         --xp-bezel: 8px;
                         --xp-radius: 30px;
-                        --xp-card-radius: 34px;
-                        --xp-rim: 7px;
-                        --xp-inset: 6vw;   /* side margin at p = 0 */
-                        --xp-lift: 48px;   /* how far below its final spot the card starts */
-                        --xp-m: calc((1 - var(--p)) * var(--xp-inset));
+                        --xp-card-radius: 36px;
+                        --xp-rim: 8px;
+                        --xp-start-scale: 0.7; /* size at p = 0 */
+                        --xp-lift: 8vh;        /* extra distance it rises on top of the scroll */
                         height: auto;
                         overflow: clip;
+                    }
+                    @supports (height: 100svh) {
+                        .xp-section { --xp-lift: 8svh; }
                     }
 
                     .xp-card {
                         position: relative;
                         overflow: hidden;
                         background: var(--bg);
-                        margin: 0 var(--xp-m);
+                        transform-origin: 50% 0; /* grows down and out from its top edge, which rides up with the scroll */
+                        transform: translateY(calc((1 - var(--p)) * var(--xp-lift)))
+                                   scale(calc(var(--xp-start-scale) + (1 - var(--xp-start-scale)) * var(--p)));
                         border-radius: calc((1 - var(--p)) * var(--xp-card-radius));
-                        transform: translateY(calc((1 - var(--p)) * var(--xp-lift)));
                         will-change: transform;
                     }
-                    .xp-section.is-open .xp-card { margin: 0; border-radius: 0; transform: none; will-change: auto; }
+                    .xp-section.is-open .xp-card { border-radius: 0; transform: none; will-change: auto; }
 
                     .xp-stage {
                         --u: clamp(0.36rem, 1.5vw, 0.55rem);
                         position: relative;
-                        /* always exactly the screen width, whatever the card's window is doing */
-                        width: calc(100% + 2 * var(--xp-m));
-                        margin-left: calc(-1 * var(--xp-m));
                         height: auto;
                         display: flex;
                         flex-direction: column;
@@ -459,7 +456,6 @@ export function HomeSection({ sectionRef }: HomeSectionProps) {
                 /* Reduced motion: no expansion, just the finished layout */
                 @media (prefers-reduced-motion: reduce) {
                     .xp-card { transform: none !important; border-radius: 0 !important; margin: 0 !important; }
-                    .xp-stage { width: 100% !important; margin-left: 0 !important; }
                     .xp-card::after { display: none; }
                 }
             `}</style>
