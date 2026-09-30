@@ -70,13 +70,15 @@
 
 /* =====================================================================
    THEME — exactly two colours.
-     paper : soft light cream  #efe9da
+     paper : airy off-white cream  #f7f4ec (light bg)
+     cream : soft cream  #efe9da (dark-mode text)
      night : warm black  #0e0d0b
    Light mode = night ink on paper.  Dark mode = paper ink on night.
    Every other shade (muted text, hairlines, fills) is a mix of these two.
    ===================================================================== */
 :root {
-    --paper: #efe9da;
+    --paper: #f7f4ec; /* light-mode background: airy off-white cream */
+    --cream: #efe9da; /* dark-mode text colour */
     --night: #0e0d0b;
 
     /* the two live colours (swapped in .dark) */
@@ -121,7 +123,7 @@
 
 .dark {
     --bg: var(--night);
-    --ink: var(--paper);
+    --ink: var(--cream);
     --destructive: hsl(0, 75%, 62%);
 }
 

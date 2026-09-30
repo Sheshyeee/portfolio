@@ -471,7 +471,7 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
             <div ref={holderRef} className={`relative w-full ${HEADER_H}`}>
                 <div
                     ref={headerRef}
-                    className="absolute top-0 right-4 left-4 z-30 h-full border-b border-[var(--hair)] bg-[var(--bg)] text-[var(--ink)] sm:right-8 sm:left-8 lg:right-10 lg:left-10"
+                    className="absolute top-0 right-4 left-4 z-30 h-full bg-[var(--bg)] text-[var(--ink)] sm:right-8 sm:left-8 lg:right-10 lg:left-10"
                 >
                     <div className="relative flex h-full items-center justify-center overflow-hidden px-4">
                         <span
@@ -487,6 +487,8 @@ export function SkillsSection({ sectionRef }: SkillsSectionProps) {
                         </span>
                         <h2 className="relative text-[clamp(1.15rem,3.6vw,2.1rem)] leading-none font-bold tracking-tight uppercase">Selected Work</h2>
                     </div>
+                    {/* soft fade so cards dissolve under the header instead of being cut off */}
+                    <div className="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-[var(--bg)] to-transparent" />
                 </div>
             </div>
 

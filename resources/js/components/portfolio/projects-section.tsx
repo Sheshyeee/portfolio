@@ -341,8 +341,9 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                     margin: 0;
                     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
                     font-weight: 800;
-                    font-size: clamp(3.6rem, 10vw, 8.5rem);
-                    line-height: 0.92;
+                    font-size: clamp(2rem, 8vw, 7rem);
+                    line-height: 1;
+                    white-space: nowrap;
                     letter-spacing: -0.045em;
                     text-transform: uppercase;
                     color: var(--ink);
@@ -587,11 +588,7 @@ export function ContactSection({ sectionRef }: { sectionRef: (el: HTMLElement | 
                 </div>
 
                 <div className="contact-row" data-align={ALIGN.title}>
-                    <h2 className="contact-title">
-                        Let&apos;s
-                        <br />
-                        connect.
-                    </h2>
+                    <h2 className="contact-title">Let&apos;s connect.</h2>
                 </div>
 
                 <div className="contact-row" data-align={ALIGN.copy}>
